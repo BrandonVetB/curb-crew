@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Curb Crew — Never touch your trash cans again</title>
+  <meta name="description" content="Curb Crew rolls your trash and recycling cans to the curb the night before pickup and brings them back in after the truck comes. A simple monthly subscription. Forget trash day exists." />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Curb Crew — Never touch your trash cans again" />
+  <meta property="og:description" content="We take your cans out the night before and bring them back in. Simple monthly subscription. Cancel anytime." />
+  <meta property="og:type" content="website" />
+
+  <!-- Fonts: Space Grotesk (display) + Inter (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230B0B0F'/><path d='M30 38h40l-4 34a6 6 0 0 1-6 5H40a6 6 0 0 1-6-5z' fill='%230066FF'/><rect x='26' y='30' width='48' height='8' rx='4' fill='%23fff'/></svg>" />
+</head>
+<body>
+  <!-- Skip link for keyboard users -->
+  <a href="#hero" class="skip-link">Skip to content</a>
+
+  <!-- ============ NAV ============ -->
+  <header class="nav" id="nav">
+    <div class="container nav__inner">
+      <!-- BRAND WORDMARK — swap the text below to rename the business -->
+      <a href="#hero" class="wordmark" data-brand aria-label="Curb Crew home">
+        <span class="wordmark__mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="28" height="28" fill="none">
+            <rect x="5" y="11" width="22" height="3" rx="1.5" fill="currentColor"/>
+            <path d="M8 14h16l-1.7 14.2A2.5 2.5 0 0 1 19.8 30H12.2a2.5 2.5 0 0 1-2.5-1.8z" fill="currentColor"/>
+            <path d="M13 8h6l1 3h-8z" fill="currentColor"/>
+          </svg>
+        </span>
+        <span class="wordmark__text">Curb&nbsp;Crew</span>
+      </a>
+
+      <nav class="nav__links" aria-label="Primary">
+        <a href="#how">How it works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#love">Why people love it</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+
+      <a href="#hero" class="btn btn--small magnetic">Check your street</a>
+
+      <button class="nav__toggle" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ HERO ============ -->
+    <section class="hero section--dark" id="hero">
+      <div class="bg-grid" aria-hidden="true"></div>
+      <div class="bg-glow" aria-hidden="true"></div>
+
+      <div class="container hero__inner">
+        <div class="hero__copy">
+          <p class="eyebrow reveal">Residential trash can valet</p>
+          <h1 class="hero__title">
+            <span class="line"><span class="word">Never</span> <span class="word">touch</span> <span class="word">your</span></span>
+            <span class="line"><span class="word">trash</span> <span class="word accent">cans</span> <span class="word accent">again.</span></span>
+          </h1>
+          <p class="hero__sub reveal">
+            We roll your trash and recycling cans to the curb the night before pickup
+            and bring them back in after the truck comes. A simple monthly subscription.
+            You just forget trash day exists.
+          </p>
+
+          <form class="address-form reveal" data-address-form novalidate>
+            <label class="visually-hidden" for="hero-address">Your address or ZIP code</label>
+            <div class="address-form__row">
+              <input
+                id="hero-address"
+                type="text"
+                name="address"
+                inputmode="text"
+                autocomplete="street-address"
+                placeholder="Enter your address or ZIP"
+                required
+              />
+              <button type="submit" class="btn magnetic">Check if we serve your street</button>
+            </div>
+            <p class="address-form__msg" data-form-msg role="status" aria-live="polite"></p>
+          </form>
+
+          <p class="hero__trust reveal">No contracts · Cancel anytime · Local crews</p>
+        </div>
+
+        <!-- Animated scene: house → curb → house -->
+        <div class="hero__scene reveal" aria-hidden="true">
+          <svg class="scene" viewBox="0 0 420 320" role="img" aria-label="A trash can rolling from a house to the curb and back">
+            <!-- ground -->
+            <line class="scene__ground" x1="0" y1="250" x2="420" y2="250" />
+            <!-- curb -->
+            <path class="scene__curb" d="M300 250 h120 v40 h-120 z" />
+            <line class="scene__curbline" x1="300" y1="250" x2="300" y2="290" />
+            <!-- house -->
+            <g class="scene__house">
+              <rect x="40" y="150" width="150" height="100" rx="4" />
+              <path class="scene__roof" d="M28 152 L115 92 L202 152 Z" />
+              <rect class="scene__door" x="95" y="196" width="40" height="54" rx="3" />
+              <rect class="scene__window" x="56" y="170" width="28" height="26" rx="2" />
+              <rect class="scene__window" x="146" y="170" width="28" height="26" rx="2" />
+            </g>
+            <!-- the trash can -->
+            <g class="scene__can" transform="translate(150,206)">
+              <g class="scene__can-rock">
+                <rect class="can__lid" x="-22" y="-14" width="44" height="9" rx="4" />
+                <path class="can__body" d="M-19 -4 h38 l-4 44 a4 4 0 0 1 -4 3.6 h-22 a4 4 0 0 1 -4 -3.6 z" />
+                <line class="can__rib" x1="-13" y1="2" x2="-15" y2="38" />
+                <line class="can__rib" x1="0" y1="2" x2="0" y2="40" />
+                <line class="can__rib" x1="13" y1="2" x2="15" y2="38" />
+              </g>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ MARQUEE ============ -->
+    <div class="marquee section--accent" aria-hidden="true">
+      <div class="marquee__track" data-marquee>
+        <span>Cans out the night before</span><span class="dot">•</span>
+        <span>Cans back in after pickup</span><span class="dot">•</span>
+        <span>No contracts</span><span class="dot">•</span>
+        <span>Cancel anytime</span><span class="dot">•</span>
+        <span>Local crews you can trust</span><span class="dot">•</span>
+        <span>Never miss trash day</span><span class="dot">•</span>
+        <span>Cans out the night before</span><span class="dot">•</span>
+        <span>Cans back in after pickup</span><span class="dot">•</span>
+        <span>No contracts</span><span class="dot">•</span>
+        <span>Cancel anytime</span><span class="dot">•</span>
+        <span>Local crews you can trust</span><span class="dot">•</span>
+        <span>Never miss trash day</span><span class="dot">•</span>
+      </div>
+    </div>
+
+    <!-- ============ HOW IT WORKS ============ -->
+    <section class="how section--light" id="how">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow eyebrow--dark">How it works</p>
+          <h2 class="section-title">Three steps. Then you stop thinking about it.</h2>
+        </header>
+      </div>
+
+      <div class="how__pin" data-how-pin>
+        <div class="container how__layout">
+          <ol class="how__steps">
+            <li class="how__step" data-step="0">
+              <span class="how__num">01</span>
+              <h3>Sign up your address</h3>
+              <p>Tell us where you live and which day your trash gets picked up. Takes about a minute.</p>
+            </li>
+            <li class="how__step" data-step="1">
+              <span class="how__num">02</span>
+              <h3>We roll your cans out &amp; back</h3>
+              <p>The night before pickup, a local crew brings your cans to the curb. After the truck comes, we bring them right back in.</p>
+            </li>
+            <li class="how__step" data-step="2">
+              <span class="how__num">03</span>
+              <h3>You forget trash day exists</h3>
+              <p>No more late-night sprints in your slippers. No more cans sitting out for two days. It just happens.</p>
+            </li>
+          </ol>
+
+          <div class="how__visual" aria-hidden="true">
+            <div class="how__card" data-how-card="0">
+              <div class="how__icon">📍</div>
+              <span>Address added</span>
+            </div>
+            <div class="how__card" data-how-card="1">
+              <div class="how__icon">🛞</div>
+              <span>Cans rolling</span>
+            </div>
+            <div class="how__card" data-how-card="2">
+              <div class="how__icon">😌</div>
+              <span>Trash day, handled</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PRICING ============ -->
+    <section class="pricing section--dark" id="pricing">
+      <div class="bg-glow bg-glow--soft" aria-hidden="true"></div>
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow">Pricing</p>
+          <h2 class="section-title">One simple plan. Cancel anytime.</h2>
+        </header>
+
+        <div class="pricing__grid">
+          <div class="price-card reveal">
+            <div class="price-card__top">
+              <p class="price-card__name">The Curb Crew Plan</p>
+              <p class="price-card__price"><span class="amount">$35</span><span class="per">/month</span></p>
+              <p class="price-card__bill">Billed monthly · No contract · Cancel anytime</p>
+            </div>
+            <ul class="price-card__list">
+              <li>Your trash can out the night before &amp; back after pickup</li>
+              <li>Every scheduled pickup, every week</li>
+              <li>Reliable local crew assigned to your street</li>
+              <li>Text reminders &amp; service updates</li>
+              <li>Pause anytime for vacations</li>
+            </ul>
+            <a href="#final-cta" class="btn btn--block magnetic">Check if we serve your street</a>
+            <p class="price-card__note">Starts the week after you sign up.</p>
+          </div>
+
+          <div class="addons reveal">
+            <p class="addons__title">Make it yours</p>
+            <div class="addon">
+              <div>
+                <p class="addon__name">Add your recycling can</p>
+                <p class="addon__desc">We handle your recycling can on its pickup schedule too.</p>
+              </div>
+              <span class="addon__price">+$8/mo</span>
+            </div>
+            <div class="addon">
+              <div>
+                <p class="addon__name">Add yard-waste can</p>
+                <p class="addon__desc">Green-waste can rolled out and back on collection days.</p>
+              </div>
+              <span class="addon__price">+$8/mo</span>
+            </div>
+            <div class="addon">
+              <div>
+                <p class="addon__name">Can cleaning</p>
+                <p class="addon__desc">A monthly deep clean and deodorize so your cans never reek.</p>
+              </div>
+              <span class="addon__price">+$12/mo</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ WHY PEOPLE LOVE IT ============ -->
+    <section class="love section--light" id="love">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow eyebrow--dark">Why people love it</p>
+          <h2 class="section-title">Small service. Surprisingly big relief.</h2>
+        </header>
+
+        <div class="love__grid">
+          <article class="benefit reveal magnetic-card">
+            <div class="benefit__icon">🏠</div>
+            <h3>No more cans at the curb for two days</h3>
+            <p>Out the night before, back in the same day the truck comes. Your curb stays clean.</p>
+          </article>
+          <article class="benefit reveal magnetic-card">
+            <div class="benefit__icon">🤝</div>
+            <h3>Reliable local crews</h3>
+            <p>The same trusted crew works your street every week. They know your schedule.</p>
+          </article>
+          <article class="benefit reveal magnetic-card">
+            <div class="benefit__icon">🚫</div>
+            <h3>No contracts, ever</h3>
+            <p>Month to month. Pause for travel, cancel in two taps. We earn it every week.</p>
+          </article>
+          <article class="benefit reveal magnetic-card">
+            <div class="benefit__icon">🌙</div>
+            <h3>No more late-night sprints</h3>
+            <p>That "wait, is tomorrow trash day?" panic at 11pm? Gone for good.</p>
+          </article>
+          <article class="benefit reveal magnetic-card">
+            <div class="benefit__icon">♿</div>
+            <h3>Great if hauling is hard</h3>
+            <p>Heavy cans and long driveways are our problem now, not yours.</p>
+          </article>
+          <article class="benefit reveal magnetic-card">
+            <div class="benefit__icon">⚡</div>
+            <h3>Set it and forget it</h3>
+            <p>One subscription runs in the background. You genuinely never think about it.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ STATS ============ -->
+    <section class="stats section--dark" id="stats">
+      <div class="bg-grid bg-grid--subtle" aria-hidden="true"></div>
+      <div class="container stats__grid">
+        <div class="stat reveal">
+          <p class="stat__num" data-countup="4200" data-suffix="+">0</p>
+          <p class="stat__label">Homes served</p>
+        </div>
+        <div class="stat reveal">
+          <p class="stat__num" data-countup="318000" data-suffix="+">0</p>
+          <p class="stat__label">Cans handled</p>
+        </div>
+        <div class="stat reveal">
+          <p class="stat__num" data-countup="52000" data-suffix="+">0</p>
+          <p class="stat__label">Hours of hassle saved</p>
+        </div>
+        <div class="stat reveal">
+          <p class="stat__num" data-countup="99" data-suffix="%">0</p>
+          <p class="stat__label">On-time pickups</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FAQ ============ -->
+    <section class="faq section--light" id="faq">
+      <div class="container faq__inner">
+        <header class="section-head reveal">
+          <p class="eyebrow eyebrow--dark">FAQ</p>
+          <h2 class="section-title">The questions everyone asks.</h2>
+        </header>
+
+        <div class="faq__list">
+          <details class="faq__item reveal">
+            <summary>What if I'm on vacation?</summary>
+            <div class="faq__body"><p>Pause your plan from your account or send us a text. We stop service and your billing pauses too. Unpause whenever you're back.</p></div>
+          </details>
+          <details class="faq__item reveal">
+            <summary>What if my pickup day changes?</summary>
+            <div class="faq__body"><p>Just let us know, or update it in your account. We sync to your city's schedule, including holiday shifts, so your cans always go out on the right night.</p></div>
+          </details>
+          <details class="faq__item reveal">
+            <summary>How do I cancel?</summary>
+            <div class="faq__body"><p>Two taps in your account, or one text. No contract, no cancellation fee, no awkward phone call. You can come back anytime.</p></div>
+          </details>
+          <details class="faq__item reveal">
+            <summary>What areas do you serve?</summary>
+            <div class="faq__body"><p>We're rolling out neighborhood by neighborhood. Drop your address or ZIP into the checker and we'll tell you instantly, or add you to the waitlist for your street.</p></div>
+          </details>
+          <details class="faq__item reveal">
+            <summary>What if you miss a pickup?</summary>
+            <div class="faq__body"><p>It's rare, but if a crew ever misses your cans, that week is on us, automatically credited back. Our on-time rate is 99%+.</p></div>
+          </details>
+          <details class="faq__item reveal">
+            <summary>Where do you put the cans back?</summary>
+            <div class="faq__body"><p>Wherever you keep them, side of the house, garage, behind the gate. You tell us once during sign-up and we return them to the same spot every time.</p></div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FINAL CTA ============ -->
+    <section class="final-cta section--accent" id="final-cta">
+      <div class="bg-glow bg-glow--white" aria-hidden="true"></div>
+      <div class="container final-cta__inner reveal">
+        <h2 class="final-cta__title">Check if we serve your street.</h2>
+        <p class="final-cta__sub">Enter your address. We'll tell you in seconds, or save your spot on the waitlist.</p>
+
+        <form class="address-form address-form--light" data-address-form novalidate>
+          <label class="visually-hidden" for="final-address">Your address or ZIP code</label>
+          <div class="address-form__row">
+            <input
+              id="final-address"
+              type="text"
+              name="address"
+              autocomplete="street-address"
+              placeholder="Enter your address or ZIP"
+              required
+            />
+            <button type="submit" class="btn btn--invert magnetic">Check my street</button>
+          </div>
+          <p class="address-form__msg" data-form-msg role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer section--dark" id="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <a href="#hero" class="wordmark" data-brand aria-label="Curb Crew home">
+          <span class="wordmark__mark" aria-hidden="true">
+            <svg viewBox="0 0 32 32" width="24" height="24" fill="none">
+              <rect x="5" y="11" width="22" height="3" rx="1.5" fill="currentColor"/>
+              <path d="M8 14h16l-1.7 14.2A2.5 2.5 0 0 1 19.8 30H12.2a2.5 2.5 0 0 1-2.5-1.8z" fill="currentColor"/>
+              <path d="M13 8h6l1 3h-8z" fill="currentColor"/>
+            </svg>
+          </span>
+          <span class="wordmark__text">Curb&nbsp;Crew</span>
+        </a>
+        <p class="footer__tag">Never touch your trash cans again.</p>
+      </div>
+
+      <nav class="footer__col" aria-label="Footer">
+        <p class="footer__heading">Service</p>
+        <a href="#how">How it works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#love">Why people love it</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+
+      <div class="footer__col">
+        <p class="footer__heading">Company</p>
+        <a href="#contact" data-contact>Contact</a>
+        <a href="#faq">Support</a>
+        <a href="#" data-noop>Terms</a>
+        <a href="#" data-noop>Privacy</a>
+      </div>
+
+      <div class="footer__col footer__route">
+        <p class="footer__heading">Run a route</p>
+        <p class="footer__route-copy">Interested in running a route in your area?</p>
+        <a href="#contact" class="footer__route-link" data-contact>Get in touch →</a>
+      </div>
+    </div>
+
+    <div class="container footer__bottom">
+      <p>© <span data-year></span> <span data-brand-text>Curb Crew</span>. All rights reserved.</p>
+      <p>Made for people who hate trash day.</p>
+    </div>
+  </footer>
+
+  <!-- Confetti canvas -->
+  <canvas class="confetti-canvas" data-confetti aria-hidden="true"></canvas>
+
+  <!-- GSAP + ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="main.js" defer></script>
+</body>
+</html>
