@@ -1,5 +1,5 @@
 /* ============================================================
-   CURB CREW — main.js
+   CURB CREW - main.js
    GSAP + ScrollTrigger driven motion.
    Respects prefers-reduced-motion. Performant on mobile.
    ============================================================ */
@@ -247,7 +247,7 @@
         input.focus();
         return;
       }
-      msg.textContent = "🎉 Great news — we're serving your area! We've saved your spot, check your email.";
+      msg.textContent = "🎉 Great news, we're serving your area! We've saved your spot, check your email.";
       msg.className = "address-form__msg is-success";
       input.value = "";
       input.blur();
@@ -256,7 +256,7 @@
   });
 
   /* ============================================================
-     CONFETTI (blue + white) — lightweight canvas burst
+     CONFETTI (blue + white): lightweight canvas burst
      ============================================================ */
   var canvas = $("[data-confetti]");
   var ctx = canvas ? canvas.getContext("2d") : null;

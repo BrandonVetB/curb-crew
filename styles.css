@@ -1,5 +1,5 @@
 /* ============================================================
-   CURB CREW — styles.css
+   CURB CREW - styles.css
    3-color system: near-black, white, electric blue
    ============================================================ */
 
@@ -458,7 +458,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 }
 
 /* ============================================================
-   REDUCED MOTION — tone everything down
+   REDUCED MOTION: tone everything down
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
