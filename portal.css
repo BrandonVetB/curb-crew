@@ -40,9 +40,11 @@
 .auth__card {
   width: 100%; max-width: 420px; background: var(--white);
   border: 1px solid var(--line); border-radius: var(--radius-lg);
-  padding: 40px; box-shadow: 0 30px 70px rgba(11,11,15,0.10); text-align: left;
+  padding: 40px; box-shadow: 0 30px 70px rgba(11,11,15,0.10); text-align: center;
 }
-.auth__card .wordmark { margin-bottom: 26px; }
+.auth__card .wordmark { margin: 0 auto 26px; justify-content: center; }
+.auth__form { text-align: left; }
+.field input { text-align: left; }
 .auth__title { font-family: var(--font-display); font-size: 1.8rem; letter-spacing: -0.02em; }
 .auth__sub { color: var(--ink-60); margin: 6px 0 26px; }
 .auth__form { display: flex; flex-direction: column; gap: 16px; }
