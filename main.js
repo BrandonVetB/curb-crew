@@ -107,15 +107,15 @@
       tl.to({}, { duration: 0.8 })
         // tip back onto the wheel
         .to(bin,    { rotation: -10, duration: 0.5, ease: "power2.out" })
-        // roll down the driveway and stop right at the curb
-        .to(binGrp, { x: 86.3, y: 118.3, duration: 2.0 })
+        // roll down the driveway and out onto the street, against the curb
+        .to(binGrp, { x: 100.7, y: 134.1, duration: 2.1 })
         // set it down at the curb
         .to(bin,    { rotation: 0, duration: 0.5, ease: "power2.out" })
         .to({},     { duration: 1.8 })
 
         // bring it back up to the garage
         .to(bin,    { rotation: -10, duration: 0.5, ease: "power2.out" })
-        .to(binGrp, { x: 23.9, y: 87.1, duration: 2.0 })
+        .to(binGrp, { x: 23.9, y: 87.1, duration: 2.1 })
         .to(bin,    { rotation: 0, duration: 0.5, ease: "power2.out" })
         .to({},     { duration: 0.8 });
     }
