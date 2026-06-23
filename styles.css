@@ -29,6 +29,7 @@
   --font-body: "Inter", system-ui, -apple-system, sans-serif;
 
   --container: 1180px;
+  --nav-h: 110px;
   --radius: 18px;
   --radius-lg: 28px;
 
@@ -106,7 +107,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--line);
 }
-.nav__inner { display: flex; align-items: center; justify-content: space-between; height: 74px; gap: 20px; }
+.nav__inner { display: flex; align-items: center; justify-content: space-between; height: var(--nav-h, 110px); gap: 20px; }
 
 .wordmark {
   display: inline-flex; align-items: center; gap: 10px;
@@ -120,7 +121,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .wordmark__img { display: none; width: auto; }
 .wordmark.has-logo .wordmark__fallback { display: none; }
 .wordmark.has-logo .wordmark__img { display: block; }
-.wordmark--header .wordmark__img { height: 48px; }
+.wordmark--header .wordmark__img { height: 96px; }
 .wordmark--footer .wordmark__img { height: 40px; }
 
 .wordmark__fallback { display: inline-flex; align-items: center; gap: 10px; }
@@ -132,7 +133,10 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .bl-body { fill: var(--black); }
 .bl-slat { stroke: #fff; stroke-width: 2.4; stroke-linecap: round; }
 .bl-wheel { fill: var(--blue); stroke: var(--black); stroke-width: 3; }
-@media (max-width: 600px) { .wordmark--header .wordmark__img, .wordmark--header .brand-logo__svg { height: 40px; } }
+@media (max-width: 600px) {
+  :root { --nav-h: 84px; }
+  .wordmark--header .wordmark__img, .wordmark--header .brand-logo__svg { height: 60px; }
+}
 
 .nav__links { display: flex; gap: 30px; }
 .nav__links a {
@@ -488,7 +492,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   .nav.is-open { background: rgba(255,255,255,0.98); }
   .nav.is-open .nav__links {
     display: flex; flex-direction: column; gap: 0;
-    position: absolute; top: 74px; left: 0; right: 0;
+    position: absolute; top: var(--nav-h); left: 0; right: 0;
     background: var(--white); border-bottom: 1px solid var(--line); padding: 8px 24px 20px;
   }
   .nav.is-open .nav__links a { padding: 16px 0; border-bottom: 1px solid var(--line); font-size: 17px; }
