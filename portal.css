@@ -5,6 +5,9 @@
 
 .portal-body { background: var(--mist); min-height: 100vh; }
 
+/* the [hidden] attribute must win over the display rules below */
+.auth[hidden], .app[hidden], .panel[hidden] { display: none !important; }
+
 /* button variants used in the portal */
 .btn--ghost {
   background: var(--white); color: var(--black);
