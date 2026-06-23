@@ -89,28 +89,29 @@
   }
 
   /* ============================================================
-     HERO scene: trash can rolls house -> curb -> house, looping
+     HERO scene: can arcs from front-right to back-left and back.
+     Depth is faked with scale (bigger at the front, smaller at back).
      ============================================================ */
   var can = $(".scene__can");
   var canRock = $(".scene__can-rock");
-  if (hasGSAP && !REDUCED && can) {
-    // wheels-rocking wobble
-    gsap.to(canRock, { rotation: 4, transformOrigin: "50% 100%", duration: 0.32, yoyo: true, repeat: -1, ease: "sine.inOut" });
+  if (hasGSAP && can) {
+    // start position (front-right, near the ground)
+    gsap.set(can, { x: 372, y: 276, scale: 1.06, transformOrigin: "50% 50%" });
 
-    var tl = gsap.timeline({ repeat: -1, repeatDelay: 0.4 });
-    tl.to({}, { duration: 0.6 })
-      // roll out to the curb
-      .to(can, { x: 150, duration: 2.0, ease: "power1.inOut" })
-      .to(canRock, { rotation: 0, duration: 0.2 }, "<")
-      // sit at curb
-      .to({}, { duration: 1.1 })
-      // little hop (pickup!)
-      .to(can, { y: -16, duration: 0.22, ease: "power2.out" })
-      .to(can, { y: 0, duration: 0.32, ease: "bounce.out" })
-      .to({}, { duration: 0.5 })
-      // roll back home
-      .to(can, { x: 0, duration: 2.0, ease: "power1.inOut" })
-      .to({}, { duration: 0.8 });
+    if (!REDUCED) {
+      // gentle upright wobble so it feels alive, not rigid
+      gsap.to(canRock, { rotation: 3, transformOrigin: "50% 92%", duration: 1.2, yoyo: true, repeat: -1, ease: "sine.inOut" });
+
+      // the arc: front-right -> up over the roof -> back-left, then retrace
+      gsap.to(can, {
+        duration: 3.6, ease: "sine.inOut", repeat: -1, yoyo: true, repeatDelay: 0.3,
+        keyframes: {
+          x:     [372, 255, 150],
+          y:     [276,  92, 205],
+          scale: [1.06, 0.92, 0.66]
+        }
+      });
+    }
   }
 
   /* ============================================================

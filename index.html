@@ -92,30 +92,37 @@
           <p class="hero__trust reveal">No contracts · Cancel anytime · Local crews</p>
         </div>
 
-        <!-- Animated scene: house → curb → house -->
+        <!-- Animated scene: house with a trash can arcing front-right to back-left -->
         <div class="hero__scene reveal" aria-hidden="true">
-          <svg class="scene" viewBox="0 0 420 320" role="img" aria-label="A trash can rolling from a house to the curb and back">
+          <svg class="scene" viewBox="0 0 460 380" role="img" aria-label="A house with a trash can arcing from the front right around to the back left">
             <!-- ground -->
-            <line class="scene__ground" x1="0" y1="250" x2="420" y2="250" />
-            <!-- curb -->
-            <path class="scene__curb" d="M300 250 h120 v40 h-120 z" />
-            <line class="scene__curbline" x1="300" y1="250" x2="300" y2="290" />
+            <ellipse class="scene__shadow" cx="240" cy="314" rx="150" ry="14" />
+            <line class="house-ground" x1="120" y1="305" x2="360" y2="305" />
             <!-- house -->
-            <g class="scene__house">
-              <rect x="40" y="150" width="150" height="100" rx="4" />
-              <path class="scene__roof" d="M28 152 L115 92 L202 152 Z" />
-              <rect class="scene__door" x="95" y="196" width="40" height="54" rx="3" />
-              <rect class="scene__window" x="56" y="170" width="28" height="26" rx="2" />
-              <rect class="scene__window" x="146" y="170" width="28" height="26" rx="2" />
+            <g class="house">
+              <rect class="house-body" x="150" y="185" width="180" height="120" rx="8" />
+              <rect class="house-chimney" x="298" y="126" width="20" height="46" rx="2" />
+              <path class="house-roof" d="M136 189 L240 106 L344 189 Z" />
+              <rect class="house-window" x="168" y="210" width="36" height="36" rx="4" />
+              <line class="house-mullion" x1="186" y1="210" x2="186" y2="246" />
+              <line class="house-mullion" x1="168" y1="228" x2="204" y2="228" />
+              <rect class="house-window" x="276" y="210" width="36" height="36" rx="4" />
+              <line class="house-mullion" x1="294" y1="210" x2="294" y2="246" />
+              <line class="house-mullion" x1="276" y1="228" x2="312" y2="228" />
+              <path class="house-door" d="M218 305 L218 258 Q218 244 240 244 Q262 244 262 258 L262 305 Z" />
+              <circle class="house-knob" cx="255" cy="278" r="2.6" />
             </g>
-            <!-- the trash can -->
-            <g class="scene__can" transform="translate(150,206)">
+            <!-- the trash can (animated along an arc) -->
+            <g class="scene__can" transform="translate(372 276)">
               <g class="scene__can-rock">
-                <rect class="can__lid" x="-22" y="-14" width="44" height="9" rx="4" />
-                <path class="can__body" d="M-19 -4 h38 l-4 44 a4 4 0 0 1 -4 3.6 h-22 a4 4 0 0 1 -4 -3.6 z" />
-                <line class="can__rib" x1="-13" y1="2" x2="-15" y2="38" />
-                <line class="can__rib" x1="0" y1="2" x2="0" y2="40" />
-                <line class="can__rib" x1="13" y1="2" x2="15" y2="38" />
+                <rect class="can-handle" x="-7" y="-44" width="14" height="7" rx="3.5" />
+                <rect class="can-lid" x="-24" y="-38" width="48" height="11" rx="3.5" />
+                <path class="can-body" d="M-21 -25 L21 -25 L17 26 Q16.6 30 12.6 30 L-12.6 30 Q-16.6 30 -17 26 Z" />
+                <line class="can-rib" x1="-8" y1="-18" x2="-8" y2="23" />
+                <line class="can-rib" x1="0" y1="-18" x2="0" y2="24" />
+                <line class="can-rib" x1="8" y1="-18" x2="8" y2="23" />
+                <circle class="can-wheel" cx="-12" cy="33" r="5" />
+                <circle class="can-wheel" cx="12" cy="33" r="5" />
               </g>
             </g>
           </svg>

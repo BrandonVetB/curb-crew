@@ -81,9 +81,8 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   font-family: var(--font-display);
   font-size: 13px; font-weight: 600; letter-spacing: 0.18em;
   text-transform: uppercase; color: var(--blue);
-  display: inline-flex; align-items: center; gap: 10px; margin-bottom: 18px;
+  display: inline-block; margin-bottom: 18px;
 }
-.eyebrow::before { content: ""; width: 26px; height: 2px; background: var(--blue); }
 
 .section-title {
   font-family: var(--font-display);
@@ -212,16 +211,23 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 /* ---------- Hero scene ---------- */
 .hero__scene { position: relative; }
 .scene { width: 100%; height: auto; overflow: visible; }
-.scene__ground { stroke: var(--line-strong); stroke-width: 2; }
-.scene__curb { fill: rgba(11,11,15,0.03); stroke: var(--line-strong); stroke-width: 1.5; }
-.scene__curbline { stroke: var(--blue); stroke-width: 2; opacity: .7; }
-.scene__house rect, .scene__house path { fill: var(--white); stroke: rgba(11,11,15,0.55); stroke-width: 2; stroke-linejoin: round; }
-.scene__roof { fill: rgba(0,102,255,0.10) !important; }
-.scene__door { fill: var(--blue) !important; stroke: var(--blue) !important; }
-.scene__window { fill: rgba(0,102,255,0.16) !important; stroke: rgba(11,11,15,0.45) !important; }
-.can__body { fill: var(--blue); stroke: #0052cc; stroke-width: 1.5; }
-.can__lid { fill: var(--black); }
-.can__rib { stroke: rgba(255,255,255,0.7); stroke-width: 2; stroke-linecap: round; }
+.scene__shadow { fill: rgba(11,11,15,0.06); }
+
+/* house */
+.house-body { fill: var(--white); stroke: var(--black); stroke-width: 2.5; stroke-linejoin: round; }
+.house-roof { fill: rgba(0,102,255,0.10); stroke: var(--black); stroke-width: 2.5; stroke-linejoin: round; }
+.house-chimney { fill: var(--white); stroke: var(--black); stroke-width: 2.5; stroke-linejoin: round; }
+.house-window { fill: rgba(0,102,255,0.14); stroke: var(--black); stroke-width: 2.5; stroke-linejoin: round; }
+.house-mullion { stroke: rgba(11,11,15,0.40); stroke-width: 1.6; stroke-linecap: round; }
+.house-door { fill: var(--blue); }
+.house-knob { fill: var(--white); }
+.house-ground { stroke: rgba(11,11,15,0.14); stroke-width: 2; stroke-linecap: round; }
+
+/* trash can */
+.can-body { fill: var(--blue); stroke: #0052cc; stroke-width: 1.5; stroke-linejoin: round; }
+.can-lid, .can-handle { fill: var(--black); }
+.can-rib { stroke: rgba(255,255,255,0.72); stroke-width: 2.4; stroke-linecap: round; }
+.can-wheel { fill: var(--black); }
 
 /* ---------- Background decor ---------- */
 .bg-grid {
