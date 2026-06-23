@@ -89,28 +89,56 @@
   }
 
   /* ============================================================
-     HERO scene: can arcs from front-right to back-left and back.
-     Depth is faked with scale (bigger at the front, smaller at back).
+     HERO scene: the can rolls from the house out to the street
+     and back. Wheels spin in sync with travel, a shadow tracks it,
+     and the body leans into the motion. Seamless loop.
      ============================================================ */
   var can = $(".scene__can");
-  var canRock = $(".scene__can-rock");
+  var canBounce = $(".can-bounce");
+  var wheels = $all(".can-wheel-grp");
+
+  var START_X = 252;   // parked beside the house
+  var END_X = 388;     // parked at the curb
+  var BASE_Y = 236;    // wheels resting on the sidewalk
+  // wheel revolutions to match the distance travelled (r = 5 -> circumference ~31.4)
+  var SPIN = Math.round(((END_X - START_X) / (2 * Math.PI * 5)) * 360);
+
   if (hasGSAP && can) {
-    // start position (front-right, near the ground)
-    gsap.set(can, { x: 372, y: 276, scale: 1.06, transformOrigin: "50% 50%" });
+    gsap.set(can, { x: START_X, y: BASE_Y });
+    gsap.set(canBounce, { transformOrigin: "50% 100%" });
+    gsap.set(wheels, { transformOrigin: "50% 50%" });
 
     if (!REDUCED) {
-      // gentle upright wobble so it feels alive, not rigid
-      gsap.to(canRock, { rotation: 3, transformOrigin: "50% 92%", duration: 1.2, yoyo: true, repeat: -1, ease: "sine.inOut" });
+      var tl = gsap.timeline({ repeat: -1, defaults: { ease: "power2.inOut" } });
 
-      // the arc: front-right -> up over the roof -> back-left, then retrace
-      gsap.to(can, {
-        duration: 3.6, ease: "sine.inOut", repeat: -1, yoyo: true, repeatDelay: 0.3,
-        keyframes: {
-          x:     [372, 255, 150],
-          y:     [276,  92, 205],
-          scale: [1.06, 0.92, 0.66]
-        }
-      });
+      // pause beside the house
+      tl.to({}, { duration: 0.8 })
+
+        // roll OUT to the curb (travel + matched wheel spin + lean forward)
+        .addLabel("out")
+        .to(can,        { x: END_X, duration: 2.2 }, "out")
+        .to(wheels,     { rotation: "+=" + SPIN, duration: 2.2, ease: "power2.inOut" }, "out")
+        .to(canBounce,  { rotation: 2.5, duration: 0.5, ease: "power1.out" }, "out")
+        .to(canBounce,  { rotation: 0, duration: 0.5, ease: "power1.inOut" }, "out+=1.7")
+
+        // settle at the street
+        .to(canBounce,  { y: 1, duration: 0.12, ease: "power2.in" })
+        .to(canBounce,  { y: 0, duration: 0.45, ease: "elastic.out(1, 0.5)" })
+
+        // parked at the curb
+        .to({}, { duration: 1.3 })
+
+        // roll BACK to the house
+        .addLabel("back")
+        .to(can,        { x: START_X, duration: 2.2 }, "back")
+        .to(wheels,     { rotation: "-=" + SPIN, duration: 2.2, ease: "power2.inOut" }, "back")
+        .to(canBounce,  { rotation: -2.5, duration: 0.5, ease: "power1.out" }, "back")
+        .to(canBounce,  { rotation: 0, duration: 0.5, ease: "power1.inOut" }, "back+=1.7")
+
+        // settle at the house
+        .to(canBounce,  { y: 1, duration: 0.12, ease: "power2.in" })
+        .to(canBounce,  { y: 0, duration: 0.45, ease: "elastic.out(1, 0.5)" })
+        .to({}, { duration: 0.6 });
     }
   }
 
