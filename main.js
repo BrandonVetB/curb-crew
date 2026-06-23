@@ -89,56 +89,42 @@
   }
 
   /* ============================================================
-     HERO scene: the can rolls from the house out to the street
-     and back. Wheels spin in sync with travel, a shadow tracks it,
-     and the body leans into the motion. Seamless loop.
+     HERO scene: the real bin tilts back onto its wheel, rolls from
+     the house, drops off the curb, and settles flat on the street.
+     Then it comes back. Loops smoothly.
      ============================================================ */
-  var can = $(".scene__can");
-  var canBounce = $(".can-bounce");
-  var wheels = $all(".can-wheel-grp");
+  var binGrp = $(".sc-bin-grp");
+  var bin = $(".sc-bin");
 
-  var START_X = 252;   // parked beside the house
-  var END_X = 388;     // parked at the curb
-  var BASE_Y = 236;    // wheels resting on the sidewalk
-  // wheel revolutions to match the distance travelled (r = 5 -> circumference ~31.4)
-  var SPIN = Math.round(((END_X - START_X) / (2 * Math.PI * 5)) * 360);
-
-  if (hasGSAP && can) {
-    gsap.set(can, { x: START_X, y: BASE_Y });
-    gsap.set(canBounce, { transformOrigin: "50% 100%" });
-    gsap.set(wheels, { transformOrigin: "50% 50%" });
+  if (hasGSAP && binGrp && bin) {
+    // wheel (~22,97 in the image) rests on the sidewalk beside the house
+    gsap.set(binGrp, { x: 268, y: 187 });
+    gsap.set(bin, { transformOrigin: "22px 97px" });
 
     if (!REDUCED) {
-      var tl = gsap.timeline({ repeat: -1, defaults: { ease: "power2.inOut" } });
+      var tl = gsap.timeline({ repeat: -1, defaults: { ease: "power1.inOut" } });
 
-      // pause beside the house
-      tl.to({}, { duration: 0.8 })
+      tl.to({}, { duration: 0.7 })
+        // tip back onto the wheel
+        .to(bin,    { rotation: -11, duration: 0.5, ease: "power2.out" })
+        // roll along the sidewalk to the curb
+        .to(binGrp, { x: 338, y: 187, duration: 1.3 })
+        // drop off the curb down onto the street
+        .to(binGrp, { x: 360, y: 205, duration: 0.4, ease: "power1.in" })
+        // roll out onto the street
+        .to(binGrp, { x: 438, y: 205, duration: 1.0 })
+        // set it down flat
+        .to(bin,    { rotation: 0, duration: 0.5, ease: "power2.out" })
+        .to({},     { duration: 1.5 })
 
-        // roll OUT to the curb (travel + matched wheel spin + lean forward)
-        .addLabel("out")
-        .to(can,        { x: END_X, duration: 2.2 }, "out")
-        .to(wheels,     { rotation: "+=" + SPIN, duration: 2.2, ease: "power2.inOut" }, "out")
-        .to(canBounce,  { rotation: 2.5, duration: 0.5, ease: "power1.out" }, "out")
-        .to(canBounce,  { rotation: 0, duration: 0.5, ease: "power1.inOut" }, "out+=1.7")
-
-        // settle at the street
-        .to(canBounce,  { y: 1, duration: 0.12, ease: "power2.in" })
-        .to(canBounce,  { y: 0, duration: 0.45, ease: "elastic.out(1, 0.5)" })
-
-        // parked at the curb
-        .to({}, { duration: 1.3 })
-
-        // roll BACK to the house
-        .addLabel("back")
-        .to(can,        { x: START_X, duration: 2.2 }, "back")
-        .to(wheels,     { rotation: "-=" + SPIN, duration: 2.2, ease: "power2.inOut" }, "back")
-        .to(canBounce,  { rotation: -2.5, duration: 0.5, ease: "power1.out" }, "back")
-        .to(canBounce,  { rotation: 0, duration: 0.5, ease: "power1.inOut" }, "back+=1.7")
-
-        // settle at the house
-        .to(canBounce,  { y: 1, duration: 0.12, ease: "power2.in" })
-        .to(canBounce,  { y: 0, duration: 0.45, ease: "elastic.out(1, 0.5)" })
-        .to({}, { duration: 0.6 });
+        // bring it back in
+        .to(bin,    { rotation: -11, duration: 0.5, ease: "power2.out" })
+        .to(binGrp, { x: 360, y: 205, duration: 1.0 })
+        // back up the curb onto the sidewalk
+        .to(binGrp, { x: 338, y: 187, duration: 0.4, ease: "power1.out" })
+        .to(binGrp, { x: 268, y: 187, duration: 1.3 })
+        .to(bin,    { rotation: 0, duration: 0.5, ease: "power2.out" })
+        .to({},     { duration: 0.7 });
     }
   }
 

@@ -98,54 +98,37 @@
           <p class="hero__trust reveal">No contracts · Cancel anytime · Local crews</p>
         </div>
 
-        <!-- Animated scene: a trash can rolls from the house out to the street and back -->
+        <!-- Animated scene: the real Curb Crew bin tilts back, rolls, and settles on the street -->
         <div class="hero__scene reveal" aria-hidden="true">
-          <svg class="scene" viewBox="0 0 540 340" role="img" aria-label="A trash can rolling from a house out to the street and back">
-            <!-- street surface (lower right) -->
-            <rect class="street" x="400" y="292" width="140" height="48" />
-            <line class="street-line" x1="416" y1="316" x2="528" y2="316" stroke-dasharray="14 16" />
-            <!-- ground: sidewalk, curb face, street edge -->
-            <line class="house-ground" x1="20" y1="274" x2="400" y2="274" />
-            <line class="curb" x1="400" y1="274" x2="400" y2="292" />
-            <line class="curb" x1="400" y1="292" x2="540" y2="292" />
-            <!-- faint route the can follows -->
-            <line class="path-dash" x1="250" y1="274" x2="392" y2="274" stroke-dasharray="1 8" />
-
+          <svg class="scene" viewBox="0 0 560 360" role="img" aria-label="A trash can rolling from a house out onto the street">
+            <!-- street -->
+            <rect class="sc-street" x="360" y="302" width="200" height="58" />
+            <line class="sc-lane" x1="378" y1="330" x2="548" y2="330" stroke-dasharray="16 18" />
+            <!-- sidewalk + curb -->
+            <line class="sc-ground" x1="20" y1="284" x2="360" y2="284" />
+            <line class="sc-curb" x1="360" y1="284" x2="360" y2="302" />
+            <line class="sc-curb" x1="360" y1="302" x2="560" y2="302" />
             <!-- house -->
-            <ellipse class="scene__shadow" cx="150" cy="278" rx="118" ry="9" />
-            <g class="house">
-              <rect class="house-body" x="70" y="150" width="160" height="124" rx="8" />
-              <rect class="house-chimney" x="192" y="98" width="18" height="44" rx="2" />
-              <path class="house-roof" d="M56 154 L150 78 L244 154 Z" />
-              <rect class="house-window" x="92" y="176" width="34" height="34" rx="4" />
-              <line class="house-mullion" x1="109" y1="176" x2="109" y2="210" />
-              <line class="house-mullion" x1="92" y1="193" x2="126" y2="193" />
-              <rect class="house-window" x="174" y="176" width="34" height="34" rx="4" />
-              <line class="house-mullion" x1="191" y1="176" x2="191" y2="210" />
-              <line class="house-mullion" x1="174" y1="193" x2="208" y2="193" />
-              <path class="house-door" d="M132 274 L132 230 Q132 214 150 214 Q168 214 168 230 L168 274 Z" />
-              <circle class="house-knob" cx="161" cy="246" r="2.4" />
+            <ellipse class="sc-shadow" cx="160" cy="288" rx="122" ry="9" />
+            <g class="sc-house">
+              <rect class="sc-chimney" x="198" y="98" width="20" height="52" rx="2" />
+              <path class="sc-roof" d="M62 154 L160 94 L258 154 Z" />
+              <rect class="sc-wall" x="72" y="154" width="176" height="130" rx="6" />
+              <line class="sc-fascia" x1="62" y1="154" x2="258" y2="154" />
+              <rect class="sc-window" x="96" y="182" width="34" height="34" rx="4" />
+              <line class="sc-mull" x1="113" y1="182" x2="113" y2="216" />
+              <line class="sc-mull" x1="96" y1="199" x2="130" y2="199" />
+              <rect class="sc-window" x="190" y="182" width="34" height="34" rx="4" />
+              <line class="sc-mull" x1="207" y1="182" x2="207" y2="216" />
+              <line class="sc-mull" x1="190" y1="199" x2="224" y2="199" />
+              <path class="sc-door" d="M142 284 L142 240 Q142 220 160 220 Q178 220 178 240 L178 284 Z" />
+              <circle class="sc-knob" cx="171" cy="254" r="2.4" />
             </g>
 
-            <!-- the trash can (rolled out by GSAP) -->
-            <g class="scene__can" transform="translate(252 236)">
-              <ellipse class="can-shadow" cx="0" cy="38" rx="22" ry="5" />
-              <g class="can-bounce">
-                <rect class="can-handle" x="-7" y="-44" width="14" height="7" rx="3.5" />
-                <rect class="can-lid" x="-24" y="-38" width="48" height="11" rx="3.5" />
-                <path class="can-body" d="M-21 -25 L21 -25 L17 26 Q16.6 30 12.6 30 L-12.6 30 Q-16.6 30 -17 26 Z" />
-                <line class="can-rib" x1="-8" y1="-18" x2="-8" y2="23" />
-                <line class="can-rib" x1="0" y1="-18" x2="0" y2="24" />
-                <line class="can-rib" x1="8" y1="-18" x2="8" y2="23" />
-                <g class="can-wheel-grp">
-                  <circle class="can-wheel" cx="-12" cy="33" r="5" />
-                  <line class="can-spoke" x1="-15.2" y1="33" x2="-8.8" y2="33" />
-                </g>
-                <g class="can-wheel-grp">
-                  <circle class="can-wheel" cx="12" cy="33" r="5" />
-                  <line class="can-spoke" x1="8.8" y1="33" x2="15.2" y2="33" />
-                </g>
-              </g>
+            <!-- the real Curb Crew bin (animated by GSAP) -->
+            <g class="sc-bin-grp">
+              <ellipse class="sc-binshadow" cx="22" cy="100" rx="30" ry="6" />
+              <image class="sc-bin" href="curb-crew-bin.png" width="86" height="105" />
             </g>
           </svg>
         </div>
