@@ -116,14 +116,23 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .wordmark__mark { color: var(--blue); display: inline-flex; }
 .wordmark__text { white-space: nowrap; }
 
-/* logo image (shown once the real file is present) */
+/* logo: real PNG if present, otherwise the inline SVG recreation */
 .wordmark__img { display: none; width: auto; }
-.wordmark.has-logo .wordmark__mark,
-.wordmark.has-logo .wordmark__text { display: none; }
+.wordmark.has-logo .wordmark__fallback { display: none; }
 .wordmark.has-logo .wordmark__img { display: block; }
-.wordmark--header .wordmark__img { height: 50px; }
+.wordmark--header .wordmark__img { height: 48px; }
 .wordmark--footer .wordmark__img { height: 40px; }
-@media (max-width: 600px) { .wordmark--header .wordmark__img { height: 40px; } }
+
+.wordmark__fallback { display: inline-flex; align-items: center; }
+.brand-logo__svg { height: 46px; width: auto; display: block; }
+.wordmark--footer .brand-logo__svg { height: 40px; }
+.bl-letter { font-family: "Archivo", var(--font-display); font-weight: 800; font-style: italic; font-size: 92px; fill: var(--black); }
+.bl-crew { font-family: "Archivo", var(--font-display); font-weight: 800; font-style: italic; font-size: 30px; letter-spacing: 8px; fill: var(--black); }
+.bl-lid, .bl-underline { fill: var(--blue); }
+.bl-body { fill: var(--black); }
+.bl-slat { stroke: #fff; stroke-width: 2.4; stroke-linecap: round; }
+.bl-wheel { fill: var(--blue); stroke: var(--black); stroke-width: 3; }
+@media (max-width: 600px) { .wordmark--header .wordmark__img, .wordmark--header .brand-logo__svg { height: 40px; } }
 
 .nav__links { display: flex; gap: 30px; }
 .nav__links a {
@@ -138,6 +147,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .nav__links a:hover::after { width: 100%; }
 
 .nav__toggle { display: none; width: 44px; height: 44px; flex-direction: column; gap: 6px; align-items: center; justify-content: center; }
+[data-signin-mobile] { display: none; }
 .nav__toggle span { width: 24px; height: 2px; background: var(--black); transition: transform .3s var(--ease), opacity .3s var(--ease); }
 .nav.is-open .nav__toggle span:first-child { transform: translateY(4px) rotate(45deg); }
 .nav.is-open .nav__toggle span:last-child  { transform: translateY(-4px) rotate(-45deg); }
@@ -475,13 +485,24 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 
   .nav__links, .nav .btn--small { display: none; }
   .nav__toggle { display: flex; }
-  .nav.is-open { background: rgba(255,255,255,0.97); backdrop-filter: blur(14px); }
+  .nav.is-open { background: rgba(255,255,255,0.98); }
   .nav.is-open .nav__links {
     display: flex; flex-direction: column; gap: 0;
     position: absolute; top: 74px; left: 0; right: 0;
     background: var(--white); border-bottom: 1px solid var(--line); padding: 8px 24px 20px;
   }
   .nav.is-open .nav__links a { padding: 16px 0; border-bottom: 1px solid var(--line); font-size: 17px; }
+  .nav__links [data-signin-mobile] { display: block; color: var(--blue); }
+}
+
+/* ============================================================
+   MOBILE PERFORMANCE: drop GPU-heavy effects that cause jank/freeze
+   ============================================================ */
+@media (max-width: 860px) {
+  .nav.is-scrolled { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(255,255,255,0.97); }
+  .bg-glow, .bg-glow--soft, .bg-glow--white { display: none; }
+  .bg-grid { background-size: 48px 48px; }
+  .marquee__track, .scene__can, .can-bounce { will-change: auto; }
 }
 
 @media (max-width: 600px) {

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Client Portal | Curb Crew</title>
+  <meta name="description" content="Manage your Curb Crew service: trash schedule, plan and payments, and account settings." />
+  <meta name="robots" content="noindex" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=Archivo:ital,wght@1,800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="portal.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230B0B0F'/><path d='M30 38h40l-4 34a6 6 0 0 1-6 5H40a6 6 0 0 1-6-5z' fill='%230066FF'/><rect x='26' y='30' width='48' height='8' rx='4' fill='%23fff'/></svg>" />
+</head>
+<body class="portal-body">
+
+  <!-- ============ DEMO BANNER ============ -->
+  <div class="demo-banner">Demo portal &middot; sample data only &middot; <a href="index.html">back to site</a></div>
+
+  <!-- ============ SIGN IN ============ -->
+  <section class="auth" data-view="auth">
+    <div class="auth__card">
+      <a href="index.html" class="wordmark wordmark--header" aria-label="Curb Crew home">
+        <img class="wordmark__img" src="curb-crew-logo.png" alt="Curb Crew"
+             onload="this.closest('.wordmark').classList.add('has-logo')" onerror="this.remove()" />
+        <span class="wordmark__fallback brand-logo" aria-hidden="true">
+          <svg class="brand-logo__svg" viewBox="0 0 300 116" fill="none">
+            <text class="bl-letter" x="0" y="74">C</text>
+            <g class="bl-bin">
+              <path class="bl-lid" d="M64 44 L118 26 L130 40 L76 58 Z"/>
+              <path class="bl-body" d="M74 50 L122 50 L116 86 Q115 90 111 90 L87 90 Q83 90 82 86 Z"/>
+              <line class="bl-slat" x1="90" y1="56" x2="90" y2="84"/>
+              <line class="bl-slat" x1="99" y1="56" x2="99" y2="84"/>
+              <line class="bl-slat" x1="108" y1="56" x2="108" y2="84"/>
+              <circle class="bl-wheel" cx="83" cy="95" r="8"/>
+            </g>
+            <text class="bl-letter" x="132" y="74">RB</text>
+            <rect class="bl-underline" x="2" y="92" width="248" height="7" rx="3.5"/>
+            <text class="bl-crew" x="126" y="112">CREW</text>
+          </svg>
+        </span>
+      </a>
+
+      <h1 class="auth__title">Welcome back</h1>
+      <p class="auth__sub">Sign in to manage your service.</p>
+
+      <form class="auth__form" data-login-form novalidate>
+        <label class="field">
+          <span>Email</span>
+          <input type="email" name="email" autocomplete="email" placeholder="you@email.com" value="stelling.brandon@gmail.com" />
+        </label>
+        <label class="field">
+          <span>Password</span>
+          <input type="password" name="password" autocomplete="current-password" placeholder="••••••••" value="demo1234" />
+        </label>
+        <button type="submit" class="btn btn--block magnetic">Sign in</button>
+        <p class="auth__msg" data-auth-msg role="status" aria-live="polite"></p>
+      </form>
+
+      <p class="auth__demo">This is a demo. Any email works, no real account needed.</p>
+    </div>
+  </section>
+
+  <!-- ============ APP ============ -->
+  <div class="app" data-view="app" hidden>
+    <!-- sidebar -->
+    <aside class="side">
+      <a href="index.html" class="wordmark wordmark--header side__brand" aria-label="Curb Crew home">
+        <img class="wordmark__img" src="curb-crew-logo.png" alt="Curb Crew"
+             onload="this.closest('.wordmark').classList.add('has-logo')" onerror="this.remove()" />
+        <span class="wordmark__fallback brand-logo" aria-hidden="true">
+          <svg class="brand-logo__svg" viewBox="0 0 300 116" fill="none">
+            <text class="bl-letter" x="0" y="74">C</text>
+            <g class="bl-bin">
+              <path class="bl-lid" d="M64 44 L118 26 L130 40 L76 58 Z"/>
+              <path class="bl-body" d="M74 50 L122 50 L116 86 Q115 90 111 90 L87 90 Q83 90 82 86 Z"/>
+              <line class="bl-slat" x1="90" y1="56" x2="90" y2="84"/>
+              <line class="bl-slat" x1="99" y1="56" x2="99" y2="84"/>
+              <line class="bl-slat" x1="108" y1="56" x2="108" y2="84"/>
+              <circle class="bl-wheel" cx="83" cy="95" r="8"/>
+            </g>
+            <text class="bl-letter" x="132" y="74">RB</text>
+            <rect class="bl-underline" x="2" y="92" width="248" height="7" rx="3.5"/>
+            <text class="bl-crew" x="126" y="112">CREW</text>
+          </svg>
+        </span>
+      </a>
+
+      <nav class="side__nav" aria-label="Portal">
+        <button class="side__link is-active" data-nav="overview">Overview</button>
+        <button class="side__link" data-nav="schedule">Schedule</button>
+        <button class="side__link" data-nav="plan">Plan &amp; payments</button>
+        <button class="side__link" data-nav="account">Account</button>
+      </nav>
+
+      <div class="side__foot">
+        <div class="side__user">
+          <span class="side__avatar" aria-hidden="true">BS</span>
+          <span class="side__id">
+            <strong>Brandon Stelling</strong>
+            <small>123 Maple St</small>
+          </span>
+        </div>
+        <a href="index.html" class="side__signout" data-signout>Sign out</a>
+      </div>
+    </aside>
+
+    <!-- main -->
+    <main class="main">
+      <!-- mobile top bar -->
+      <header class="topbar">
+        <strong data-page-title>Overview</strong>
+        <select class="topbar__select" data-mobile-nav aria-label="Section">
+          <option value="overview">Overview</option>
+          <option value="schedule">Schedule</option>
+          <option value="plan">Plan &amp; payments</option>
+          <option value="account">Account</option>
+        </select>
+      </header>
+
+      <!-- OVERVIEW -->
+      <section class="panel" data-panel="overview">
+        <div class="panel__head">
+          <h1>Good morning, Brandon</h1>
+          <p>Everything is on track. Here's your service at a glance.</p>
+        </div>
+
+        <div class="grid grid--3">
+          <article class="card card--feature">
+            <span class="pill pill--blue">Next pickup</span>
+            <p class="card__big">Thursday</p>
+            <p class="card__sub">June 25 &middot; in 3 days</p>
+            <p class="card__note">We roll your cans out <strong>Wednesday night</strong> and bring them back in Thursday after the truck.</p>
+          </article>
+
+          <article class="card">
+            <span class="pill pill--green">Active</span>
+            <p class="card__label">Your plan</p>
+            <p class="card__value">Curb Crew + Recycling</p>
+            <p class="card__muted">$43.00 / month</p>
+            <button class="link-btn" data-nav="plan">Manage plan →</button>
+          </article>
+
+          <article class="card">
+            <p class="card__label">Crew on your street</p>
+            <p class="card__value">Team&nbsp;7 &middot; Austin South</p>
+            <p class="card__muted">On-time rate 99.4%</p>
+            <button class="link-btn" data-nav="account">Contact crew →</button>
+          </article>
+        </div>
+
+        <div class="grid grid--2">
+          <article class="card">
+            <p class="card__label">Quick actions</p>
+            <div class="actions">
+              <button class="btn btn--ghost" data-action="pause">Pause for vacation</button>
+              <button class="btn btn--ghost" data-nav="plan">Update payment</button>
+              <button class="btn btn--ghost" data-nav="account">Edit can location</button>
+            </div>
+          </article>
+          <article class="card">
+            <p class="card__label">Recent activity</p>
+            <ul class="timeline">
+              <li><span class="dot-ok"></span> Cans returned &middot; <span class="muted">Thu Jun 18</span></li>
+              <li><span class="dot-ok"></span> Cans rolled out &middot; <span class="muted">Wed Jun 17</span></li>
+              <li><span class="dot-pay"></span> Payment of $43.00 &middot; <span class="muted">Jun 1</span></li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <!-- SCHEDULE -->
+      <section class="panel" data-panel="schedule" hidden>
+        <div class="panel__head">
+          <h1>Your schedule</h1>
+          <p>Synced to the City of Austin collection calendar, including holiday shifts.</p>
+        </div>
+
+        <div class="grid grid--3">
+          <article class="card"><p class="card__label">Trash</p><p class="card__value">Every Thursday</p><p class="card__muted">Next: Thu Jun 25</p></article>
+          <article class="card"><p class="card__label">Recycling</p><p class="card__value">Every other Thursday</p><p class="card__muted">Next: Thu Jun 25</p></article>
+          <article class="card"><p class="card__label">Yard waste</p><p class="card__value">Not on your plan</p><button class="link-btn" data-nav="plan">Add for $8/mo →</button></article>
+        </div>
+
+        <article class="card">
+          <p class="card__label">Next 4 weeks</p>
+          <table class="table">
+            <thead><tr><th>Date</th><th>Out the night before</th><th>Going out</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Thu Jun 25</td><td>Wed Jun 24</td><td>Trash + Recycling</td><td><span class="tag tag--scheduled">Scheduled</span></td></tr>
+              <tr><td>Thu Jul 2</td><td>Wed Jul 1</td><td>Trash</td><td><span class="tag tag--scheduled">Scheduled</span></td></tr>
+              <tr><td>Fri Jul 10</td><td>Thu Jul 9</td><td>Trash + Recycling</td><td><span class="tag tag--holiday">Holiday shift</span></td></tr>
+              <tr><td>Thu Jul 16</td><td>Wed Jul 15</td><td>Trash</td><td><span class="tag tag--scheduled">Scheduled</span></td></tr>
+            </tbody>
+          </table>
+          <p class="card__note">July 4 holiday pushes that week's pickup to Friday. We adjust automatically.</p>
+        </article>
+      </section>
+
+      <!-- PLAN & PAYMENTS -->
+      <section class="panel" data-panel="plan" hidden>
+        <div class="panel__head">
+          <h1>Plan &amp; payments</h1>
+          <p>Manage your subscription, add-ons, and billing.</p>
+        </div>
+
+        <div class="grid grid--2">
+          <article class="card">
+            <p class="card__label">Current plan</p>
+            <div class="line"><span>Curb Crew Plan</span><strong>$35.00</strong></div>
+            <div class="line"><span>Recycling can</span><strong>$8.00</strong></div>
+            <div class="line line--total"><span>Total monthly</span><strong>$43.00</strong></div>
+            <p class="card__muted">Next charge: July 1, 2026</p>
+            <div class="actions actions--wrap">
+              <button class="btn btn--ghost" data-action="pause">Pause</button>
+              <button class="btn btn--danger-ghost" data-action="cancel">Cancel plan</button>
+            </div>
+          </article>
+
+          <article class="card">
+            <p class="card__label">Add-ons</p>
+            <div class="addon-row"><div><strong>Yard-waste can</strong><span>Rolled out on collection days</span></div><button class="btn btn--ghost btn--sm" data-action="addon">Add $8/mo</button></div>
+            <div class="addon-row"><div><strong>Can cleaning</strong><span>Monthly deep clean &amp; deodorize</span></div><button class="btn btn--ghost btn--sm" data-action="addon">Add $12/mo</button></div>
+            <div class="addon-row addon-row--on"><div><strong>Recycling can</strong><span>Active on your plan</span></div><span class="tag tag--on">On</span></div>
+          </article>
+        </div>
+
+        <article class="card">
+          <div class="card__row">
+            <p class="card__label">Payment method</p>
+            <button class="link-btn" data-action="payment">Update</button>
+          </div>
+          <div class="pay"><span class="pay__brand">VISA</span><span>•••• •••• •••• 4242</span><span class="muted">exp 08/27</span></div>
+        </article>
+
+        <article class="card">
+          <p class="card__label">Billing history</p>
+          <table class="table">
+            <thead><tr><th>Date</th><th>Description</th><th>Amount</th><th>Receipt</th></tr></thead>
+            <tbody>
+              <tr><td>Jun 1, 2026</td><td>Monthly subscription</td><td>$43.00</td><td><button class="link-btn" data-action="receipt">Download</button></td></tr>
+              <tr><td>May 1, 2026</td><td>Monthly subscription</td><td>$43.00</td><td><button class="link-btn" data-action="receipt">Download</button></td></tr>
+              <tr><td>Apr 1, 2026</td><td>Monthly subscription</td><td>$43.00</td><td><button class="link-btn" data-action="receipt">Download</button></td></tr>
+              <tr><td>Mar 1, 2026</td><td>Monthly subscription</td><td>$35.00</td><td><button class="link-btn" data-action="receipt">Download</button></td></tr>
+            </tbody>
+          </table>
+        </article>
+      </section>
+
+      <!-- ACCOUNT -->
+      <section class="panel" data-panel="account" hidden>
+        <div class="panel__head">
+          <h1>Account</h1>
+          <p>Your details and how we service your home.</p>
+        </div>
+
+        <div class="grid grid--2">
+          <article class="card">
+            <p class="card__label">Profile</p>
+            <div class="line"><span>Name</span><strong>Brandon Stelling</strong></div>
+            <div class="line"><span>Email</span><strong>stelling.brandon@gmail.com</strong></div>
+            <div class="line"><span>Phone</span><strong>(512) 555-0148</strong></div>
+            <button class="btn btn--ghost btn--sm" data-action="edit">Edit profile</button>
+          </article>
+
+          <article class="card">
+            <p class="card__label">Service address</p>
+            <div class="line"><span>Address</span><strong>123 Maple St</strong></div>
+            <div class="line"><span>City</span><strong>Austin, TX 78704</strong></div>
+            <div class="line"><span>Where we return cans</span><strong>Left side, behind gate</strong></div>
+            <button class="btn btn--ghost btn--sm" data-action="edit">Edit address</button>
+          </article>
+        </div>
+
+        <article class="card">
+          <div class="card__row">
+            <div>
+              <p class="card__label">Need a hand?</p>
+              <p class="card__muted">Message your crew or our support team. We usually reply within an hour.</p>
+            </div>
+            <button class="btn magnetic" data-action="support">Contact support</button>
+          </div>
+        </article>
+
+        <article class="card card--danger">
+          <div class="card__row">
+            <div>
+              <p class="card__label">Cancel service</p>
+              <p class="card__muted">No contract, no fee. You can reactivate anytime.</p>
+            </div>
+            <button class="btn btn--danger-ghost" data-action="cancel">Cancel plan</button>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <!-- ============ MODAL ============ -->
+  <div class="modal" data-modal hidden>
+    <div class="modal__backdrop" data-modal-close></div>
+    <div class="modal__card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <h2 id="modal-title" data-modal-title>Confirm</h2>
+      <p data-modal-body>Are you sure?</p>
+      <div class="modal__actions">
+        <button class="btn btn--ghost" data-modal-close>Never mind</button>
+        <button class="btn" data-modal-confirm>Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- toast -->
+  <div class="toast" data-toast hidden></div>
+
+  <script src="portal.js" defer></script>
+</body>
+</html>

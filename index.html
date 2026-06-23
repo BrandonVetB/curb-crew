@@ -14,7 +14,7 @@
   <!-- Fonts: Space Grotesk (display) + Inter (body) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=Archivo:ital,wght@1,800&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="styles.css" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230B0B0F'/><path d='M30 38h40l-4 34a6 6 0 0 1-6 5H40a6 6 0 0 1-6-5z' fill='%230066FF'/><rect x='26' y='30' width='48' height='8' rx='4' fill='%23fff'/></svg>" />
@@ -31,14 +31,22 @@
         <img class="wordmark__img" src="curb-crew-logo.png" alt="Curb Crew"
              onload="this.closest('.wordmark').classList.add('has-logo')"
              onerror="this.remove()" />
-        <span class="wordmark__mark" aria-hidden="true">
-          <svg viewBox="0 0 32 32" width="28" height="28" fill="none">
-            <rect x="5" y="11" width="22" height="3" rx="1.5" fill="currentColor"/>
-            <path d="M8 14h16l-1.7 14.2A2.5 2.5 0 0 1 19.8 30H12.2a2.5 2.5 0 0 1-2.5-1.8z" fill="currentColor"/>
-            <path d="M13 8h6l1 3h-8z" fill="currentColor"/>
+        <span class="wordmark__fallback brand-logo" aria-hidden="true">
+          <svg class="brand-logo__svg" viewBox="0 0 300 116" fill="none">
+            <text class="bl-letter" x="0" y="74">C</text>
+            <g class="bl-bin">
+              <path class="bl-lid" d="M64 44 L118 26 L130 40 L76 58 Z"/>
+              <path class="bl-body" d="M74 50 L122 50 L116 86 Q115 90 111 90 L87 90 Q83 90 82 86 Z"/>
+              <line class="bl-slat" x1="90" y1="56" x2="90" y2="84"/>
+              <line class="bl-slat" x1="99" y1="56" x2="99" y2="84"/>
+              <line class="bl-slat" x1="108" y1="56" x2="108" y2="84"/>
+              <circle class="bl-wheel" cx="83" cy="95" r="8"/>
+            </g>
+            <text class="bl-letter" x="132" y="74">RB</text>
+            <rect class="bl-underline" x="2" y="92" width="248" height="7" rx="3.5"/>
+            <text class="bl-crew" x="126" y="112">CREW</text>
           </svg>
         </span>
-        <span class="wordmark__text">Curb&nbsp;Crew</span>
       </a>
 
       <nav class="nav__links" aria-label="Primary">
@@ -46,9 +54,10 @@
         <a href="#pricing">Pricing</a>
         <a href="#love">Why people love it</a>
         <a href="#faq">FAQ</a>
+        <a href="portal.html" data-signin-mobile>Sign in</a>
       </nav>
 
-      <a href="#hero" class="btn btn--small magnetic">Check your street</a>
+      <a href="portal.html" class="btn btn--small magnetic">Sign in</a>
 
       <button class="nav__toggle" aria-label="Toggle menu" aria-expanded="false">
         <span></span><span></span>
@@ -423,14 +432,22 @@
           <img class="wordmark__img" src="curb-crew-logo.png" alt="Curb Crew"
                onload="this.closest('.wordmark').classList.add('has-logo')"
                onerror="this.remove()" />
-          <span class="wordmark__mark" aria-hidden="true">
-            <svg viewBox="0 0 32 32" width="24" height="24" fill="none">
-              <rect x="5" y="11" width="22" height="3" rx="1.5" fill="currentColor"/>
-              <path d="M8 14h16l-1.7 14.2A2.5 2.5 0 0 1 19.8 30H12.2a2.5 2.5 0 0 1-2.5-1.8z" fill="currentColor"/>
-              <path d="M13 8h6l1 3h-8z" fill="currentColor"/>
+          <span class="wordmark__fallback brand-logo" aria-hidden="true">
+            <svg class="brand-logo__svg" viewBox="0 0 300 116" fill="none">
+              <text class="bl-letter" x="0" y="74">C</text>
+              <g class="bl-bin">
+                <path class="bl-lid" d="M64 44 L118 26 L130 40 L76 58 Z"/>
+                <path class="bl-body" d="M74 50 L122 50 L116 86 Q115 90 111 90 L87 90 Q83 90 82 86 Z"/>
+                <line class="bl-slat" x1="90" y1="56" x2="90" y2="84"/>
+                <line class="bl-slat" x1="99" y1="56" x2="99" y2="84"/>
+                <line class="bl-slat" x1="108" y1="56" x2="108" y2="84"/>
+                <circle class="bl-wheel" cx="83" cy="95" r="8"/>
+              </g>
+              <text class="bl-letter" x="132" y="74">RB</text>
+              <rect class="bl-underline" x="2" y="92" width="248" height="7" rx="3.5"/>
+              <text class="bl-crew" x="126" y="112">CREW</text>
             </svg>
           </span>
-          <span class="wordmark__text">Curb&nbsp;Crew</span>
         </a>
         <p class="footer__tag">Never touch your trash cans again.</p>
       </div>

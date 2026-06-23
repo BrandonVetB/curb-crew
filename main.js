@@ -154,8 +154,10 @@
     var setWidth = set.getBoundingClientRect().width;
     if (!setWidth) return;
     var needed = window.innerWidth + setWidth;
-    while (track.getBoundingClientRect().width < needed) {
+    var guard = 0;
+    while (track.getBoundingClientRect().width < needed && guard < 40) {
       track.appendChild(set.cloneNode(true));
+      guard++;
     }
     gsap.to(track, {
       x: "-=" + setWidth,
