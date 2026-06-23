@@ -107,22 +107,15 @@
       tl.to({}, { duration: 0.7 })
         // tip back onto the wheel
         .to(bin,    { rotation: -11, duration: 0.5, ease: "power2.out" })
-        // roll along the sidewalk to the curb
-        .to(binGrp, { x: 338, y: 187, duration: 1.3 })
-        // drop off the curb down onto the street
-        .to(binGrp, { x: 360, y: 205, duration: 0.4, ease: "power1.in" })
-        // roll out onto the street
-        .to(binGrp, { x: 438, y: 205, duration: 1.0 })
-        // set it down flat
+        // roll along the sidewalk and stop right at the curb
+        .to(binGrp, { x: 323, y: 187, duration: 1.8 })
+        // set it down next to the curb
         .to(bin,    { rotation: 0, duration: 0.5, ease: "power2.out" })
-        .to({},     { duration: 1.5 })
+        .to({},     { duration: 1.7 })
 
-        // bring it back in
+        // bring it back to the house
         .to(bin,    { rotation: -11, duration: 0.5, ease: "power2.out" })
-        .to(binGrp, { x: 360, y: 205, duration: 1.0 })
-        // back up the curb onto the sidewalk
-        .to(binGrp, { x: 338, y: 187, duration: 0.4, ease: "power1.out" })
-        .to(binGrp, { x: 268, y: 187, duration: 1.3 })
+        .to(binGrp, { x: 268, y: 187, duration: 1.8 })
         .to(bin,    { rotation: 0, duration: 0.5, ease: "power2.out" })
         .to({},     { duration: 0.7 });
     }
