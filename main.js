@@ -274,7 +274,7 @@
   function fireConfetti() {
     if (!ctx || REDUCED) return;
     var dpr = window.devicePixelRatio || 1;
-    var colors = ["#0066FF", "#FFFFFF", "#3b86ff"];
+    var colors = ["#0066FF", "#0B0B0F", "#3b86ff"];
     var cx = canvas.width / 2;
     var cy = canvas.height * 0.42;
     var count = window.innerWidth < 600 ? 70 : 130;
