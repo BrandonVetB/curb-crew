@@ -143,54 +143,36 @@
   }
 
   /* ============================================================
-     MARQUEE: seamless infinite scroll
+     MARQUEE: seamless, gap-free loop.
+     Clone the set until the track is wider than viewport + one set,
+     then wrap x by exactly one set width so it never breaks.
      ============================================================ */
   var track = $("[data-marquee]");
-  if (hasGSAP && !REDUCED && track) {
-    // track contains 2 identical halves -> animate -50%
-    gsap.to(track, { xPercent: -50, duration: 22, ease: "none", repeat: -1 });
-  }
-
-  /* ============================================================
-     HOW IT WORKS: pinned step sequence
-     ============================================================ */
-  var steps = $all(".how__step");
-  var cards = $all("[data-how-card]");
-  function setActiveStep(i) {
-    steps.forEach(function (s, idx) { s.classList.toggle("is-active", idx === i); });
-    cards.forEach(function (c, idx) { c.classList.toggle("is-active", idx === i); });
-  }
-  setActiveStep(0);
-
-  if (hasGSAP && !REDUCED && steps.length && window.innerWidth > 960) {
-    var pin = $("[data-how-pin]");
-    ScrollTrigger.create({
-      trigger: pin,
-      start: "top top+=80",
-      end: "+=" + (steps.length * 420),
-      pin: true,
-      scrub: 0.4,
-      onUpdate: function (self) {
-        var i = Math.min(steps.length - 1, Math.floor(self.progress * steps.length));
-        setActiveStep(i);
-      }
+  function buildMarquee() {
+    var set = $(".marquee__set", track);
+    if (!set) return;
+    var setWidth = set.getBoundingClientRect().width;
+    if (!setWidth) return;
+    var needed = window.innerWidth + setWidth;
+    while (track.getBoundingClientRect().width < needed) {
+      track.appendChild(set.cloneNode(true));
+    }
+    gsap.to(track, {
+      x: "-=" + setWidth,
+      duration: setWidth / 70,
+      ease: "none",
+      repeat: -1,
+      modifiers: { x: gsap.utils.unitize(gsap.utils.wrap(-setWidth, 0)) }
     });
-  } else {
-    // mobile / reduced: light up each step as it enters
-    if (!REDUCED && "IntersectionObserver" in window) {
-      var stepIO = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-          if (entry.isIntersecting) {
-            var idx = steps.indexOf(entry.target);
-            setActiveStep(idx);
-          }
-        });
-      }, { threshold: 0.6 });
-      steps.forEach(function (s) { stepIO.observe(s); });
+  }
+  if (track && hasGSAP && !REDUCED) {
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(buildMarquee);
     } else {
-      steps.forEach(function (s) { s.classList.add("is-active"); });
+      window.addEventListener("load", buildMarquee);
     }
   }
+  /* "How it works" now uses plain scroll-reveal (.reveal) — no pin, no lag. */
 
   /* ============================================================
      STATS: count-up when in view

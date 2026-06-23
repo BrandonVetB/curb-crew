@@ -116,6 +116,15 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .wordmark__mark { color: var(--blue); display: inline-flex; }
 .wordmark__text { white-space: nowrap; }
 
+/* logo image (shown once the real file is present) */
+.wordmark__img { display: none; width: auto; }
+.wordmark.has-logo .wordmark__mark,
+.wordmark.has-logo .wordmark__text { display: none; }
+.wordmark.has-logo .wordmark__img { display: block; }
+.wordmark--header .wordmark__img { height: 50px; }
+.wordmark--footer .wordmark__img { height: 40px; }
+@media (max-width: 600px) { .wordmark--header .wordmark__img { height: 40px; } }
+
 .nav__links { display: flex; gap: 30px; }
 .nav__links a {
   font-size: 15px; font-weight: 500; color: var(--ink-70);
@@ -262,48 +271,50 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
    MARQUEE (blue accent band)
    ============================================================ */
 .marquee { padding: 20px 0; overflow: hidden; border-top: 1px solid rgba(255,255,255,0.22); border-bottom: 1px solid rgba(255,255,255,0.22); }
-.marquee__track {
-  display: flex; align-items: center; gap: 28px; white-space: nowrap; width: max-content;
+.marquee__track { display: flex; align-items: center; width: max-content; will-change: transform; }
+.marquee__set {
+  display: flex; align-items: center; gap: 28px; padding-right: 28px; flex: none;
   font-family: var(--font-display); font-weight: 600; font-size: 18px; letter-spacing: 0.01em;
-  color: var(--white); will-change: transform;
+  color: var(--white); white-space: nowrap;
 }
-.marquee__track .dot { opacity: .6; }
+.marquee__set .dot { opacity: .6; }
 
 /* ============================================================
    HOW IT WORKS
    ============================================================ */
-.how { padding: 110px 0 0; }
-.how__pin { padding-bottom: 110px; }
-.how__layout { display: grid; grid-template-columns: 1fr 0.85fr; gap: 60px; align-items: start; }
+.how { padding: 110px 0; }
+.how__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.how-step {
+  background: var(--white); border: 1px solid var(--line); border-radius: var(--radius-lg);
+  padding: 26px; box-shadow: 0 10px 30px rgba(11,11,15,0.04);
+  transition: border-color .3s var(--ease), box-shadow .3s var(--ease), transform .3s var(--ease);
+}
+.how-step:hover { border-color: var(--blue); box-shadow: 0 24px 56px rgba(0,102,255,0.14); transform: translateY(-5px); }
+.how-step__art {
+  border-radius: var(--radius); background: rgba(0,102,255,0.06);
+  padding: 16px; margin-bottom: 22px; display: grid; place-items: center;
+}
+.how-step__art svg { width: 100%; max-width: 190px; height: auto; }
+.how-step__num {
+  font-family: var(--font-display); font-weight: 700; font-size: 14px;
+  color: var(--blue); letter-spacing: 0.08em; display: block; margin-bottom: 10px;
+}
+.how-step h3 { font-family: var(--font-display); font-size: 1.35rem; letter-spacing: -0.01em; margin-bottom: 10px; }
+.how-step p { color: var(--dark-60); font-size: 1rem; }
 
-.how__steps { display: flex; flex-direction: column; gap: 22px; }
-.how__step {
-  border: 1px solid var(--line); border-radius: var(--radius-lg);
-  padding: 30px 32px; background: var(--white);
-  transition: border-color .35s var(--ease), box-shadow .35s var(--ease), transform .35s var(--ease), opacity .35s var(--ease);
-  opacity: .5;
-}
-.how__step.is-active {
-  opacity: 1; border-color: var(--blue);
-  box-shadow: 0 20px 50px rgba(0,102,255,0.14);
-  transform: translateY(-2px);
-}
-.how__num {
-  font-family: var(--font-display); font-weight: 700; font-size: 15px;
-  color: var(--blue); letter-spacing: 0.08em; display: block; margin-bottom: 12px;
-}
-.how__step h3 { font-family: var(--font-display); font-size: clamp(1.3rem, 2.4vw, 1.7rem); letter-spacing: -0.01em; margin-bottom: 10px; }
-.how__step p { color: var(--dark-60); font-size: 1.02rem; max-width: 46ch; }
-
-.how__visual { position: sticky; top: 120px; height: 320px; border-radius: var(--radius-lg); background: var(--black); overflow: hidden; display: grid; place-items: center; box-shadow: 0 30px 70px rgba(11,11,15,0.18); }
-.how__visual::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 50% 40%, rgba(0,102,255,0.28), transparent 65%); }
-.how__card {
-  position: absolute; display: flex; flex-direction: column; align-items: center; gap: 14px;
-  font-family: var(--font-display); font-weight: 600; font-size: 1.1rem; color: var(--white);
-  opacity: 0; transform: scale(.9); transition: opacity .4s var(--ease), transform .4s var(--ease);
-}
-.how__card.is-active { opacity: 1; transform: scale(1); }
-.how__icon { font-size: 64px; line-height: 1; filter: drop-shadow(0 8px 24px var(--blue-glow)); }
+/* step illustrations */
+.ill-card { fill: #fff; stroke: var(--black); stroke-width: 2.5; }
+.ill-line { stroke: rgba(0,102,255,0.4); stroke-width: 3; stroke-linecap: round; fill: none; }
+.ill-blue { fill: var(--blue); }
+.ill-white { fill: #fff; }
+.ill-faint { fill: rgba(11,11,15,0.18); }
+.ill-ground { stroke: rgba(11,11,15,0.14); stroke-width: 2.5; stroke-linecap: round; }
+.ill-pop { stroke: var(--blue); stroke-width: 3; stroke-linecap: round; fill: none; }
+.ill-pop2 { stroke: var(--blue); stroke-width: 4.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+.ill-dark { fill: var(--black); }
+.ill-dark2 { stroke: var(--black); stroke-width: 3; stroke-linecap: round; }
+.ill-blue2 { fill: var(--blue); stroke: #0052cc; stroke-width: 1.2; stroke-linejoin: round; }
+.ill-rib { stroke: rgba(255,255,255,0.75); stroke-width: 2; stroke-linecap: round; }
 
 /* ============================================================
    PRICING
@@ -367,7 +378,11 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .benefit:hover { border-color: var(--blue); box-shadow: 0 24px 56px rgba(0,102,255,0.16); transform: translateY(-5px); }
 .benefit__icon {
   width: 56px; height: 56px; border-radius: 16px; display: grid; place-items: center;
-  font-size: 28px; background: var(--blue-soft); margin-bottom: 20px;
+  background: var(--blue-soft); margin-bottom: 20px;
+}
+.benefit__icon svg {
+  width: 30px; height: 30px; stroke: var(--blue); fill: none;
+  stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;
 }
 .benefit h3 { font-family: var(--font-display); font-size: 1.25rem; letter-spacing: -0.01em; margin-bottom: 10px; line-height: 1.2; }
 .benefit p { color: var(--dark-60); }
@@ -452,8 +467,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 @media (max-width: 960px) {
   .hero__inner { grid-template-columns: 1fr; gap: 40px; }
   .hero__scene { max-width: 460px; }
-  .how__layout { grid-template-columns: 1fr; }
-  .how__visual { display: none; }
+  .how__grid { grid-template-columns: 1fr; max-width: 460px; margin-inline: auto; }
   .pricing__grid { grid-template-columns: 1fr; }
   .love__grid { grid-template-columns: repeat(2, 1fr); }
   .stats__grid { grid-template-columns: repeat(2, 1fr); row-gap: 44px; }
