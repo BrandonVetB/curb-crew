@@ -40,6 +40,7 @@
     if (!TITLES[name]) return;
     $all(".panel").forEach(function (p) { p.hidden = p.getAttribute("data-panel") !== name; });
     $all(".side__link").forEach(function (l) { l.classList.toggle("is-active", l.getAttribute("data-nav") === name); });
+    $all(".tabbar__item").forEach(function (t) { t.classList.toggle("is-active", t.getAttribute("data-nav") === name); });
     var title = $("[data-page-title]");
     if (title) title.textContent = TITLES[name];
     var sel = $("[data-mobile-nav]");
