@@ -97,27 +97,27 @@
   var bin = $(".sc-bin");
 
   if (hasGSAP && binGrp && bin) {
-    // wheel (~22,97 in the image) rests on the sidewalk beside the house
-    gsap.set(binGrp, { x: 268, y: 187 });
-    gsap.set(bin, { transformOrigin: "22px 97px" });
+    // wheel (~9.7,49.7 in the image) sits at the front of the garage
+    gsap.set(binGrp, { x: 23.9, y: 87.1 });
+    gsap.set(bin, { transformOrigin: "9.7px 49.7px" });
 
     if (!REDUCED) {
       var tl = gsap.timeline({ repeat: -1, defaults: { ease: "power1.inOut" } });
 
-      tl.to({}, { duration: 0.7 })
+      tl.to({}, { duration: 0.8 })
         // tip back onto the wheel
-        .to(bin,    { rotation: -11, duration: 0.5, ease: "power2.out" })
-        // roll along the sidewalk and stop right at the curb
-        .to(binGrp, { x: 323, y: 187, duration: 1.8 })
-        // set it down next to the curb
+        .to(bin,    { rotation: -10, duration: 0.5, ease: "power2.out" })
+        // roll down the driveway and stop right at the curb
+        .to(binGrp, { x: 86.3, y: 118.3, duration: 2.0 })
+        // set it down at the curb
         .to(bin,    { rotation: 0, duration: 0.5, ease: "power2.out" })
-        .to({},     { duration: 1.7 })
+        .to({},     { duration: 1.8 })
 
-        // bring it back to the house
-        .to(bin,    { rotation: -11, duration: 0.5, ease: "power2.out" })
-        .to(binGrp, { x: 268, y: 187, duration: 1.8 })
+        // bring it back up to the garage
+        .to(bin,    { rotation: -10, duration: 0.5, ease: "power2.out" })
+        .to(binGrp, { x: 23.9, y: 87.1, duration: 2.0 })
         .to(bin,    { rotation: 0, duration: 0.5, ease: "power2.out" })
-        .to({},     { duration: 0.7 });
+        .to({},     { duration: 0.8 });
     }
   }
 

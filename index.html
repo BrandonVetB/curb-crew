@@ -98,37 +98,51 @@
           <p class="hero__trust reveal">No contracts · Cancel anytime · Local crews</p>
         </div>
 
-        <!-- Animated scene: the real Curb Crew bin tilts back, rolls, and settles on the street -->
+        <!-- Isometric scene: bin rolls down the driveway and stops at the curb -->
         <div class="hero__scene reveal" aria-hidden="true">
-          <svg class="scene" viewBox="0 0 560 360" role="img" aria-label="A trash can rolling from a house out onto the street">
-            <!-- street -->
-            <rect class="sc-street" x="360" y="302" width="200" height="58" />
-            <line class="sc-lane" x1="378" y1="330" x2="548" y2="330" stroke-dasharray="16 18" />
-            <!-- sidewalk + curb -->
-            <line class="sc-ground" x1="20" y1="284" x2="360" y2="284" />
-            <line class="sc-curb" x1="360" y1="284" x2="360" y2="302" />
-            <line class="sc-curb" x1="360" y1="302" x2="560" y2="302" />
-            <!-- house -->
-            <ellipse class="sc-shadow" cx="160" cy="288" rx="122" ry="9" />
-            <g class="sc-house">
-              <rect class="sc-chimney" x="198" y="98" width="20" height="52" rx="2" />
-              <path class="sc-roof" d="M62 154 L160 94 L258 154 Z" />
-              <rect class="sc-wall" x="72" y="154" width="176" height="130" rx="6" />
-              <line class="sc-fascia" x1="62" y1="154" x2="258" y2="154" />
-              <rect class="sc-window" x="96" y="182" width="34" height="34" rx="4" />
-              <line class="sc-mull" x1="113" y1="182" x2="113" y2="216" />
-              <line class="sc-mull" x1="96" y1="199" x2="130" y2="199" />
-              <rect class="sc-window" x="190" y="182" width="34" height="34" rx="4" />
-              <line class="sc-mull" x1="207" y1="182" x2="207" y2="216" />
-              <line class="sc-mull" x1="190" y1="199" x2="224" y2="199" />
-              <path class="sc-door" d="M142 284 L142 240 Q142 220 160 220 Q178 220 178 240 L178 284 Z" />
-              <circle class="sc-knob" cx="171" cy="254" r="2.4" />
-            </g>
-
-            <!-- the real Curb Crew bin (animated by GSAP) -->
+          <svg class="scene" viewBox="-226 -121 526 391" role="img" aria-label="An isometric house with a garage, driveway and a trash can rolling to the curb">
+      <polygon points="0.0,0.0 264.0,132.0 72.0,228.0 -192.0,96.0" fill="#7fc25b"/>
+      <polygon points="264.0,132.0 72.0,228.0 72.0,237.5 264.0,141.5" fill="#5a9a3e"/>
+      <polygon points="-192.0,96.0 72.0,228.0 72.0,237.5 -192.0,105.5" fill="#5a9a3e"/>
+      <polygon points="237.6,115.4 290.4,141.8 74.4,249.8 21.6,223.3" fill="#cdd1d8"/>
+      <polygon points="21.6,223.3 74.4,249.8 74.4,259.2 21.6,232.8" fill="#aeb3bc"/>
+      <polygon points="244.8,135.6 252.0,139.2 235.2,147.6 228.0,144.0" fill="#f4f6f8"/>
+      <polygon points="216.0,150.0 223.2,153.6 206.4,162.0 199.2,158.4" fill="#f4f6f8"/>
+      <polygon points="187.2,164.4 194.4,168.0 177.6,176.4 170.4,172.8" fill="#f4f6f8"/>
+      <polygon points="158.4,178.8 165.6,182.4 148.8,190.8 141.6,187.2" fill="#f4f6f8"/>
+      <polygon points="129.6,193.2 136.8,196.8 120.0,205.2 112.8,201.6" fill="#f4f6f8"/>
+      <polygon points="100.8,207.6 108.0,211.2 91.2,219.6 84.0,216.0" fill="#f4f6f8"/>
+      <polygon points="72.0,222.0 79.2,225.6 62.4,234.0 55.2,230.4" fill="#f4f6f8"/>
+      <polygon points="232.8,104.4 237.6,106.8 21.6,214.8 16.8,212.4" fill="#e7e9ed"/>
+      <polygon points="237.6,106.8 21.6,214.8 21.6,223.3 237.6,115.4" fill="#c4c8d0"/>
+      <polygon points="62.4,112.6 139.2,151.0 76.8,182.2 0.0,143.8" fill="#dfe2e8"/>
+      <polygon points="-81.6,103.0 -57.6,115.0 -105.6,139.0 -129.6,127.0" fill="#e7e9ed"/>
+      <polygon points="0.0,57.5 100.8,107.9 4.8,155.9 -96.0,105.5" fill="rgba(20,40,10,0.10)"/>
+      <polygon points="96.0,96.0 0.0,144.0 0.0,87.0 96.0,39.0" fill="#bcc2cc"/>
+      <polygon points="-96.0,96.0 0.0,144.0 0.0,87.0 -96.0,39.0" fill="#e2e6ec"/>
+      <polygon points="64.8,111.6 4.8,141.6 4.8,99.8 64.8,69.8" fill="#c9ced7"/>
+      <polygon points="64.8,111.6 64.8,69.8 60.0,72.2 60.0,114.0" fill="#aeb4bf"/>
+      <line x1="64.8" y1="102.1" x2="4.8" y2="132.1" stroke="#9aa0ac" stroke-width="1.2"/>
+      <line x1="64.8" y1="92.6" x2="4.8" y2="122.6" stroke="#9aa0ac" stroke-width="1.2"/>
+      <line x1="64.8" y1="83.1" x2="4.8" y2="113.1" stroke="#9aa0ac" stroke-width="1.2"/>
+      <line x1="64.8" y1="73.6" x2="4.8" y2="103.6" stroke="#9aa0ac" stroke-width="1.2"/>
+      <polygon points="-88.8,99.6 -67.2,110.4 -67.2,70.5 -88.8,59.7" fill="#0066ff"/>
+      <polygon points="-50.4,94.1 -33.6,102.5 -33.6,83.5 -50.4,75.1" fill="#bcdcff"/>
+      <polygon points="-28.8,104.9 -12.0,113.3 -12.0,94.3 -28.8,85.9" fill="#bcdcff"/>
+      <circle cx="-70.8" cy="88.7" r="2.2" fill="#fff"/>
+      <polygon points="-50.4,94.1 -33.6,102.5 -33.6,83.5 -50.4,75.1" fill="none" stroke="#0b0b0f" stroke-width="1.6" stroke-linejoin="round"/>
+      <polygon points="-28.8,104.9 -12.0,113.3 -12.0,94.3 -28.8,85.9" fill="none" stroke="#0b0b0f" stroke-width="1.6" stroke-linejoin="round"/>
+      <polygon points="0.0,-9.0 -96.0,39.0 -48.0,-23.0" fill="#bcc2cc"/>
+      <polygon points="0.0,-9.0 96.0,39.0 48.0,25.0 -48.0,-23.0" fill="#0a57e0"/>
+      <polygon points="-96.0,39.0 0.0,87.0 48.0,25.0 -48.0,-23.0" fill="#2f7bff"/>
+      <polygon points="96.0,39.0 0.0,87.0 48.0,25.0" fill="#e2e6ec"/>
+      <line x1="-48.0" y1="-23.0" x2="48.0" y2="25.0" stroke="#1f6bf2" stroke-width="2"/>
+      <rect x="-102.8" y="100.4" width="4" height="22" fill="#7a5b3a"/>
+      <ellipse cx="-100.8" cy="92.4" rx="16" ry="13" fill="#3f8a2e"/>
+      <ellipse cx="-104.8" cy="88.4" rx="12" ry="10" fill="#54a83e"/>
             <g class="sc-bin-grp">
-              <ellipse class="sc-binshadow" cx="22" cy="100" rx="30" ry="6" />
-              <image class="sc-bin" href="curb-crew-bin.png" width="86" height="105" />
+              <ellipse class="sc-binshadow" cx="9.7" cy="52.7" rx="22" ry="5"/>
+              <image class="sc-bin" href="curb-crew-bin.png" width="44" height="54"/>
             </g>
           </svg>
         </div>
