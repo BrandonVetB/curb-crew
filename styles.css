@@ -29,7 +29,7 @@
   --font-body: "Inter", system-ui, -apple-system, sans-serif;
 
   --container: 1180px;
-  --nav-h: 110px;
+  --nav-h: 158px;
   --radius: 18px;
   --radius-lg: 28px;
 
@@ -121,8 +121,8 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .wordmark__img { display: none; width: auto; }
 .wordmark.has-logo .wordmark__fallback { display: none; }
 .wordmark.has-logo .wordmark__img { display: block; }
-.wordmark--header .wordmark__img { height: 96px; }
-.wordmark--footer .wordmark__img { height: 40px; }
+.wordmark--header .wordmark__img { height: 140px; }
+.wordmark--footer .wordmark__img { height: 44px; }
 
 .wordmark__fallback { display: inline-flex; align-items: center; gap: 10px; }
 .brand-logo__svg { height: 46px; width: auto; display: block; }
@@ -134,8 +134,8 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .bl-slat { stroke: #fff; stroke-width: 2.4; stroke-linecap: round; }
 .bl-wheel { fill: var(--blue); stroke: var(--black); stroke-width: 3; }
 @media (max-width: 600px) {
-  :root { --nav-h: 84px; }
-  .wordmark--header .wordmark__img, .wordmark--header .brand-logo__svg { height: 60px; }
+  :root { --nav-h: 104px; }
+  .wordmark--header .wordmark__img, .wordmark--header .brand-logo__svg { height: 84px; }
 }
 
 .nav__links { display: flex; gap: 30px; }
@@ -185,7 +185,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 /* ============================================================
    HERO
    ============================================================ */
-.hero { padding: 150px 0 90px; overflow: hidden; min-height: 100svh; display: flex; align-items: center; }
+.hero { padding: 200px 0 90px; overflow: hidden; min-height: 100svh; display: flex; align-items: center; }
 .hero__inner {
   display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 56px; align-items: center;
   position: relative; z-index: 2;
@@ -511,7 +511,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 
 @media (max-width: 600px) {
   .container { padding-inline: 18px; }
-  .hero { padding: 120px 0 70px; }
+  .hero { padding: 140px 0 70px; }
   .address-form__row { flex-direction: column; border-radius: 22px; padding: 10px; }
   .address-form .btn { width: 100%; }
   .love__grid { grid-template-columns: 1fr; }

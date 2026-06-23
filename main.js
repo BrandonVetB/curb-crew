@@ -53,7 +53,7 @@
       e.preventDefault();
       nav.classList.remove("is-open");
       if (toggle) toggle.setAttribute("aria-expanded", "false");
-      var top = target.getBoundingClientRect().top + window.scrollY - 116;
+      var top = target.getBoundingClientRect().top + window.scrollY - 164;
       window.scrollTo({ top: top, behavior: REDUCED ? "auto" : "smooth" });
     });
   });
