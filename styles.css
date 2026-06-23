@@ -123,7 +123,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .wordmark--header .wordmark__img { height: 48px; }
 .wordmark--footer .wordmark__img { height: 40px; }
 
-.wordmark__fallback { display: inline-flex; align-items: center; }
+.wordmark__fallback { display: inline-flex; align-items: center; gap: 10px; }
 .brand-logo__svg { height: 46px; width: auto; display: block; }
 .wordmark--footer .brand-logo__svg { height: 40px; }
 .bl-letter { font-family: "Archivo", var(--font-display); font-weight: 800; font-style: italic; font-size: 92px; fill: var(--black); }
