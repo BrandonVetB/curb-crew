@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Join Curb Crew</title>
+  <meta name="description" content="Sign up for Curb Crew. Pick your plan, enter your details, and never touch your trash cans again." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=Archivo:ital,wght@1,800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="join.css" />
+  <link rel="icon" type="image/png" href="curb-crew-favicon.png" />
+  <link rel="apple-touch-icon" href="curb-crew-favicon.png" />
+</head>
+<body class="join-body">
+
+  <header class="join-top">
+    <a href="index.html" class="wordmark wordmark--header" aria-label="Curb Crew home">
+      <img class="wordmark__img" src="curb-crew-logo.png" alt="Curb Crew"
+           onload="this.closest('.wordmark').classList.add('has-logo')" onerror="this.remove()" />
+      <span class="wordmark__fallback" aria-hidden="true">
+        <span class="wordmark__mark">
+          <svg viewBox="0 0 32 32" width="22" height="22" fill="none">
+            <rect x="5" y="11" width="22" height="3" rx="1.5" fill="currentColor"/>
+            <path d="M8 14h16l-1.7 14.2A2.5 2.5 0 0 1 19.8 30H12.2a2.5 2.5 0 0 1-2.5-1.8z" fill="currentColor"/>
+            <path d="M13 8h6l1 3h-8z" fill="currentColor"/>
+          </svg>
+        </span>
+        <span class="wordmark__text">Curb&nbsp;Crew</span>
+      </span>
+    </a>
+  </header>
+
+  <main class="join">
+    <div class="join__intro">
+      <p class="join__eyebrow">Residential trash can valet</p>
+      <h1>Never touch your trash cans again.</h1>
+      <p class="join__sub">Pick your plan, drop your details, and we take it from there. No contracts, cancel anytime.</p>
+    </div>
+
+    <form class="join__form" data-join-form novalidate>
+      <!-- PLAN -->
+      <section class="join__card">
+        <h2 class="join__h2">Your plan</h2>
+
+        <div class="plan-base">
+          <div>
+            <strong>The Curb Crew Plan</strong>
+            <span>Cans out the night before, back in after pickup. Every week.</span>
+          </div>
+          <span class="plan-base__price">$35<small>/mo</small></span>
+        </div>
+
+        <p class="addons-label">Add-ons (optional)</p>
+        <label class="addon-toggle">
+          <input type="checkbox" data-addon data-price="8" name="recycling" />
+          <span class="addon-toggle__box" aria-hidden="true"></span>
+          <span class="addon-toggle__name">Recycling can</span>
+          <span class="addon-toggle__price">+$8/mo</span>
+        </label>
+        <label class="addon-toggle">
+          <input type="checkbox" data-addon data-price="8" name="yard" />
+          <span class="addon-toggle__box" aria-hidden="true"></span>
+          <span class="addon-toggle__name">Yard-waste can</span>
+          <span class="addon-toggle__price">+$8/mo</span>
+        </label>
+        <label class="addon-toggle">
+          <input type="checkbox" data-addon data-price="12" name="cleaning" />
+          <span class="addon-toggle__box" aria-hidden="true"></span>
+          <span class="addon-toggle__name">Monthly can cleaning</span>
+          <span class="addon-toggle__price">+$12/mo</span>
+        </label>
+
+        <div class="plan-total">
+          <span>Your total</span>
+          <strong data-total>$35<small>/mo</small></strong>
+        </div>
+      </section>
+
+      <!-- DETAILS -->
+      <section class="join__card">
+        <h2 class="join__h2">Your details</h2>
+        <div class="join__grid">
+          <label class="field"><span>Full name</span><input type="text" name="name" autocomplete="name" placeholder="Jane Smith" /></label>
+          <label class="field"><span>Email</span><input type="email" name="email" autocomplete="email" placeholder="you@email.com" /></label>
+          <label class="field"><span>Phone</span><input type="tel" name="phone" autocomplete="tel" placeholder="(555) 555-5555" /></label>
+          <label class="field"><span>ZIP code</span><input type="text" name="zip" inputmode="numeric" autocomplete="postal-code" placeholder="78704" /></label>
+          <label class="field field--wide"><span>Street address</span><input type="text" name="address" autocomplete="street-address" placeholder="123 Maple St, Austin TX" /></label>
+        </div>
+      </section>
+
+      <button type="submit" class="btn btn--block">Start my service</button>
+      <p class="join__msg" data-join-msg role="status" aria-live="polite"></p>
+      <p class="join__fine">No charge today. We confirm your street and email you to finish setup. <a href="index.html">See the full site</a></p>
+    </form>
+  </main>
+
+  <script src="join.js" defer></script>
+</body>
+</html>
