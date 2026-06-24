@@ -218,8 +218,32 @@
   }
 
   /* ============================================================
-     ADDRESS FORM: validate, success state, confetti
+     ADDRESS FORM: validate, capture lead to Supabase, success, confetti
      ============================================================ */
+  var SUPABASE_URL = "https://hezahtnfyhqfucixzqxi.supabase.co";
+  var SUPABASE_KEY = "sb_publishable_9l4_Bqgjg7qBapvYlLPJSA_pHOk0nMB";
+
+  function captureLead(raw) {
+    var zip = (raw.match(/\b\d{5}\b/) || [null])[0];
+    try {
+      fetch(SUPABASE_URL + "/rest/v1/leads", {
+        method: "POST",
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": "Bearer " + SUPABASE_KEY,
+          "Content-Type": "application/json",
+          "Prefer": "return=minimal"
+        },
+        body: JSON.stringify({
+          raw_input: raw,
+          zip: zip,
+          source: "homepage",
+          user_agent: navigator.userAgent
+        })
+      }).catch(function () {});
+    } catch (e) {}
+  }
+
   function isValidEntry(v) {
     v = v.trim();
     if (/^\d{5}(-\d{4})?$/.test(v)) return true;      // ZIP
@@ -239,6 +263,7 @@
         input.focus();
         return;
       }
+      captureLead(val.trim());
       msg.textContent = "🎉 Great news, we're serving your area! We've saved your spot, check your email.";
       msg.className = "address-form__msg is-success";
       input.value = "";
