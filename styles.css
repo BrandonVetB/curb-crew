@@ -78,12 +78,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .section--accent{ background: var(--blue);  color: var(--white); position: relative; }
 
 /* ---------- Typography ---------- */
-.eyebrow {
-  font-family: var(--font-display);
-  font-size: 13px; font-weight: 600; letter-spacing: 0.18em;
-  text-transform: uppercase; color: var(--blue);
-  display: inline-block; margin-bottom: 18px;
-}
+.eyebrow { display: none; }
 
 .section-title {
   font-family: var(--font-display);
@@ -305,6 +300,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   padding: 16px; margin-bottom: 22px; display: grid; place-items: center;
 }
 .how-step__art svg { width: 100%; max-width: 190px; height: auto; }
+.how-step__bin { height: 104px; width: auto; display: block; }
 .how-step__num {
   font-family: var(--font-display); font-weight: 700; font-size: 14px;
   color: var(--blue); letter-spacing: 0.08em; display: block; margin-bottom: 10px;
