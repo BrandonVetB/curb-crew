@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bulk &amp; Junk Pickup | Curb Crew</title>
+  <meta name="description" content="Get an instant quote for bulk and junk pickup. Furniture, appliances, yard bags, and more. Plus your city's next bulk collection date." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=Archivo:ital,wght@1,800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="bulk.css" />
+  <link rel="icon" type="image/png" href="curb-crew-favicon.png" />
+  <link rel="apple-touch-icon" href="curb-crew-favicon.png" />
+</head>
+<body class="bulk-body">
+
+  <header class="bulk-top">
+    <a href="index.html" class="wordmark wordmark--header" aria-label="Curb Crew home">
+      <img class="wordmark__img" src="curb-crew-logo.png" alt="Curb Crew"
+           onload="this.closest('.wordmark').classList.add('has-logo')" onerror="this.remove()" />
+      <span class="wordmark__fallback" aria-hidden="true">
+        <span class="wordmark__mark">
+          <svg viewBox="0 0 32 32" width="22" height="22" fill="none">
+            <rect x="5" y="11" width="22" height="3" rx="1.5" fill="currentColor"/>
+            <path d="M8 14h16l-1.7 14.2A2.5 2.5 0 0 1 19.8 30H12.2a2.5 2.5 0 0 1-2.5-1.8z" fill="currentColor"/>
+            <path d="M13 8h6l1 3h-8z" fill="currentColor"/>
+          </svg>
+        </span>
+        <span class="wordmark__text">Curb&nbsp;Crew</span>
+      </span>
+    </a>
+    <a href="index.html" class="bulk-top__back">Back to site</a>
+  </header>
+
+  <main class="bulk">
+    <div class="bulk__intro">
+      <h1>Bulk &amp; junk pickup, priced in seconds.</h1>
+      <p>Tell us what needs to go and get an instant estimate. We haul furniture, appliances, yard bags, and the random pile in the garage.</p>
+    </div>
+
+    <!-- QUOTE CALCULATOR -->
+    <section class="bulk__card">
+      <h2 class="bulk__h2">What needs to go?</h2>
+      <div class="bulk-items" data-items>
+        <div class="bulk-item" data-item data-key="furniture" data-unit="3000" data-label="Furniture">
+          <div class="bulk-item__info"><strong>Furniture</strong><span>Couch, chair, dresser &middot; $30 each</span></div>
+          <div class="stepper"><button type="button" data-dec aria-label="Decrease">&minus;</button><span data-qty>0</span><button type="button" data-inc aria-label="Increase">+</button></div>
+        </div>
+        <div class="bulk-item" data-item data-key="mattress" data-unit="3500" data-label="Mattress / box spring">
+          <div class="bulk-item__info"><strong>Mattress / box spring</strong><span>Any size &middot; $35 each</span></div>
+          <div class="stepper"><button type="button" data-dec aria-label="Decrease">&minus;</button><span data-qty>0</span><button type="button" data-inc aria-label="Increase">+</button></div>
+        </div>
+        <div class="bulk-item" data-item data-key="appliance" data-unit="5000" data-label="Appliance">
+          <div class="bulk-item__info"><strong>Appliance</strong><span>Fridge, washer, dryer &middot; $50 each</span></div>
+          <div class="stepper"><button type="button" data-dec aria-label="Decrease">&minus;</button><span data-qty>0</span><button type="button" data-inc aria-label="Increase">+</button></div>
+        </div>
+        <div class="bulk-item" data-item data-key="electronics" data-unit="2000" data-label="TV / electronics">
+          <div class="bulk-item__info"><strong>TV / electronics</strong><span>TV, monitor, printer &middot; $20 each</span></div>
+          <div class="stepper"><button type="button" data-dec aria-label="Decrease">&minus;</button><span data-qty>0</span><button type="button" data-inc aria-label="Increase">+</button></div>
+        </div>
+        <div class="bulk-item" data-item data-key="junk" data-unit="1000" data-label="Boxes / bags of junk">
+          <div class="bulk-item__info"><strong>Boxes / bags of junk</strong><span>General clutter &middot; $10 each</span></div>
+          <div class="stepper"><button type="button" data-dec aria-label="Decrease">&minus;</button><span data-qty>0</span><button type="button" data-inc aria-label="Increase">+</button></div>
+        </div>
+        <div class="bulk-item" data-item data-key="yard" data-unit="600" data-label="Yard-waste bag / bundle">
+          <div class="bulk-item__info"><strong>Yard-waste bag / bundle</strong><span>Leaves, branches &middot; $6 each</span></div>
+          <div class="stepper"><button type="button" data-dec aria-label="Decrease">&minus;</button><span data-qty>0</span><button type="button" data-inc aria-label="Increase">+</button></div>
+        </div>
+      </div>
+
+      <div class="bulk-estimate">
+        <div>
+          <span class="bulk-estimate__label">Estimated total</span>
+          <p class="bulk-estimate__note">Includes a $25 trip fee. Final price confirmed on site before we haul.</p>
+        </div>
+        <strong data-estimate>$0</strong>
+      </div>
+    </section>
+
+    <!-- CITY SCHEDULE LOOKUP -->
+    <section class="bulk__card">
+      <h2 class="bulk__h2">Prefer to use your city's free pickup?</h2>
+      <p class="bulk__muted">Many cities collect bulk and yard waste a couple of times a year. Check your next date, then let us roll it to the curb for you.</p>
+      <div class="city-lookup">
+        <input type="text" data-city-zip inputmode="numeric" placeholder="Enter your ZIP" />
+        <button type="button" class="btn btn--ghost" data-city-check>Check</button>
+      </div>
+      <div class="city-result" data-city-result></div>
+    </section>
+
+    <!-- REQUEST FORM -->
+    <form class="bulk__card" data-bulk-form novalidate>
+      <h2 class="bulk__h2">Schedule your pickup</h2>
+      <div class="bulk__grid">
+        <label class="field"><span>Full name</span><input type="text" name="name" autocomplete="name" placeholder="Jane Smith" /></label>
+        <label class="field"><span>Email</span><input type="email" name="email" autocomplete="email" placeholder="you@email.com" /></label>
+        <label class="field"><span>Phone</span><input type="tel" name="phone" autocomplete="tel" placeholder="(555) 555-5555" /></label>
+        <label class="field"><span>Preferred date</span><input type="date" name="preferred_date" /></label>
+        <label class="field field--wide"><span>Pickup address</span><input type="text" name="address" autocomplete="street-address" placeholder="123 Maple St, Austin TX" /></label>
+        <label class="field field--wide"><span>Anything we should know?</span><input type="text" name="notes" placeholder="Items are in the back alley, etc." /></label>
+      </div>
+      <button type="submit" class="btn btn--block">Request my pickup</button>
+      <p class="bulk__msg" data-bulk-msg role="status" aria-live="polite"></p>
+      <p class="bulk__fine">No charge to request. We confirm the price and time by email. <a href="index.html">See the full site</a></p>
+    </form>
+  </main>
+
+  <script src="bulk.js" defer></script>
+</body>
+</html>
