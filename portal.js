@@ -75,13 +75,13 @@
       if (title) title.textContent = "Create your account";
       if (sub) sub.textContent = "Set up access to manage your service.";
       if (submit) submit.textContent = "Create account";
-      if (nameField) nameField.hidden = false;
+      if (nameField) { nameField.hidden = false; nameField.style.display = ""; }
       if (toggle) toggle.innerHTML = 'Already have an account? <button type="button" class="link-btn" data-auth-switch="signin">Sign in</button>';
     } else {
       if (title) title.textContent = "Welcome back";
       if (sub) sub.textContent = "Sign in to manage your service.";
       if (submit) submit.textContent = "Sign in";
-      if (nameField) nameField.hidden = true;
+      if (nameField) { nameField.hidden = true; nameField.style.display = "none"; }
       if (toggle) toggle.innerHTML = 'New customer? <button type="button" class="link-btn" data-auth-switch="signup">Create an account</button>';
     }
     setAuthMsg("");
