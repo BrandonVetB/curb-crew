@@ -8,9 +8,14 @@
 
   document.documentElement.classList.add("js");
 
-  var REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Motion plays for all visitors by request, so we don't disable
+  // animations when the OS "reduce motion" setting is on.
+  var REDUCED = false;
   var IS_TOUCH = window.matchMedia("(hover: none)").matches;
   var hasGSAP = typeof window.gsap !== "undefined";
+
+  // If GSAP failed to load, flag it so the CSS fallback animations run.
+  if (!hasGSAP) document.documentElement.classList.add("no-gsap");
 
   if (hasGSAP && window.ScrollTrigger) {
     gsap.registerPlugin(ScrollTrigger);

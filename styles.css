@@ -194,6 +194,16 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .hero__title .word { display: inline-block; will-change: transform; }
 .hero__title .accent { color: var(--blue); }
 
+/* Hero headline fallback: animates even if the GSAP library never loads */
+@keyframes wordRise { from { opacity: 0; transform: translateY(115%); } to { opacity: 1; transform: translateY(0); } }
+.no-gsap .hero__title .word { opacity: 0; animation: wordRise .9s var(--ease) both; }
+.no-gsap .hero__title .line:nth-of-type(1) .word:nth-of-type(1) { animation-delay: .15s; }
+.no-gsap .hero__title .line:nth-of-type(1) .word:nth-of-type(2) { animation-delay: .22s; }
+.no-gsap .hero__title .line:nth-of-type(1) .word:nth-of-type(3) { animation-delay: .29s; }
+.no-gsap .hero__title .line:nth-of-type(2) .word:nth-of-type(1) { animation-delay: .36s; }
+.no-gsap .hero__title .line:nth-of-type(2) .word:nth-of-type(2) { animation-delay: .43s; }
+.no-gsap .hero__title .line:nth-of-type(2) .word:nth-of-type(3) { animation-delay: .50s; }
+
 .hero__sub { font-size: clamp(1.02rem, 1.6vw, 1.22rem); color: var(--ink-70); max-width: 540px; margin-bottom: 30px; }
 .hero__trust { margin-top: 18px; font-size: 14px; color: var(--ink-50); letter-spacing: 0.01em; }
 
@@ -464,7 +474,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
    REVEAL (JS adds .is-in). Fallback: visible if no JS.
    ============================================================ */
 .reveal { opacity: 1; }
-.js .reveal { opacity: 0; transform: translateY(28px); }
+.js .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
 .js .reveal.is-in { opacity: 1; transform: none; }
 
 /* ============================================================
@@ -515,15 +525,8 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 /* ============================================================
    REDUCED MOTION: tone everything down
    ============================================================ */
+/* Motion plays for all visitors by request: reduced-motion no longer
+   disables the site's animations, it only skips smooth-scroll jumps. */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  *, *::before, *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-  }
-  .js .reveal { opacity: 1 !important; transform: none !important; }
-  .marquee__track { animation: none !important; }
-  .how__step { opacity: 1 !important; }
-  .btn:hover { transform: none; }
 }
