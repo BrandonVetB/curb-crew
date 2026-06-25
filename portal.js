@@ -26,7 +26,7 @@
   function setMode(m) {
     mode = m;
     $("[data-auth-title]").textContent = m === "signin" ? "Welcome back" : "Create your account";
-    $("[data-auth-sub]").textContent = m === "signin" ? "Sign in to manage your service." : "Set up your Curb Crew account.";
+    $("[data-auth-sub]").textContent = m === "signin" ? "Sign in to manage your service." : "Set up your Curb Crews account.";
     $("[data-auth-submit]").textContent = m === "signin" ? "Sign in" : "Create account";
     $("[data-name-field]").hidden = m !== "signup";
     $('[data-mode="signin"]').hidden = m !== "signin";
@@ -131,7 +131,7 @@
     var pillEl = $('[data-bind="plan_pill"]');
     if (!sub || sub.status === "pending") {
       bind("plan_name", "No active plan yet");
-      bind("plan_name2", "Curb Crew Plan");
+      bind("plan_name2", "Curb Crews Plan");
       bind("plan_price", "Add payment to start");
       bind("plan_base", "$35.00");
       bind("plan_total", "$35.00");
@@ -143,9 +143,9 @@
     if (sub.addon_recycling) addons.push("Recycling");
     if (sub.addon_yard_waste) addons.push("Yard-waste");
     if (sub.addon_cleaning) addons.push("Cleaning");
-    var label = "Curb Crew" + (addons.length ? " + " + addons.join(" + ") : "");
+    var label = "Curb Crews" + (addons.length ? " + " + addons.join(" + ") : "");
     bind("plan_name", label);
-    bind("plan_name2", "Curb Crew Plan");
+    bind("plan_name2", "Curb Crews Plan");
     bind("plan_price", money(sub.monthly_total_cents) + " / month");
     bind("plan_base", money(sub.base_price_cents));
     bind("plan_total", money(sub.monthly_total_cents));

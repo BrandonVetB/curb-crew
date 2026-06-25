@@ -50,7 +50,7 @@
       phone: val("phone"),
       address: address,
       zip: parsedZip,
-      plan: "Curb Crew Plan",
+      plan: "Curb Crews Plan",
       addon_recycling: addons.recycling,
       addon_yard_waste: addons.yard,
       addon_cleaning: addons.cleaning,
@@ -85,7 +85,7 @@
       '<div class="join__done">' +
       '<div class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>' +
       '<h2>You are on the list' + (name ? ", " + name.split(" ")[0] : "") + "!</h2>" +
-      "<p>We'll confirm your street and email you to finish setup. Welcome to Curb Crew.</p>" +
+      "<p>We'll confirm your street and email you to finish setup. Welcome to Curb Crews.</p>" +
       '<p class="join__fine" style="margin-top:18px"><a href="index.html">Back to the site</a></p>' +
       "</div>";
   }
