@@ -18,8 +18,8 @@
 </head>
 <body class="portal-body">
 
-  <!-- ============ DEMO BANNER ============ -->
-  <div class="demo-banner">Demo portal &middot; sample data only &middot; <a href="index.html">back to site</a></div>
+  <!-- ============ BANNER ============ -->
+  <div class="demo-banner"><a href="index.html">&larr; Back to curbcrew.com</a></div>
 
   <!-- ============ SIGN IN ============ -->
   <section class="auth" data-view="auth">
@@ -39,23 +39,27 @@
         </span>
       </a>
 
-      <h1 class="auth__title">Welcome back</h1>
-      <p class="auth__sub">Sign in to manage your service.</p>
+      <h1 class="auth__title" data-auth-title>Welcome back</h1>
+      <p class="auth__sub" data-auth-sub>Sign in to manage your service.</p>
 
       <form class="auth__form" data-login-form novalidate>
+        <label class="field" data-name-field hidden>
+          <span>Full name</span>
+          <input type="text" name="full_name" autocomplete="name" placeholder="Your name" />
+        </label>
         <label class="field">
           <span>Email</span>
-          <input type="email" name="email" autocomplete="email" placeholder="you@email.com" value="stelling.brandon@gmail.com" />
+          <input type="email" name="email" autocomplete="email" placeholder="you@email.com" />
         </label>
         <label class="field">
           <span>Password</span>
-          <input type="password" name="password" autocomplete="current-password" placeholder="••••••••" value="demo1234" />
+          <input type="password" name="password" autocomplete="current-password" placeholder="••••••••" />
         </label>
-        <button type="submit" class="btn btn--block magnetic">Sign in</button>
+        <button type="submit" class="btn btn--block magnetic" data-auth-submit>Sign in</button>
         <p class="auth__msg" data-auth-msg role="status" aria-live="polite"></p>
       </form>
 
-      <p class="auth__demo">This is a demo. Any email works, no real account needed.</p>
+      <p class="auth__demo" data-auth-toggle>New customer? <button type="button" class="link-btn" data-auth-switch="signup">Create an account</button></p>
     </div>
   </section>
 
@@ -87,10 +91,10 @@
 
       <div class="side__foot">
         <div class="side__user">
-          <span class="side__avatar" aria-hidden="true">BS</span>
+          <span class="side__avatar" aria-hidden="true" data-bind="user.initials">CC</span>
           <span class="side__id">
-            <strong>Brandon Stelling</strong>
-            <small>123 Maple St</small>
+            <strong data-bind="user.name">Your account</strong>
+            <small data-bind="user.addr"></small>
           </span>
         </div>
         <a href="index.html" class="side__signout" data-signout>Sign out</a>
@@ -121,31 +125,31 @@
       <!-- OVERVIEW -->
       <section class="panel" data-panel="overview">
         <div class="panel__head">
-          <h1>Good morning, Brandon</h1>
-          <p>Everything is on track. Here's your service at a glance.</p>
+          <h1>Welcome back, <span data-bind="greeting.first">there</span></h1>
+          <p>Here's your service at a glance.</p>
         </div>
 
         <div class="grid grid--3">
           <article class="card card--feature">
             <span class="pill pill--blue">Next pickup</span>
-            <p class="card__big">Thursday</p>
-            <p class="card__sub">June 25 &middot; in 3 days</p>
-            <p class="card__note">We roll your cans out <strong>Wednesday night</strong> and bring them back in Thursday after the truck.</p>
+            <p class="card__big" data-bind="pickup.next">—</p>
+            <p class="card__sub" data-bind="pickup.date"></p>
+            <p class="card__note">We roll your cans out <strong>the night before</strong> and bring them back in after the truck.</p>
           </article>
 
           <article class="card">
-            <span class="pill pill--green">Active</span>
+            <span class="pill pill--green" data-bind="plan.status">Active</span>
             <p class="card__label">Your plan</p>
-            <p class="card__value">Curb Crew + Recycling</p>
-            <p class="card__muted">$43.00 / month</p>
+            <p class="card__value" data-bind="plan.name">Curb Crew</p>
+            <p class="card__muted" data-bind="plan.price_month"></p>
             <button class="link-btn" data-nav="plan">Manage plan →</button>
           </article>
 
           <article class="card">
-            <p class="card__label">Crew on your street</p>
-            <p class="card__value">Team&nbsp;7 &middot; Austin South</p>
-            <p class="card__muted">On-time rate 99.4%</p>
-            <button class="link-btn" data-nav="account">Contact crew →</button>
+            <p class="card__label">Need help?</p>
+            <p class="card__value">Support</p>
+            <p class="card__muted">We usually reply within an hour.</p>
+            <button class="link-btn" data-action="support">Contact support →</button>
           </article>
         </div>
 
@@ -160,10 +164,8 @@
           </article>
           <article class="card">
             <p class="card__label">Recent activity</p>
-            <ul class="timeline">
-              <li><span class="dot-ok"></span> Cans returned &middot; <span class="muted">Thu Jun 18</span></li>
-              <li><span class="dot-ok"></span> Cans rolled out &middot; <span class="muted">Wed Jun 17</span></li>
-              <li><span class="dot-pay"></span> Payment of $43.00 &middot; <span class="muted">Jun 1</span></li>
+            <ul class="timeline" data-list="activity">
+              <li class="muted">Loading…</li>
             </ul>
           </article>
         </div>
@@ -177,23 +179,19 @@
         </div>
 
         <div class="grid grid--3">
-          <article class="card"><p class="card__label">Trash</p><p class="card__value">Every Thursday</p><p class="card__muted">Next: Thu Jun 25</p></article>
-          <article class="card"><p class="card__label">Recycling</p><p class="card__value">Every other Thursday</p><p class="card__muted">Next: Thu Jun 25</p></article>
-          <article class="card"><p class="card__label">Yard waste</p><p class="card__value">Not on your plan</p><button class="link-btn" data-nav="plan">Add for $8/mo →</button></article>
+          <article class="card"><p class="card__label">Pickup day</p><p class="card__value" data-bind="pickup.next">—</p><p class="card__muted">Next: <span data-bind="pickup.date"></span></p></article>
+          <article class="card"><p class="card__label">Your plan</p><p class="card__value" data-bind="plan.name">Curb Crew</p><p class="card__muted" data-bind="plan.price_month"></p></article>
+          <article class="card"><p class="card__label">Add-ons</p><p class="card__value">Manage anytime</p><button class="link-btn" data-nav="plan">Plan &amp; add-ons →</button></article>
         </div>
 
         <article class="card">
           <p class="card__label">Next 4 weeks</p>
           <table class="table">
             <thead><tr><th>Date</th><th>Out the night before</th><th>Going out</th><th>Status</th></tr></thead>
-            <tbody>
-              <tr><td>Thu Jun 25</td><td>Wed Jun 24</td><td>Trash + Recycling</td><td><span class="tag tag--scheduled">Scheduled</span></td></tr>
-              <tr><td>Thu Jul 2</td><td>Wed Jul 1</td><td>Trash</td><td><span class="tag tag--scheduled">Scheduled</span></td></tr>
-              <tr><td>Fri Jul 10</td><td>Thu Jul 9</td><td>Trash + Recycling</td><td><span class="tag tag--holiday">Holiday shift</span></td></tr>
-              <tr><td>Thu Jul 16</td><td>Wed Jul 15</td><td>Trash</td><td><span class="tag tag--scheduled">Scheduled</span></td></tr>
+            <tbody data-list="schedule">
+              <tr><td colspan="4" class="muted">Loading…</td></tr>
             </tbody>
           </table>
-          <p class="card__note">July 4 holiday pushes that week's pickup to Friday. We adjust automatically.</p>
         </article>
       </section>
 
@@ -207,10 +205,10 @@
         <div class="grid grid--2">
           <article class="card">
             <p class="card__label">Current plan</p>
-            <div class="line"><span>Curb Crew Plan</span><strong>$35.00</strong></div>
-            <div class="line"><span>Recycling can</span><strong>$8.00</strong></div>
-            <div class="line line--total"><span>Total monthly</span><strong>$43.00</strong></div>
-            <p class="card__muted">Next charge: July 1, 2026</p>
+            <div data-list="plan_lines">
+              <div class="line"><span>Curb Crew Plan</span><strong>—</strong></div>
+            </div>
+            <p class="card__muted">Next charge: <span data-bind="plan.next_charge">—</span></p>
             <div class="actions actions--wrap">
               <button class="btn btn--ghost" data-action="pause">Pause</button>
               <button class="btn btn--danger-ghost" data-action="cancel">Cancel plan</button>
@@ -219,29 +217,26 @@
 
           <article class="card">
             <p class="card__label">Add-ons</p>
-            <div class="addon-row"><div><strong>Yard-waste can</strong><span>Rolled out on collection days</span></div><button class="btn btn--ghost btn--sm" data-action="addon">Add $8/mo</button></div>
-            <div class="addon-row"><div><strong>Can cleaning</strong><span>Monthly deep clean &amp; deodorize</span></div><button class="btn btn--ghost btn--sm" data-action="addon">Add $12/mo</button></div>
-            <div class="addon-row addon-row--on"><div><strong>Recycling can</strong><span>Active on your plan</span></div><span class="tag tag--on">On</span></div>
+            <div data-list="addons">
+              <div class="addon-row"><div class="muted">Loading…</div></div>
+            </div>
           </article>
         </div>
 
         <article class="card">
           <div class="card__row">
             <p class="card__label">Payment method</p>
-            <button class="link-btn" data-action="payment">Update</button>
+            <button class="link-btn" data-action="payment">Manage</button>
           </div>
-          <div class="pay"><span class="pay__brand">VISA</span><span>•••• •••• •••• 4242</span><span class="muted">exp 08/27</span></div>
+          <div class="pay"><span class="muted">Online payment management is coming soon.</span></div>
         </article>
 
         <article class="card">
           <p class="card__label">Billing history</p>
           <table class="table">
             <thead><tr><th>Date</th><th>Description</th><th>Amount</th><th>Receipt</th></tr></thead>
-            <tbody>
-              <tr><td>Jun 1, 2026</td><td>Monthly subscription</td><td>$43.00</td><td><button class="link-btn" data-action="receipt">Download</button></td></tr>
-              <tr><td>May 1, 2026</td><td>Monthly subscription</td><td>$43.00</td><td><button class="link-btn" data-action="receipt">Download</button></td></tr>
-              <tr><td>Apr 1, 2026</td><td>Monthly subscription</td><td>$43.00</td><td><button class="link-btn" data-action="receipt">Download</button></td></tr>
-              <tr><td>Mar 1, 2026</td><td>Monthly subscription</td><td>$35.00</td><td><button class="link-btn" data-action="receipt">Download</button></td></tr>
+            <tbody data-list="invoices">
+              <tr><td colspan="4" class="muted">Loading…</td></tr>
             </tbody>
           </table>
         </article>
@@ -257,18 +252,18 @@
         <div class="grid grid--2">
           <article class="card">
             <p class="card__label">Profile</p>
-            <div class="line"><span>Name</span><strong>Brandon Stelling</strong></div>
-            <div class="line"><span>Email</span><strong>stelling.brandon@gmail.com</strong></div>
-            <div class="line"><span>Phone</span><strong>(512) 555-0148</strong></div>
-            <button class="btn btn--ghost btn--sm" data-action="edit">Edit profile</button>
+            <div class="line"><span>Name</span><strong data-bind="account.name">—</strong></div>
+            <div class="line"><span>Email</span><strong data-bind="account.email">—</strong></div>
+            <div class="line"><span>Phone</span><strong data-bind="account.phone">—</strong></div>
+            <button class="btn btn--ghost btn--sm" data-action="edit-profile">Edit profile</button>
           </article>
 
           <article class="card">
             <p class="card__label">Service address</p>
-            <div class="line"><span>Address</span><strong>123 Maple St</strong></div>
-            <div class="line"><span>City</span><strong>Austin, TX 78704</strong></div>
-            <div class="line"><span>Where we return cans</span><strong>Left side, behind gate</strong></div>
-            <button class="btn btn--ghost btn--sm" data-action="edit">Edit address</button>
+            <div class="line"><span>Address</span><strong data-bind="addr.line">—</strong></div>
+            <div class="line"><span>City</span><strong data-bind="addr.city">—</strong></div>
+            <div class="line"><span>Where we return cans</span><strong data-bind="addr.return">—</strong></div>
+            <button class="btn btn--ghost btn--sm" data-action="edit-address">Edit address</button>
           </article>
         </div>
 
@@ -320,7 +315,7 @@
     <div class="modal__backdrop" data-modal-close></div>
     <div class="modal__card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <h2 id="modal-title" data-modal-title>Confirm</h2>
-      <p data-modal-body>Are you sure?</p>
+      <div data-modal-body>Are you sure?</div>
       <div class="modal__actions">
         <button class="btn btn--ghost" data-modal-close>Never mind</button>
         <button class="btn" data-modal-confirm>Confirm</button>
@@ -331,6 +326,8 @@
   <!-- toast -->
   <div class="toast" data-toast hidden></div>
 
+  <!-- Supabase client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="portal.js" defer></script>
 </body>
 </html>
