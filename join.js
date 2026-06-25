@@ -75,7 +75,7 @@
       if (!res.ok) throw new Error("save failed");
       showDone(name);
     }).catch(function () {
-      msg.textContent = "Something went wrong. Please try again or email hello@curbcrew.example.";
+      msg.textContent = "Something went wrong. Please try again or email hello@curbcrews.com.";
       msg.className = "join__msg is-error";
     });
   });
@@ -89,4 +89,4 @@
       '<p class="join__fine" style="margin-top:18px"><a href="index.html">Back to the site</a></p>' +
       "</div>";
   }
-})();
+})()

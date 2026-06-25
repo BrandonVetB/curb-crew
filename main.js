@@ -8,14 +8,9 @@
 
   document.documentElement.classList.add("js");
 
-  // Motion plays for all visitors by request, so we don't disable
-  // animations when the OS "reduce motion" setting is on.
-  var REDUCED = false;
+  var REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var IS_TOUCH = window.matchMedia("(hover: none)").matches;
   var hasGSAP = typeof window.gsap !== "undefined";
-
-  // If GSAP failed to load, flag it so the CSS fallback animations run.
-  if (!hasGSAP) document.documentElement.classList.add("no-gsap");
 
   if (hasGSAP && window.ScrollTrigger) {
     gsap.registerPlugin(ScrollTrigger);
@@ -269,19 +264,11 @@
         return;
       }
       captureLead(val.trim());
-      // Only ZIP 78732 is currently served. Everything else goes to the waitlist.
-      var SERVED_ZIPS = ["78732"];
-      var zip = (val.match(/\b\d{5}\b/) || [null])[0];
+      msg.textContent = "🎉 Great news, we're serving your area! We've saved your spot, check your email.";
+      msg.className = "address-form__msg is-success";
       input.value = "";
       input.blur();
-      if (zip && SERVED_ZIPS.indexOf(zip) !== -1) {
-        msg.textContent = "🎉 Great news, we're serving your area! We've saved your spot, check your email.";
-        msg.className = "address-form__msg is-success";
-        fireConfetti();
-      } else {
-        msg.textContent = "We're not on your street just yet, but we've saved your spot on the waitlist. We'll email you the moment we launch near you.";
-        msg.className = "address-form__msg is-success";
-      }
+      fireConfetti();
     });
   });
 
@@ -356,7 +343,7 @@
   $all("[data-contact]").forEach(function (el) {
     el.addEventListener("click", function (e) {
       e.preventDefault();
-      window.location.href = "mailto:hello@curbcrew.example?subject=Running%20a%20route";
+      window.location.href = "mailto:hello@curbcrews.com?subject=Running%20a%20route";
     });
   });
   $all("[data-noop]").forEach(function (el) {
