@@ -269,11 +269,19 @@
         return;
       }
       captureLead(val.trim());
-      msg.textContent = "🎉 Great news, we're serving your area! We've saved your spot, check your email.";
-      msg.className = "address-form__msg is-success";
+      // Only ZIP 78732 is currently served. Everything else goes to the waitlist.
+      var SERVED_ZIPS = ["78732"];
+      var zip = (val.match(/\b\d{5}\b/) || [null])[0];
       input.value = "";
       input.blur();
-      fireConfetti();
+      if (zip && SERVED_ZIPS.indexOf(zip) !== -1) {
+        msg.textContent = "🎉 Great news, we're serving your area! We've saved your spot, check your email.";
+        msg.className = "address-form__msg is-success";
+        fireConfetti();
+      } else {
+        msg.textContent = "We're not on your street just yet, but we've saved your spot on the waitlist. We'll email you the moment we launch near you.";
+        msg.className = "address-form__msg is-success";
+      }
     });
   });
 
