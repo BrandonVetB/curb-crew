@@ -1,495 +1,259 @@
 /* ============================================================
-   CURB CREW - portal.js  (LIVE client portal)
-   Real Supabase auth + data. Each customer sees only their own
-   rows (enforced by row-level security in the database).
+   CURB CREW - portal.js  (real Supabase Auth + live data)
    ============================================================ */
 (function () {
   "use strict";
 
-  /* ---------- Supabase client ---------- */
   var SUPABASE_URL = "https://hezahtnfyhqfucixzqxi.supabase.co";
   var SUPABASE_KEY = "sb_publishable_9l4_Bqgjg7qBapvYlLPJSA_pHOk0nMB";
-  var sb = (window.supabase && window.supabase.createClient)
-    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
-    : null;
+  var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   function $(s, c) { return (c || document).querySelector(s); }
   function $all(s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); }
+  function money(cents) { return cents == null ? "$0" : "$" + (cents / 100).toFixed(2); }
+  function bind(key, val) { var el = $('[data-bind="' + key + '"]'); if (el) el.textContent = val; }
+  function bindHTML(key, html) { var el = $('[data-bind="' + key + '"]'); if (el) el.innerHTML = html; }
 
   var authView = $('[data-view="auth"]');
   var appView = $('[data-view="app"]');
-
-  /* Add-on catalog (price in cents). Slugs match subscriptions.addon_* columns. */
-  var ADDONS = [
-    { slug: "recycling",   col: "addon_recycling",   name: "Recycling can", desc: "Rolled out on recycling days",      cents: 800 },
-    { slug: "yard_waste",  col: "addon_yard_waste",  name: "Yard-waste can", desc: "Rolled out on collection days",    cents: 800 },
-    { slug: "cleaning",    col: "addon_cleaning",    name: "Can cleaning",   desc: "Monthly deep clean & deodorize",   cents: 1200 }
-  ];
-
   var TITLES = { overview: "Overview", schedule: "Schedule", plan: "Plan & payments", account: "Account" };
 
-  /* current user's loaded data */
-  var DATA = { user: null, profile: null, address: null, sub: null, invoices: [], events: [] };
+  /* ================= AUTH ================= */
+  var form = $("[data-auth-form]");
+  var msg = $("[data-auth-msg]");
+  var mode = "signin";
 
-  /* ---------- helpers ---------- */
-  function money(cents) {
-    if (cents == null || isNaN(cents)) return "$0.00";
-    return "$" + (cents / 100).toFixed(2);
+  function setMode(m) {
+    mode = m;
+    $("[data-auth-title]").textContent = m === "signin" ? "Welcome back" : "Create your account";
+    $("[data-auth-sub]").textContent = m === "signin" ? "Sign in to manage your service." : "Set up your Curb Crew account.";
+    $("[data-auth-submit]").textContent = m === "signin" ? "Sign in" : "Create account";
+    $("[data-name-field]").hidden = m !== "signup";
+    $('[data-mode="signin"]').hidden = m !== "signin";
+    $('[data-mode="signup"]').hidden = m !== "signup";
+    msg.textContent = "";
   }
-  function initialsOf(name) {
-    if (!name) return "CC";
-    var p = name.trim().split(/\s+/);
-    return ((p[0] || "")[0] || "" ) + ((p[1] || "")[0] || "");
-  }
-  function fmtDate(d) {
-    if (!d) return "";
-    var dt = new Date(d);
-    if (isNaN(dt)) return "";
-    return dt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-  }
-  function setText(key, val) {
-    $all('[data-bind="' + key + '"]').forEach(function (el) { el.textContent = (val == null || val === "") ? "—" : val; });
-  }
+  $("[data-toggle-mode]").addEventListener("click", function (e) { e.preventDefault(); setMode(mode === "signin" ? "signup" : "signin"); });
 
-  /* ============================================================
-     AUTH
-     ============================================================ */
-  var loginForm = $("[data-login-form]");
-  var authMsg = $("[data-auth-msg]");
-  var authMode = "signin"; // or "signup"
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var email = form.querySelector('[name="email"]').value.trim();
+    var password = form.querySelector('[name="password"]').value;
+    var name = (form.querySelector('[name="name"]') || {}).value || "";
+    if (!email || email.indexOf("@") === -1) { return fail("Enter a valid email."); }
+    if (!password || password.length < 8) { return fail("Password must be at least 8 characters."); }
+    msg.className = "auth__msg"; msg.textContent = mode === "signin" ? "Signing in..." : "Creating account...";
 
-  function setAuthMsg(text, kind) {
-    if (!authMsg) return;
-    authMsg.textContent = text || "";
-    authMsg.className = "auth__msg" + (kind ? " is-" + kind : "");
-  }
-
-  function setAuthMode(mode) {
-    authMode = mode;
-    var title = $("[data-auth-title]");
-    var sub = $("[data-auth-sub]");
-    var submit = $("[data-auth-submit]");
-    var nameField = $("[data-name-field]");
-    var toggle = $("[data-auth-toggle]");
     if (mode === "signup") {
-      if (title) title.textContent = "Create your account";
-      if (sub) sub.textContent = "Set up access to manage your service.";
-      if (submit) submit.textContent = "Create account";
-      if (nameField) { nameField.hidden = false; nameField.style.display = ""; }
-      if (toggle) toggle.innerHTML = 'Already have an account? <button type="button" class="link-btn" data-auth-switch="signin">Sign in</button>';
-    } else {
-      if (title) title.textContent = "Welcome back";
-      if (sub) sub.textContent = "Sign in to manage your service.";
-      if (submit) submit.textContent = "Sign in";
-      if (nameField) { nameField.hidden = true; nameField.style.display = "none"; }
-      if (toggle) toggle.innerHTML = 'New customer? <button type="button" class="link-btn" data-auth-switch="signup">Create an account</button>';
-    }
-    setAuthMsg("");
-  }
-
-  document.addEventListener("click", function (e) {
-    var sw = e.target.closest("[data-auth-switch]");
-    if (sw) { e.preventDefault(); setAuthMode(sw.getAttribute("data-auth-switch")); }
-  });
-
-  if (loginForm && sb) {
-    loginForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-      var email = (loginForm.querySelector('input[name="email"]').value || "").trim();
-      var pass = (loginForm.querySelector('input[name="password"]').value || "");
-      var nameInput = loginForm.querySelector('input[name="full_name"]');
-      var fullName = nameInput ? nameInput.value.trim() : "";
-      var submit = $("[data-auth-submit]");
-
-      if (!email || email.indexOf("@") === -1) { setAuthMsg("Enter a valid email address.", "error"); return; }
-      if (pass.length < 6) { setAuthMsg("Password must be at least 6 characters.", "error"); return; }
-
-      if (submit) { submit.disabled = true; }
-      setAuthMsg(authMode === "signup" ? "Creating your account…" : "Signing you in…");
-
-      if (authMode === "signup") {
-        sb.auth.signUp({
-          email: email, password: pass,
-          options: { data: { full_name: fullName } }
-        }).then(function (res) {
-          if (submit) submit.disabled = false;
-          if (res.error) { setAuthMsg(res.error.message, "error"); return; }
-          if (res.data && res.data.session) {
-            enterApp(); // confirmation disabled -> straight in
-          } else {
-            setAuthMsg("Account created. Check your email to confirm, then sign in.", "success");
-            setAuthMode("signin");
-          }
+      sb.auth.signUp({ email: email, password: password, options: { data: { full_name: name.trim() } } })
+        .then(function (r) {
+          if (r.error) return fail(r.error.message);
+          if (r.data.session) { enterApp(); }
+          else { setMode("signin"); ok("Account created. Check your email to confirm, then sign in."); }
         });
-      } else {
-        sb.auth.signInWithPassword({ email: email, password: pass }).then(function (res) {
-          if (submit) submit.disabled = false;
-          if (res.error) { setAuthMsg(res.error.message, "error"); return; }
+    } else {
+      sb.auth.signInWithPassword({ email: email, password: password })
+        .then(function (r) {
+          if (r.error) return fail(r.error.message);
           enterApp();
         });
-      }
-    });
-  } else if (loginForm && !sb) {
-    loginForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-      setAuthMsg("Could not reach the login service. Please refresh and try again.", "error");
-    });
-  }
+    }
+  });
+  function fail(t) { msg.className = "auth__msg is-error"; msg.textContent = t; }
+  function ok(t) { msg.className = "auth__msg is-success"; msg.textContent = t; }
 
-  /* sign out */
-  document.addEventListener("click", function (e) {
-    var so = e.target.closest("[data-signout]");
-    if (!so || !sb) return;
-    e.preventDefault();
-    sb.auth.signOut().then(function () { showAuth(); });
+  $("[data-signout]").addEventListener("click", function () {
+    sb.auth.signOut().then(function () { appView.hidden = true; authView.hidden = false; form.reset(); });
   });
 
-  function showAuth() {
-    if (appView) appView.hidden = true;
-    if (authView) authView.hidden = false;
-    window.scrollTo(0, 0);
-  }
+  function enterApp() { authView.hidden = true; appView.hidden = false; window.scrollTo(0, 0); loadData(); }
 
-  function enterApp() {
-    if (authView) authView.hidden = true;
-    if (appView) appView.hidden = false;
-    window.scrollTo(0, 0);
-    loadData();
-  }
+  // session on load
+  sb.auth.getSession().then(function (r) {
+    if (r.data.session) { authView.hidden = true; appView.hidden = false; loadData(); }
+    else { authView.hidden = false; appView.hidden = true; }
+  });
 
-  /* ============================================================
-     DATA LOADING
-     ============================================================ */
+  /* ================= LOAD DATA ================= */
+  function fmtDay(d) { return new Date(d + "T00:00:00").toLocaleDateString("en-US", { weekday: "long" }); }
+  function fmtDate(d) { return new Date(d + "T00:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric" }); }
+  function fmtShort(d) { return new Date(d + "T00:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }); }
+  function relDays(d) { var diff = Math.round((new Date(d + "T00:00:00") - new Date(new Date().toDateString())) / 86400000); return diff <= 0 ? "today" : diff === 1 ? "tomorrow" : "in " + diff + " days"; }
+  function initials(n) { return (n || "CC").split(" ").map(function (p) { return p[0]; }).join("").slice(0, 2).toUpperCase(); }
+  function greet() { var h = new Date().getHours(); return h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening"; }
+
   function loadData() {
-    if (!sb) return;
     sb.auth.getUser().then(function (u) {
-      var user = u && u.data ? u.data.user : null;
-      if (!user) { showAuth(); return; }
-      DATA.user = user;
-      var uid = user.id;
+      var uid = u.data.user && u.data.user.id;
+      var email = u.data.user && u.data.user.email;
+      if (!uid) return;
+
       Promise.all([
         sb.from("profiles").select("*").eq("id", uid).maybeSingle(),
-        sb.from("service_addresses").select("*").eq("profile_id", uid).limit(1),
-        sb.from("subscriptions").select("*").eq("profile_id", uid).maybeSingle(),
-        sb.from("invoices").select("*").eq("profile_id", uid).order("invoice_date", { ascending: false }),
-        sb.from("service_events").select("*").eq("profile_id", uid).order("occurred_at", { ascending: false }).limit(6)
-      ]).then(function (r) {
-        DATA.profile = (r[0] && r[0].data) || { email: user.email };
-        DATA.address = (r[1] && r[1].data && r[1].data[0]) || null;
-        DATA.sub = (r[2] && r[2].data) || null;
-        DATA.invoices = (r[3] && r[3].data) || [];
-        DATA.events = (r[4] && r[4].data) || [];
-        render();
+        sb.from("service_addresses").select("*").eq("profile_id", uid).order("is_primary", { ascending: false }).limit(1).maybeSingle(),
+        sb.from("subscriptions").select("*").eq("profile_id", uid).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+        sb.from("pickups").select("*").eq("profile_id", uid).gte("pickup_date", new Date().toISOString().slice(0, 10)).order("pickup_date", { ascending: true }).limit(8),
+        sb.from("invoices").select("*").eq("profile_id", uid).order("invoice_date", { ascending: false }).limit(8),
+        sb.from("service_events").select("*").eq("profile_id", uid).order("occurred_at", { ascending: false }).limit(5)
+      ]).then(function (res) {
+        var p = res[0].data || {}, addr = res[1].data, sub = res[2].data, pickups = res[3].data || [], invoices = res[4].data || [], events = res[5].data || [];
+        var name = p.full_name || (email ? email.split("@")[0] : "there");
+
+        // identity
+        bind("greeting", greet() + ", " + name.split(" ")[0]);
+        bind("avatar", initials(p.full_name));
+        bind("side_name", p.full_name || name);
+        bind("side_addr", addr ? addr.line1 : "No address yet");
+        bind("name", p.full_name || "Not set");
+        bind("email", p.email || email || "");
+        bind("phone", p.phone || "Not set");
+        bind("address", addr ? addr.line1 : "Not set");
+        bind("city", addr ? [addr.city, addr.state, addr.zip].filter(Boolean).join(", ") : "Not set");
+        bind("can_return", (addr && addr.can_return_location) || "Not set");
+        bind("crew", "Assigning to your street");
+        bind("ontime", "");
+
+        // plan
+        renderPlan(sub);
+
+        // next pickup
+        renderNext(pickups[0]);
+
+        // lists
+        renderActivity(events);
+        renderSchedule(pickups);
+        renderInvoices(invoices);
       });
     });
   }
 
-  /* ============================================================
-     RENDER
-     ============================================================ */
-  function planName(sub) {
-    if (!sub) return "Curb Crew";
-    var extras = ADDONS.filter(function (a) { return sub[a.col]; }).map(function (a) { return a.name.replace(" can", ""); });
-    return extras.length ? "Curb Crew + " + extras.join(" + ") : "Curb Crew";
-  }
-  function monthlyTotalCents(sub) {
-    if (!sub) return 0;
-    if (sub.monthly_total_cents != null) return sub.monthly_total_cents;
-    var base = sub.base_price_cents || 0;
-    ADDONS.forEach(function (a) { if (sub[a.col]) base += a.cents; });
-    return base;
-  }
-  function statusLabel(sub) {
-    var s = sub && sub.status ? sub.status : "active";
-    return s.charAt(0).toUpperCase() + s.slice(1);
-  }
-
-  function render() {
-    var p = DATA.profile || {}, a = DATA.address || {}, s = DATA.sub || {};
-    var name = p.full_name || (DATA.user && DATA.user.email) || "there";
-    var firstName = (p.full_name || "").split(/\s+/)[0] || "there";
-
-    // sidebar + greeting
-    setText("user.name", p.full_name || "Your account");
-    setText("user.addr", a.line1 || "");
-    $all('[data-bind="user.initials"]').forEach(function (el) { el.textContent = initialsOf(p.full_name); });
-    setText("greeting.first", firstName);
-
-    // plan card / overview
-    setText("plan.name", planName(s));
-    setText("plan.price_month", money(monthlyTotalCents(s)) + " / month");
-    var statusEls = $all('[data-bind="plan.status"]');
-    statusEls.forEach(function (el) {
-      el.textContent = statusLabel(s);
-      el.className = "pill " + (s.status === "paused" ? "pill--amber" : s.status === "cancelled" ? "pill--grey" : "pill--green");
-    });
-
-    // account
-    setText("account.name", p.full_name);
-    setText("account.email", p.email || (DATA.user && DATA.user.email));
-    setText("account.phone", p.phone);
-    setText("addr.line", a.line1);
-    setText("addr.city", [a.city, a.state, a.zip].filter(Boolean).join(", "));
-    setText("addr.return", a.can_return_location);
-
-    // plan & payments: line items
-    var plan_lines = $('[data-list="plan_lines"]');
-    if (plan_lines) {
-      var rows = ['<div class="line"><span>Curb Crew Plan</span><strong>' + money(s.base_price_cents || 3500) + "</strong></div>"];
-      ADDONS.forEach(function (ad) { if (s[ad.col]) rows.push('<div class="line"><span>' + ad.name + "</span><strong>" + money(ad.cents) + "</strong></div>"); });
-      rows.push('<div class="line line--total"><span>Total monthly</span><strong>' + money(monthlyTotalCents(s)) + "</strong></div>");
-      plan_lines.innerHTML = rows.join("");
-    }
-    setText("plan.next_charge", s.current_period_end ? fmtDate(s.current_period_end) : "—");
-
-    // pause/resume button label
-    $all('[data-action="pause"]').forEach(function (b) { b.textContent = (s.status === "paused") ? "Resume" : "Pause"; });
-
-    // add-ons
-    var addonList = $('[data-list="addons"]');
-    if (addonList) {
-      addonList.innerHTML = ADDONS.map(function (ad) {
-        var on = !!s[ad.col];
-        if (on) {
-          return '<div class="addon-row addon-row--on"><div><strong>' + ad.name + "</strong><span>Active on your plan</span></div>" +
-                 '<button class="btn btn--ghost btn--sm" data-addon-remove="' + ad.col + '">Remove</button></div>';
-        }
-        return '<div class="addon-row"><div><strong>' + ad.name + "</strong><span>" + ad.desc + "</span></div>" +
-               '<button class="btn btn--ghost btn--sm" data-addon-add="' + ad.col + '">Add ' + money(ad.cents) + "/mo</button></div>";
-      }).join("");
-    }
-
-    // invoices
-    var inv = $('[data-list="invoices"]');
-    if (inv) {
-      if (!DATA.invoices.length) {
-        inv.innerHTML = '<tr><td colspan="4" class="muted">No invoices yet.</td></tr>';
-      } else {
-        inv.innerHTML = DATA.invoices.map(function (i) {
-          var receipt = i.receipt_url
-            ? '<a class="link-btn" href="' + i.receipt_url + '" target="_blank" rel="noopener">Download</a>'
-            : '<span class="muted">—</span>';
-          return "<tr><td>" + fmtDate(i.invoice_date) + "</td><td>" + (i.description || "Monthly subscription") +
-                 "</td><td>" + money(i.amount_cents) + "</td><td>" + receipt + "</td></tr>";
-        }).join("");
-      }
-    }
-
-    // activity
-    var act = $('[data-list="activity"]');
-    if (act) {
-      if (!DATA.events.length) {
-        act.innerHTML = '<li class="muted">No activity yet.</li>';
-      } else {
-        act.innerHTML = DATA.events.map(function (ev) {
-          var dot = /pay|invoice|charge/i.test(ev.event_type || "") ? "dot-pay" : "dot-ok";
-          var label = ev.event_type || ev.notes || "Service update";
-          return '<li><span class="' + dot + '"></span> ' + label + ' &middot; <span class="muted">' + fmtDate(ev.occurred_at) + "</span></li>";
-        }).join("");
-      }
-    }
-
-    renderSchedule();
-  }
-
-  /* schedule: derive from a pickup day on the address if present */
-  function renderSchedule() {
-    var a = DATA.address || {};
-    var dayName = a.pickup_day || a.collection_day || a.day || null;
-    var nextEl = $('[data-bind="pickup.next"]');
-    var dateEl = $('[data-bind="pickup.date"]');
-    var schedBody = $('[data-list="schedule"]');
-
-    var DAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-    function dayIndex(name) {
-      if (!name) return -1;
-      var n = String(name).toLowerCase().slice(0, 3);
-      for (var i = 0; i < DAYS.length; i++) if (DAYS[i].toLowerCase().slice(0, 3) === n) return i;
-      return -1;
-    }
-    var di = dayIndex(dayName);
-    if (di === -1) {
-      if (nextEl) nextEl.textContent = "Pending";
-      if (dateEl) dateEl.textContent = "Set once your route is assigned";
-      if (schedBody) schedBody.innerHTML = '<tr><td colspan="4" class="muted">Your pickup schedule will appear here once your route is assigned.</td></tr>';
+  function renderPlan(sub) {
+    var pillEl = $('[data-bind="plan_pill"]');
+    if (!sub || sub.status === "pending") {
+      bind("plan_name", "No active plan yet");
+      bind("plan_name2", "Curb Crew Plan");
+      bind("plan_price", "Add payment to start");
+      bind("plan_base", "$35.00");
+      bind("plan_total", "$35.00");
+      bind("next_charge", "Not billing yet");
+      if (pillEl) { pillEl.textContent = "Inactive"; pillEl.className = "pill"; }
       return;
     }
-    // next 4 occurrences
-    var today = new Date(); today.setHours(0,0,0,0);
-    var dates = [];
-    var d = new Date(today);
-    while (dates.length < 4) {
-      if (d.getDay() === di && d >= today) dates.push(new Date(d));
-      d.setDate(d.getDate() + 1);
+    var addons = [];
+    if (sub.addon_recycling) addons.push("Recycling");
+    if (sub.addon_yard_waste) addons.push("Yard-waste");
+    if (sub.addon_cleaning) addons.push("Cleaning");
+    var label = "Curb Crew" + (addons.length ? " + " + addons.join(" + ") : "");
+    bind("plan_name", label);
+    bind("plan_name2", "Curb Crew Plan");
+    bind("plan_price", money(sub.monthly_total_cents) + " / month");
+    bind("plan_base", money(sub.base_price_cents));
+    bind("plan_total", money(sub.monthly_total_cents));
+    var addonCents = (sub.monthly_total_cents || 0) - (sub.base_price_cents || 0);
+    if (addonCents > 0) { var l = $('[data-bind="addons_line"]'); if (l) l.hidden = false; bind("addons_total", money(addonCents)); }
+    bind("next_charge", sub.current_period_end ? "Next charge: " + fmtDate(sub.current_period_end) : "Billing starts when Stripe is connected");
+    if (pillEl) {
+      var map = { active: ["Active", "pill pill--green"], paused: ["Paused", "pill"], canceled: ["Canceled", "pill"] };
+      var m = map[sub.status] || ["Active", "pill pill--green"];
+      pillEl.textContent = m[0]; pillEl.className = m[1];
     }
-    var items = (a.addon_recycling || (DATA.sub && DATA.sub.addon_recycling)) ? "Trash + Recycling" : "Trash";
-    if (nextEl) nextEl.textContent = DAYS[di];
-    if (dateEl) dateEl.textContent = fmtDate(dates[0]);
-    if (schedBody) {
-      schedBody.innerHTML = dates.map(function (dt) {
-        var night = new Date(dt); night.setDate(night.getDate() - 1);
-        return "<tr><td>" + fmtDate(dt) + "</td><td>" + fmtDate(night) + "</td><td>" + items +
-               '</td><td><span class="tag tag--scheduled">Scheduled</span></td></tr>';
-      }).join("");
-    }
+    if (sub.stripe_subscription_id) { /* real card hookup later */ }
   }
 
-  /* ============================================================
-     PANEL NAVIGATION
-     ============================================================ */
+  function renderNext(pk) {
+    if (!pk) {
+      bind("next_day", "—"); bind("next_date_rel", "No pickup scheduled yet");
+      bind("next_note", "Your schedule appears here once your service starts.");
+      return;
+    }
+    bind("next_day", fmtDay(pk.pickup_date));
+    bind("next_date_rel", fmtDate(pk.pickup_date) + " · " + relDays(pk.pickup_date));
+    var t = (pk.types || []).join(" + ") || "Trash";
+    bind("next_note", "Going out: " + t + ". We roll your cans out " + (pk.out_night ? "the night before" : "the evening prior") + ".");
+  }
+
+  function renderActivity(events) {
+    var el = $('[data-list="activity"]');
+    if (!el) return;
+    if (!events.length) { el.innerHTML = '<li><span class="muted">No activity yet.</span></li>'; return; }
+    var labels = { rolled_out: ["dot-ok", "Cans rolled out"], brought_in: ["dot-ok", "Cans returned"] };
+    el.innerHTML = events.map(function (e) {
+      var L = labels[e.event_type] || ["dot-ok", e.event_type];
+      var d = new Date(e.occurred_at).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+      return '<li><span class="' + L[0] + '"></span> ' + L[1] + ' &middot; <span class="muted">' + d + "</span></li>";
+    }).join("");
+  }
+
+  function renderSchedule(pickups) {
+    var el = $('[data-list="schedule"]');
+    if (!el) return;
+    if (!pickups.length) { el.innerHTML = '<tr><td colspan="4" class="muted">No upcoming pickups scheduled yet.</td></tr>'; return; }
+    el.innerHTML = pickups.map(function (pk) {
+      var tag = pk.is_holiday_shift ? '<span class="tag tag--holiday">Holiday shift</span>' : '<span class="tag tag--scheduled">Scheduled</span>';
+      return "<tr><td>" + fmtShort(pk.pickup_date) + "</td><td>" + (pk.out_night ? fmtShort(pk.out_night) : "—") +
+        "</td><td>" + ((pk.types || []).join(" + ") || "Trash") + "</td><td>" + tag + "</td></tr>";
+    }).join("");
+  }
+
+  function renderInvoices(invoices) {
+    var el = $('[data-list="invoices"]');
+    if (!el) return;
+    if (!invoices.length) { el.innerHTML = '<tr><td colspan="4" class="muted">No invoices yet.</td></tr>'; return; }
+    el.innerHTML = invoices.map(function (inv) {
+      return "<tr><td>" + fmtDate(inv.invoice_date) + "</td><td>" + (inv.description || "Monthly subscription") +
+        "</td><td>" + money(inv.amount_cents) + '</td><td><button class="link-btn" data-action="receipt">Download</button></td></tr>';
+    }).join("");
+  }
+
+  /* ================= NAV ================= */
   function showPanel(name) {
     if (!TITLES[name]) return;
     $all(".panel").forEach(function (p) { p.hidden = p.getAttribute("data-panel") !== name; });
     $all(".side__link").forEach(function (l) { l.classList.toggle("is-active", l.getAttribute("data-nav") === name); });
     $all(".tabbar__item").forEach(function (t) { t.classList.toggle("is-active", t.getAttribute("data-nav") === name); });
     var title = $("[data-page-title]"); if (title) title.textContent = TITLES[name];
-    var sel = $("[data-mobile-nav]"); if (sel) sel.value = name;
-    var main = $(".main"); if (main) main.scrollTop = 0;
     window.scrollTo(0, 0);
   }
   document.addEventListener("click", function (e) {
     var navEl = e.target.closest("[data-nav]");
     if (navEl) { e.preventDefault(); showPanel(navEl.getAttribute("data-nav")); }
   });
-  var mobileNav = $("[data-mobile-nav]");
-  if (mobileNav) mobileNav.addEventListener("change", function () { showPanel(mobileNav.value); });
 
-  /* ============================================================
-     MODAL  (supports confirm + custom form body)
-     ============================================================ */
-  var modal = $("[data-modal]");
-  var modalTitle = $("[data-modal-title]");
-  var modalBody = $("[data-modal-body]");
-  var modalConfirm = $("[data-modal-confirm]");
-  var pendingConfirm = null;
-
-  function openModal(title, bodyHTML, confirmLabel, onConfirm, danger) {
-    modalTitle.textContent = title;
-    modalBody.innerHTML = bodyHTML;
-    modalConfirm.textContent = confirmLabel || "Confirm";
-    modalConfirm.classList.toggle("btn--danger-ghost", !!danger);
-    pendingConfirm = onConfirm || null;
-    modal.hidden = false;
+  /* ================= MODAL + ACTIONS ================= */
+  var modal = $("[data-modal]"), modalTitle = $("[data-modal-title]"), modalBody = $("[data-modal-body]"), modalConfirm = $("[data-modal-confirm]");
+  var pending = null;
+  function openModal(title, body, label, onConfirm, danger) {
+    modalTitle.textContent = title; modalBody.textContent = body; modalConfirm.textContent = label || "Confirm";
+    modalConfirm.classList.toggle("btn--danger-ghost", !!danger); pending = onConfirm; modal.hidden = false;
   }
-  function closeModal() { modal.hidden = true; pendingConfirm = null; modalConfirm.classList.remove("btn--danger-ghost"); }
+  function closeModal() { modal.hidden = true; pending = null; modalConfirm.classList.remove("btn--danger-ghost"); }
   $all("[data-modal-close]").forEach(function (el) { el.addEventListener("click", closeModal); });
-  if (modalConfirm) modalConfirm.addEventListener("click", function () { var fn = pendingConfirm; if (fn) fn(); });
-  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && modal && !modal.hidden) closeModal(); });
+  modalConfirm.addEventListener("click", function () { var fn = pending; closeModal(); if (fn) fn(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !modal.hidden) closeModal(); });
 
-  /* ---------- toast ---------- */
-  var toast = $("[data-toast]"); var toastTimer = null;
-  function showToast(text) {
-    if (!toast) return;
-    toast.textContent = text; toast.classList.add("is-show");
-    clearTimeout(toastTimer); toastTimer = setTimeout(function () { toast.classList.remove("is-show"); }, 3200);
-  }
+  var toast = $("[data-toast]"), toastTimer = null;
+  function showToast(t) { toast.textContent = t; toast.classList.add("is-show"); clearTimeout(toastTimer); toastTimer = setTimeout(function () { toast.classList.remove("is-show"); }, 3200); }
 
-  /* ============================================================
-     WRITE ACTIONS  (update the customer's own rows)
-     ============================================================ */
-  function updateSub(patch) {
-    if (!sb || !DATA.user) return Promise.resolve({ error: "no session" });
-    return sb.from("subscriptions").update(patch).eq("profile_id", DATA.user.id).then(function (r) {
-      if (!r.error) { Object.assign(DATA.sub = DATA.sub || {}, patch); render(); }
-      return r;
-    });
-  }
-  function recalcTotal(sub) {
-    var base = sub.base_price_cents || 3500;
-    ADDONS.forEach(function (a) { if (sub[a.col]) base += a.cents; });
-    return base;
-  }
-
-  function setAddon(col, on) {
-    var next = Object.assign({}, DATA.sub || {});
-    next[col] = on;
-    var patch = {}; patch[col] = on;
-    patch.monthly_total_cents = recalcTotal(next);
-    updateSub(patch).then(function (r) {
-      showToast(r.error ? "Could not update add-on." : (on ? "Add-on added to your plan." : "Add-on removed."));
+  function updateSub(status, done) {
+    sb.auth.getUser().then(function (u) {
+      var uid = u.data.user && u.data.user.id; if (!uid) return;
+      sb.from("subscriptions").update({ status: status, updated_at: new Date().toISOString() }).eq("profile_id", uid).select().then(function (r) {
+        if (r.error || !r.data || !r.data.length) { showToast("No active plan to update yet."); return; }
+        loadData(); if (done) done();
+      });
     });
   }
 
   var ACTIONS = {
-    pause: function () {
-      var paused = DATA.sub && DATA.sub.status === "paused";
-      if (paused) {
-        updateSub({ status: "active" }).then(function (r) { showToast(r.error ? "Could not resume." : "Service resumed."); });
-        return;
-      }
-      openModal("Pause your service?", "We'll stop pickups and pause billing until you resume. You can come back anytime.", "Pause service", function () {
-        updateSub({ status: "paused" }).then(function (r) { closeModal(); showToast(r.error ? "Could not pause." : "Service paused."); });
-      });
-    },
-    cancel: function () {
-      openModal("Cancel your plan?", "No contract and no fee. Your service ends after your current billing period.", "Cancel plan", function () {
-        updateSub({ status: "cancelled" }).then(function (r) { closeModal(); showToast(r.error ? "Could not cancel." : "Plan cancelled."); });
-      }, true);
-    },
-    "edit-profile": function () {
-      var p = DATA.profile || {};
-      openModal("Edit profile",
-        formRow("Full name", "f_name", p.full_name) +
-        formRow("Phone", "f_phone", p.phone),
-        "Save", function () {
-          var patch = { full_name: val("f_name"), phone: val("f_phone") };
-          sb.from("profiles").update(patch).eq("id", DATA.user.id).then(function (r) {
-            closeModal();
-            if (r.error) { showToast("Could not save profile."); return; }
-            Object.assign(DATA.profile, patch); render(); showToast("Profile updated.");
-          });
-        });
-    },
-    "edit-address": function () {
-      var a = DATA.address || {};
-      openModal("Edit service address",
-        formRow("Street", "a_line1", a.line1) +
-        formRow("City", "a_city", a.city) +
-        formRow("State", "a_state", a.state) +
-        formRow("ZIP", "a_zip", a.zip) +
-        formRow("Where we return cans", "a_ret", a.can_return_location),
-        "Save", function () {
-          var patch = { line1: val("a_line1"), city: val("a_city"), state: val("a_state"), zip: val("a_zip"), can_return_location: val("a_ret") };
-          if (!DATA.address) { showToast("No address on file to edit yet."); closeModal(); return; }
-          sb.from("service_addresses").update(patch).eq("id", DATA.address.id).then(function (r) {
-            closeModal();
-            if (r.error) { showToast("Could not save address."); return; }
-            Object.assign(DATA.address, patch); render(); showToast("Address updated.");
-          });
-        });
-    },
-    payment: function () { showToast("Online payment management is coming soon."); },
-    support: function () { window.location.href = "mailto:hello@curbcrew.example?subject=Portal%20support"; }
+    pause: function () { openModal("Pause your service?", "We'll stop pickups and pause billing until you resume.", "Pause service", function () { updateSub("paused", function () { showToast("Service paused."); }); }); },
+    cancel: function () { openModal("Cancel your plan?", "No contract and no fee. Service ends after your current period.", "Cancel plan", function () { updateSub("canceled", function () { showToast("Plan canceled."); }); }, true); },
+    payment: function () { showToast("Card management opens here once Stripe is connected."); },
+    receipt: function () { showToast("Receipts available once Stripe is connected."); },
+    edit: function () { showToast("Inline editing is coming next."); },
+    support: function () { window.location.href = "mailto:hello@curbcrew.com?subject=Support"; }
   };
-
-  function formRow(label, id, value) {
-    return '<label class="field"><span>' + label + '</span><input type="text" data-f="' + id + '" value="' + (value == null ? "" : String(value).replace(/"/g, "&quot;")) + '" /></label>';
-  }
-  function val(id) { var el = $('[data-f="' + id + '"]'); return el ? el.value.trim() : ""; }
-
   document.addEventListener("click", function (e) {
-    var add = e.target.closest("[data-addon-add]");
-    if (add) { setAddon(add.getAttribute("data-addon-add"), true); return; }
-    var rem = e.target.closest("[data-addon-remove]");
-    if (rem) { setAddon(rem.getAttribute("data-addon-remove"), false); return; }
-    var actEl = e.target.closest("[data-action]");
-    if (actEl) { var fn = ACTIONS[actEl.getAttribute("data-action")]; if (fn) fn(); }
+    var a = e.target.closest("[data-action]"); if (!a) return;
+    var fn = ACTIONS[a.getAttribute("data-action")]; if (fn) fn();
   });
-
-  /* ============================================================
-     BOOT
-     ============================================================ */
-  setAuthMode("signin");
-  if (sb) {
-    sb.auth.getSession().then(function (r) {
-      if (r && r.data && r.data.session) enterApp();
-      else showAuth();
-    });
-    sb.auth.onAuthStateChange(function (_evt, session) {
-      if (session) { if (appView && appView.hidden) enterApp(); }
-      else showAuth();
-    });
-  } else {
-    showAuth();
-  }
 })();

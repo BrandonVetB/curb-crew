@@ -36,7 +36,7 @@
 .demo-banner a { color: #6fa8ff; font-weight: 600; }
 
 /* ============ AUTH ============ */
-.auth { min-height: calc(100vh - 36px); display: grid; place-items: center; padding: 40px 20px; }
+.auth { min-height: 100vh; display: grid; place-items: center; padding: 40px 20px; }
 .auth__card {
   width: 100%; max-width: 420px; background: var(--white);
   border: 1px solid var(--line); border-radius: var(--radius-lg);
@@ -60,12 +60,12 @@
 .auth__demo { margin-top: 22px; font-size: 13px; color: var(--ink-50); }
 
 /* ============ APP LAYOUT ============ */
-.app { display: grid; grid-template-columns: 264px 1fr; min-height: calc(100vh - 36px); }
+.app { display: grid; grid-template-columns: 264px 1fr; min-height: 100vh; }
 
 .side {
   background: var(--white); border-right: 1px solid var(--line);
   padding: 26px 20px; display: flex; flex-direction: column; gap: 26px;
-  position: sticky; top: 0; height: calc(100vh - 36px);
+  position: sticky; top: 0; height: 100vh;
 }
 .side__brand { margin-bottom: 4px; }
 .side__nav { display: flex; flex-direction: column; gap: 4px; }

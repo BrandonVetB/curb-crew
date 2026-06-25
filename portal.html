@@ -18,10 +18,7 @@
 </head>
 <body class="portal-body">
 
-  <!-- ============ BANNER ============ -->
-  <div class="demo-banner"><a href="index.html">&larr; Back to curbcrew.com</a></div>
-
-  <!-- ============ SIGN IN ============ -->
+  <!-- ============ AUTH ============ -->
   <section class="auth" data-view="auth">
     <div class="auth__card">
       <a href="index.html" class="wordmark wordmark--header" aria-label="Curb Crew home">
@@ -42,10 +39,10 @@
       <h1 class="auth__title" data-auth-title>Welcome back</h1>
       <p class="auth__sub" data-auth-sub>Sign in to manage your service.</p>
 
-      <form class="auth__form" data-login-form novalidate>
+      <form class="auth__form" data-auth-form novalidate>
         <label class="field" data-name-field hidden>
           <span>Full name</span>
-          <input type="text" name="full_name" autocomplete="name" placeholder="Your name" />
+          <input type="text" name="name" autocomplete="name" placeholder="Jane Smith" />
         </label>
         <label class="field">
           <span>Email</span>
@@ -53,13 +50,16 @@
         </label>
         <label class="field">
           <span>Password</span>
-          <input type="password" name="password" autocomplete="current-password" placeholder="••••••••" />
+          <input type="password" name="password" autocomplete="current-password" placeholder="At least 8 characters" />
         </label>
-        <button type="submit" class="btn btn--block magnetic" data-auth-submit>Sign in</button>
+        <button type="submit" class="btn btn--block" data-auth-submit>Sign in</button>
         <p class="auth__msg" data-auth-msg role="status" aria-live="polite"></p>
       </form>
 
-      <p class="auth__demo" data-auth-toggle>New customer? <button type="button" class="link-btn" data-auth-switch="signup">Create an account</button></p>
+      <p class="auth__demo">
+        <span data-mode="signin">New to Curb Crew? <a href="#" data-toggle-mode>Create an account</a></span>
+        <span data-mode="signup" hidden>Already have an account? <a href="#" data-toggle-mode>Sign in</a></span>
+      </p>
     </div>
   </section>
 
@@ -91,31 +91,24 @@
 
       <div class="side__foot">
         <div class="side__user">
-          <span class="side__avatar" aria-hidden="true" data-bind="user.initials">CC</span>
+          <span class="side__avatar" aria-hidden="true" data-bind="avatar">CC</span>
           <span class="side__id">
-            <strong data-bind="user.name">Your account</strong>
-            <small data-bind="user.addr"></small>
+            <strong data-bind="side_name">&nbsp;</strong>
+            <small data-bind="side_addr">&nbsp;</small>
           </span>
         </div>
-        <a href="index.html" class="side__signout" data-signout>Sign out</a>
+        <button class="side__signout" data-signout>Sign out</button>
       </div>
     </aside>
 
     <!-- main -->
     <main class="main">
-      <!-- mobile top bar -->
       <header class="topbar">
         <a href="index.html" class="wordmark wordmark--header topbar__logo" aria-label="Curb Crew home">
           <img class="wordmark__img" src="curb-crew-logo.png" alt="Curb Crew"
                onload="this.closest('.wordmark').classList.add('has-logo')" onerror="this.remove()" />
           <span class="wordmark__fallback" aria-hidden="true">
-            <span class="wordmark__mark">
-              <svg viewBox="0 0 32 32" width="22" height="22" fill="none">
-                <rect x="5" y="11" width="22" height="3" rx="1.5" fill="currentColor"/>
-                <path d="M8 14h16l-1.7 14.2A2.5 2.5 0 0 1 19.8 30H12.2a2.5 2.5 0 0 1-2.5-1.8z" fill="currentColor"/>
-                <path d="M13 8h6l1 3h-8z" fill="currentColor"/>
-              </svg>
-            </span>
+            <span class="wordmark__mark"><svg viewBox="0 0 32 32" width="22" height="22" fill="none"><rect x="5" y="11" width="22" height="3" rx="1.5" fill="currentColor"/><path d="M8 14h16l-1.7 14.2A2.5 2.5 0 0 1 19.8 30H12.2a2.5 2.5 0 0 1-2.5-1.8z" fill="currentColor"/><path d="M13 8h6l1 3h-8z" fill="currentColor"/></svg></span>
             <span class="wordmark__text">Curb&nbsp;Crew</span>
           </span>
         </a>
@@ -125,31 +118,31 @@
       <!-- OVERVIEW -->
       <section class="panel" data-panel="overview">
         <div class="panel__head">
-          <h1>Welcome back, <span data-bind="greeting.first">there</span></h1>
+          <h1 data-bind="greeting">Welcome back</h1>
           <p>Here's your service at a glance.</p>
         </div>
 
         <div class="grid grid--3">
           <article class="card card--feature">
             <span class="pill pill--blue">Next pickup</span>
-            <p class="card__big" data-bind="pickup.next">—</p>
-            <p class="card__sub" data-bind="pickup.date"></p>
-            <p class="card__note">We roll your cans out <strong>the night before</strong> and bring them back in after the truck.</p>
+            <p class="card__big" data-bind="next_day">&mdash;</p>
+            <p class="card__sub" data-bind="next_date_rel">No pickup scheduled yet</p>
+            <p class="card__note" data-bind="next_note">We roll your cans out the night before and bring them back after the truck.</p>
           </article>
 
           <article class="card">
-            <span class="pill pill--green" data-bind="plan.status">Active</span>
+            <span class="pill" data-bind="plan_pill">Status</span>
             <p class="card__label">Your plan</p>
-            <p class="card__value" data-bind="plan.name">Curb Crew</p>
-            <p class="card__muted" data-bind="plan.price_month"></p>
-            <button class="link-btn" data-nav="plan">Manage plan →</button>
+            <p class="card__value" data-bind="plan_name">No plan yet</p>
+            <p class="card__muted" data-bind="plan_price">&mdash;</p>
+            <button class="link-btn" data-nav="plan">Manage plan &rarr;</button>
           </article>
 
           <article class="card">
-            <p class="card__label">Need help?</p>
-            <p class="card__value">Support</p>
-            <p class="card__muted">We usually reply within an hour.</p>
-            <button class="link-btn" data-action="support">Contact support →</button>
+            <p class="card__label">Crew on your street</p>
+            <p class="card__value" data-bind="crew">Assigning</p>
+            <p class="card__muted" data-bind="ontime">&nbsp;</p>
+            <button class="link-btn" data-nav="account">Contact support &rarr;</button>
           </article>
         </div>
 
@@ -158,15 +151,13 @@
             <p class="card__label">Quick actions</p>
             <div class="actions">
               <button class="btn btn--ghost" data-action="pause">Pause for vacation</button>
-              <button class="btn btn--ghost" data-nav="plan">Update payment</button>
-              <button class="btn btn--ghost" data-nav="account">Edit can location</button>
+              <button class="btn btn--ghost" data-action="payment">Update payment</button>
+              <button class="btn btn--ghost" data-action="edit">Edit can location</button>
             </div>
           </article>
           <article class="card">
             <p class="card__label">Recent activity</p>
-            <ul class="timeline" data-list="activity">
-              <li class="muted">Loading…</li>
-            </ul>
+            <ul class="timeline" data-list="activity"><li><span class="muted">No activity yet.</span></li></ul>
           </article>
         </div>
       </section>
@@ -175,22 +166,13 @@
       <section class="panel" data-panel="schedule" hidden>
         <div class="panel__head">
           <h1>Your schedule</h1>
-          <p>Synced to the City of Austin collection calendar, including holiday shifts.</p>
+          <p>Synced to your city's collection calendar, including holiday shifts.</p>
         </div>
-
-        <div class="grid grid--3">
-          <article class="card"><p class="card__label">Pickup day</p><p class="card__value" data-bind="pickup.next">—</p><p class="card__muted">Next: <span data-bind="pickup.date"></span></p></article>
-          <article class="card"><p class="card__label">Your plan</p><p class="card__value" data-bind="plan.name">Curb Crew</p><p class="card__muted" data-bind="plan.price_month"></p></article>
-          <article class="card"><p class="card__label">Add-ons</p><p class="card__value">Manage anytime</p><button class="link-btn" data-nav="plan">Plan &amp; add-ons →</button></article>
-        </div>
-
         <article class="card">
-          <p class="card__label">Next 4 weeks</p>
+          <p class="card__label">Upcoming pickups</p>
           <table class="table">
             <thead><tr><th>Date</th><th>Out the night before</th><th>Going out</th><th>Status</th></tr></thead>
-            <tbody data-list="schedule">
-              <tr><td colspan="4" class="muted">Loading…</td></tr>
-            </tbody>
+            <tbody data-list="schedule"><tr><td colspan="4" class="muted">No upcoming pickups scheduled yet.</td></tr></tbody>
           </table>
         </article>
       </section>
@@ -205,10 +187,10 @@
         <div class="grid grid--2">
           <article class="card">
             <p class="card__label">Current plan</p>
-            <div data-list="plan_lines">
-              <div class="line"><span>Curb Crew Plan</span><strong>—</strong></div>
-            </div>
-            <p class="card__muted">Next charge: <span data-bind="plan.next_charge">—</span></p>
+            <div class="line"><span data-bind="plan_name2">Curb Crew Plan</span><strong data-bind="plan_base">&mdash;</strong></div>
+            <div class="line" data-bind="addons_line" hidden><span>Add-ons</span><strong data-bind="addons_total">&mdash;</strong></div>
+            <div class="line line--total"><span>Total monthly</span><strong data-bind="plan_total">&mdash;</strong></div>
+            <p class="card__muted" data-bind="next_charge">Not billing yet</p>
             <div class="actions actions--wrap">
               <button class="btn btn--ghost" data-action="pause">Pause</button>
               <button class="btn btn--danger-ghost" data-action="cancel">Cancel plan</button>
@@ -216,28 +198,17 @@
           </article>
 
           <article class="card">
-            <p class="card__label">Add-ons</p>
-            <div data-list="addons">
-              <div class="addon-row"><div class="muted">Loading…</div></div>
-            </div>
+            <p class="card__label">Payment method</p>
+            <div class="pay" data-bind="pay"><span class="muted">No card on file yet. Billing starts when Stripe is connected.</span></div>
+            <button class="btn btn--ghost btn--sm" data-action="payment" style="margin-top:14px">Add payment method</button>
           </article>
         </div>
-
-        <article class="card">
-          <div class="card__row">
-            <p class="card__label">Payment method</p>
-            <button class="link-btn" data-action="payment">Manage</button>
-          </div>
-          <div class="pay"><span class="muted">Online payment management is coming soon.</span></div>
-        </article>
 
         <article class="card">
           <p class="card__label">Billing history</p>
           <table class="table">
             <thead><tr><th>Date</th><th>Description</th><th>Amount</th><th>Receipt</th></tr></thead>
-            <tbody data-list="invoices">
-              <tr><td colspan="4" class="muted">Loading…</td></tr>
-            </tbody>
+            <tbody data-list="invoices"><tr><td colspan="4" class="muted">No invoices yet.</td></tr></tbody>
           </table>
         </article>
       </section>
@@ -248,41 +219,31 @@
           <h1>Account</h1>
           <p>Your details and how we service your home.</p>
         </div>
-
         <div class="grid grid--2">
           <article class="card">
             <p class="card__label">Profile</p>
-            <div class="line"><span>Name</span><strong data-bind="account.name">—</strong></div>
-            <div class="line"><span>Email</span><strong data-bind="account.email">—</strong></div>
-            <div class="line"><span>Phone</span><strong data-bind="account.phone">—</strong></div>
-            <button class="btn btn--ghost btn--sm" data-action="edit-profile">Edit profile</button>
+            <div class="line"><span>Name</span><strong data-bind="name">&mdash;</strong></div>
+            <div class="line"><span>Email</span><strong data-bind="email">&mdash;</strong></div>
+            <div class="line"><span>Phone</span><strong data-bind="phone">&mdash;</strong></div>
+            <button class="btn btn--ghost btn--sm" data-action="edit">Edit profile</button>
           </article>
-
           <article class="card">
             <p class="card__label">Service address</p>
-            <div class="line"><span>Address</span><strong data-bind="addr.line">—</strong></div>
-            <div class="line"><span>City</span><strong data-bind="addr.city">—</strong></div>
-            <div class="line"><span>Where we return cans</span><strong data-bind="addr.return">—</strong></div>
-            <button class="btn btn--ghost btn--sm" data-action="edit-address">Edit address</button>
+            <div class="line"><span>Address</span><strong data-bind="address">Not set</strong></div>
+            <div class="line"><span>City</span><strong data-bind="city">&mdash;</strong></div>
+            <div class="line"><span>Where we return cans</span><strong data-bind="can_return">&mdash;</strong></div>
+            <button class="btn btn--ghost btn--sm" data-action="edit">Edit address</button>
           </article>
         </div>
-
         <article class="card">
           <div class="card__row">
-            <div>
-              <p class="card__label">Need a hand?</p>
-              <p class="card__muted">Message your crew or our support team. We usually reply within an hour.</p>
-            </div>
-            <button class="btn magnetic" data-action="support">Contact support</button>
+            <div><p class="card__label">Need a hand?</p><p class="card__muted">Message our support team. We usually reply within an hour.</p></div>
+            <button class="btn" data-action="support">Contact support</button>
           </div>
         </article>
-
         <article class="card card--danger">
           <div class="card__row">
-            <div>
-              <p class="card__label">Cancel service</p>
-              <p class="card__muted">No contract, no fee. You can reactivate anytime.</p>
-            </div>
+            <div><p class="card__label">Cancel service</p><p class="card__muted">No contract, no fee. You can reactivate anytime.</p></div>
             <button class="btn btn--danger-ghost" data-action="cancel">Cancel plan</button>
           </div>
         </article>
@@ -291,22 +252,10 @@
 
     <!-- mobile bottom tab bar -->
     <nav class="tabbar" aria-label="Sections">
-      <button class="tabbar__item is-active" data-nav="overview">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11 12 4l8 7"/><path d="M6 10v10h12V10"/></svg>
-        <span>Home</span>
-      </button>
-      <button class="tabbar__item" data-nav="schedule">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="2"/><line x1="4" y1="9.5" x2="20" y2="9.5"/><line x1="8" y1="3" x2="8" y2="6"/><line x1="16" y1="3" x2="16" y2="6"/></svg>
-        <span>Schedule</span>
-      </button>
-      <button class="tabbar__item" data-nav="plan">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        <span>Plan</span>
-      </button>
-      <button class="tabbar__item" data-nav="account">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
-        <span>Account</span>
-      </button>
+      <button class="tabbar__item is-active" data-nav="overview"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11 12 4l8 7"/><path d="M6 10v10h12V10"/></svg><span>Home</span></button>
+      <button class="tabbar__item" data-nav="schedule"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="2"/><line x1="4" y1="9.5" x2="20" y2="9.5"/><line x1="8" y1="3" x2="8" y2="6"/><line x1="16" y1="3" x2="16" y2="6"/></svg><span>Schedule</span></button>
+      <button class="tabbar__item" data-nav="plan"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Plan</span></button>
+      <button class="tabbar__item" data-nav="account"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg><span>Account</span></button>
     </nav>
   </div>
 
@@ -315,7 +264,7 @@
     <div class="modal__backdrop" data-modal-close></div>
     <div class="modal__card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <h2 id="modal-title" data-modal-title>Confirm</h2>
-      <div data-modal-body>Are you sure?</div>
+      <p data-modal-body>Are you sure?</p>
       <div class="modal__actions">
         <button class="btn btn--ghost" data-modal-close>Never mind</button>
         <button class="btn" data-modal-confirm>Confirm</button>
@@ -323,10 +272,8 @@
     </div>
   </div>
 
-  <!-- toast -->
   <div class="toast" data-toast hidden></div>
 
-  <!-- Supabase client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="portal.js" defer></script>
 </body>
