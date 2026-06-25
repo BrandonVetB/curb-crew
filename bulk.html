@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bulk &amp; Junk Pickup | Curb Crew</title>
-  <meta name="description" content="Get an instant quote for bulk and junk pickup. Furniture, appliances, yard bags, and more. Plus your city's next bulk collection date." />
+  <meta name="description" content="Bulk and junk pickup from Curb Crew. Contact us for a quick quote, and check your city's next bulk collection date." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -37,47 +37,45 @@
 
   <main class="bulk">
     <div class="bulk__intro">
-      <h1>Bulk &amp; junk pickup, priced in seconds.</h1>
-      <p>Tell us what needs to go and get an instant estimate. We haul furniture, appliances, yard bags, and the random pile in the garage.</p>
+      <h1>Bulk &amp; junk pickup.</h1>
+      <p>Got furniture, appliances, or a pile of junk that needs to go? Reach out and we'll get you a quick quote.</p>
     </div>
 
-    <!-- QUOTE CALCULATOR -->
+    <!-- CONTACT FOR A QUOTE -->
     <section class="bulk__card">
-      <h2 class="bulk__h2">What needs to go?</h2>
-      <div class="bulk-items" data-items>
-        <div class="bulk-item" data-item data-key="furniture" data-unit="3000" data-label="Furniture">
-          <div class="bulk-item__info"><strong>Furniture</strong><span>Couch, chair, dresser &middot; $30 each</span></div>
-          <div class="stepper"><button type="button" data-dec aria-label="Decrease">&minus;</button><span data-qty>0</span><button type="button" data-inc aria-label="Increase">+</button></div>
-        </div>
-        <div class="bulk-item" data-item data-key="mattress" data-unit="3500" data-label="Mattress / box spring">
-          <div class="bulk-item__info"><strong>Mattress / box spring</strong><span>Any size &middot; $35 each</span></div>
-          <div class="stepper"><button type="button" data-dec aria-label="Decrease">&minus;</button><span data-qty>0</span><button type="button" data-inc aria-label="Increase">+</button></div>
-        </div>
-        <div class="bulk-item" data-item data-key="appliance" data-unit="5000" data-label="Appliance">
-          <div class="bulk-item__info"><strong>Appliance</strong><span>Fridge, washer, dryer &middot; $50 each</span></div>
-          <div class="stepper"><button type="button" data-dec aria-label="Decrease">&minus;</button><span data-qty>0</span><button type="button" data-inc aria-label="Increase">+</button></div>
-        </div>
-        <div class="bulk-item" data-item data-key="electronics" data-unit="2000" data-label="TV / electronics">
-          <div class="bulk-item__info"><strong>TV / electronics</strong><span>TV, monitor, printer &middot; $20 each</span></div>
-          <div class="stepper"><button type="button" data-dec aria-label="Decrease">&minus;</button><span data-qty>0</span><button type="button" data-inc aria-label="Increase">+</button></div>
-        </div>
-        <div class="bulk-item" data-item data-key="junk" data-unit="1000" data-label="Boxes / bags of junk">
-          <div class="bulk-item__info"><strong>Boxes / bags of junk</strong><span>General clutter &middot; $10 each</span></div>
-          <div class="stepper"><button type="button" data-dec aria-label="Decrease">&minus;</button><span data-qty>0</span><button type="button" data-inc aria-label="Increase">+</button></div>
-        </div>
-        <div class="bulk-item" data-item data-key="yard" data-unit="600" data-label="Yard-waste bag / bundle">
-          <div class="bulk-item__info"><strong>Yard-waste bag / bundle</strong><span>Leaves, branches &middot; $6 each</span></div>
-          <div class="stepper"><button type="button" data-dec aria-label="Decrease">&minus;</button><span data-qty>0</span><button type="button" data-inc aria-label="Increase">+</button></div>
-        </div>
+      <h2 class="bulk__h2">Contact us for a quote</h2>
+      <p class="bulk__muted">Email, text, or call and we'll price it fast, usually the same day.</p>
+
+      <div class="contact-btns">
+        <a class="contact-btn" href="mailto:hello@curbcrew.com?subject=Bulk%20pickup%20quote">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+          <span><strong>Email us</strong>hello@curbcrew.com</span>
+        </a>
+        <a class="contact-btn" href="sms:+15125550148">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.4L3 21l2.1-5.7A8.4 8.4 0 1 1 21 11.5z"/></svg>
+          <span><strong>Text us</strong>(512) 555-0148</span>
+        </a>
+        <a class="contact-btn" href="tel:+15125550148">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L19 13l2 4v0a2 2 0 0 1-2 2 16 16 0 0 1-14-14 2 2 0 0 1 2-1z"/></svg>
+          <span><strong>Call us</strong>(512) 555-0148</span>
+        </a>
       </div>
 
-      <div class="bulk-estimate">
-        <div>
-          <span class="bulk-estimate__label">Estimated total</span>
-          <p class="bulk-estimate__note">Includes a $25 trip fee. Final price confirmed on site before we haul.</p>
+      <div class="contact-or"><span>or send us the details</span></div>
+
+      <form class="contact-form" data-bulk-form novalidate>
+        <div class="bulk__grid">
+          <label class="field"><span>Full name</span><input type="text" name="name" autocomplete="name" placeholder="Jane Smith" /></label>
+          <label class="field"><span>Email</span><input type="email" name="email" autocomplete="email" placeholder="you@email.com" /></label>
+          <label class="field"><span>Phone</span><input type="tel" name="phone" autocomplete="tel" placeholder="(555) 555-5555" /></label>
+          <label class="field"><span>Preferred date</span><input type="date" name="preferred_date" /></label>
+          <label class="field field--wide"><span>Pickup address</span><input type="text" name="address" autocomplete="street-address" placeholder="123 Maple St, Austin TX" /></label>
+          <label class="field field--wide"><span>What needs to go?</span><input type="text" name="notes" placeholder="Couch, fridge, a few bags of yard waste..." /></label>
         </div>
-        <strong data-estimate>$0</strong>
-      </div>
+        <button type="submit" class="btn btn--block">Request a quote</button>
+        <p class="bulk__msg" data-bulk-msg role="status" aria-live="polite"></p>
+        <p class="bulk__fine">No charge to ask. We reply with a price and a time. <a href="index.html">See the full site</a></p>
+      </form>
     </section>
 
     <!-- CITY SCHEDULE LOOKUP -->
@@ -90,22 +88,6 @@
       </div>
       <div class="city-result" data-city-result></div>
     </section>
-
-    <!-- REQUEST FORM -->
-    <form class="bulk__card" data-bulk-form novalidate>
-      <h2 class="bulk__h2">Schedule your pickup</h2>
-      <div class="bulk__grid">
-        <label class="field"><span>Full name</span><input type="text" name="name" autocomplete="name" placeholder="Jane Smith" /></label>
-        <label class="field"><span>Email</span><input type="email" name="email" autocomplete="email" placeholder="you@email.com" /></label>
-        <label class="field"><span>Phone</span><input type="tel" name="phone" autocomplete="tel" placeholder="(555) 555-5555" /></label>
-        <label class="field"><span>Preferred date</span><input type="date" name="preferred_date" /></label>
-        <label class="field field--wide"><span>Pickup address</span><input type="text" name="address" autocomplete="street-address" placeholder="123 Maple St, Austin TX" /></label>
-        <label class="field field--wide"><span>Anything we should know?</span><input type="text" name="notes" placeholder="Items are in the back alley, etc." /></label>
-      </div>
-      <button type="submit" class="btn btn--block">Request my pickup</button>
-      <p class="bulk__msg" data-bulk-msg role="status" aria-live="polite"></p>
-      <p class="bulk__fine">No charge to request. We confirm the price and time by email. <a href="index.html">See the full site</a></p>
-    </form>
   </main>
 
   <script src="bulk.js" defer></script>
