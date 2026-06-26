@@ -26,7 +26,7 @@
   var step = 1;
   var MAX = 4;
   var BASE = 3500;
-  var ADDON = { recycling: 800, yard: 800, cleaning: 1200 };
+  var ADDON = { recycling: 800, yard: 800, cleaning: 2500 };
 
   function val(name) { var el = form.querySelector('[name="' + name + '"]'); return el ? el.value.trim() : ""; }
   function checked(name) { var el = form.querySelector('[name="' + name + '"]'); return !!(el && el.checked); }
@@ -88,7 +88,7 @@
     var addons = [];
     if (checked("recycling")) addons.push("Recycling +$8");
     if (checked("yard")) addons.push("Yard-waste +$8");
-    if (checked("cleaning")) addons.push("Cleaning +$12");
+    if (checked("cleaning")) addons.push("Cleaning +$25");
     var rows = [
       ["Address", val("address")],
       ["Pickup day", val("pickup_day")],
