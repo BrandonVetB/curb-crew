@@ -58,9 +58,13 @@
       me.uid = user.id; me.email = (user.email || "").toLowerCase();
       sb.from("staff_roles").select("role, full_name").ilike("email", me.email).maybeSingle().then(function (r) {
         var row = r.data;
+        if (row && (row.role === "crew_member" || row.role === "crew_lead")) {
+          window.location.replace("crew.html");
+          return;
+        }
         if (!row || row.role !== "admin") {
           showAuth();
-          fail("This account isn't an admin. Ask an owner to add you in Crew & users.");
+          fail("This account isn't set up for the OS. Ask an owner to add you in Crew & users.");
           sb.auth.signOut();
           return;
         }
