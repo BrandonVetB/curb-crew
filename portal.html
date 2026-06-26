@@ -199,15 +199,16 @@
             <div class="line line--total"><span>Total monthly</span><strong data-bind="plan_total">&mdash;</strong></div>
             <p class="card__muted" data-bind="next_charge">Not billing yet</p>
             <div class="actions actions--wrap">
-              <button class="btn btn--ghost" data-action="pause">Pause</button>
-              <button class="btn btn--danger-ghost" data-action="cancel">Cancel plan</button>
+              <button class="btn" data-action="resume" data-resume-btn hidden>Resume now</button>
+              <button class="btn btn--ghost" data-action="pause" data-pause-btn>Pause for vacation</button>
+              <button class="btn btn--danger-ghost" data-action="cancel" data-cancel-btn>Cancel plan</button>
             </div>
           </article>
 
           <article class="card">
             <p class="card__label">Payment method</p>
             <div class="pay" data-bind="pay"><span class="muted">No card on file yet. Billing starts when Stripe is connected.</span></div>
-            <button class="btn btn--ghost btn--sm" data-action="payment" style="margin-top:14px">Add payment method</button>
+            <button class="btn btn--ghost btn--sm" data-action="payment" style="margin-top:14px">Update payment method</button>
           </article>
         </div>
 
@@ -226,32 +227,22 @@
           <h1>Account</h1>
           <p>Your details and how we service your home.</p>
         </div>
-        <div class="grid grid--2">
-          <article class="card">
-            <p class="card__label">Profile</p>
-            <div class="line"><span>Name</span><strong data-bind="name">&mdash;</strong></div>
-            <div class="line"><span>Email</span><strong data-bind="email">&mdash;</strong></div>
-            <div class="line"><span>Phone</span><strong data-bind="phone">&mdash;</strong></div>
+        <article class="card">
+          <div class="card__row">
+            <p class="card__label">Your profile &amp; service</p>
             <button class="btn btn--ghost btn--sm" data-action="edit">Edit profile</button>
-          </article>
-          <article class="card">
-            <p class="card__label">Service address</p>
-            <div class="line"><span>Address</span><strong data-bind="address">Not set</strong></div>
-            <div class="line"><span>City</span><strong data-bind="city">&mdash;</strong></div>
-            <div class="line"><span>Where we return cans</span><strong data-bind="can_return">&mdash;</strong></div>
-            <button class="btn btn--ghost btn--sm" data-action="edit">Edit address</button>
-          </article>
-        </div>
+          </div>
+          <div class="line"><span>Name</span><strong data-bind="name">&mdash;</strong></div>
+          <div class="line"><span>Email</span><strong data-bind="email">&mdash;</strong></div>
+          <div class="line"><span>Phone</span><strong data-bind="phone">&mdash;</strong></div>
+          <div class="line"><span>Address</span><strong data-bind="address">Not set</strong></div>
+          <div class="line"><span>City</span><strong data-bind="city">&mdash;</strong></div>
+          <div class="line"><span>Where we return cans</span><strong data-bind="can_return">&mdash;</strong></div>
+        </article>
         <article class="card">
           <div class="card__row">
             <div><p class="card__label">Need a hand?</p><p class="card__muted">Message our support team. We usually reply within an hour.</p></div>
             <button class="btn" data-action="support">Contact support</button>
-          </div>
-        </article>
-        <article class="card card--danger">
-          <div class="card__row">
-            <div><p class="card__label">Cancel service</p><p class="card__muted">No contract, no fee. You can reactivate anytime.</p></div>
-            <button class="btn btn--danger-ghost" data-action="cancel">Cancel plan</button>
           </div>
         </article>
       </section>
@@ -271,9 +262,10 @@
     <div class="modal__backdrop" data-modal-close></div>
     <div class="modal__card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <h2 id="modal-title" data-modal-title>Confirm</h2>
-      <p data-modal-body>Are you sure?</p>
+      <div data-modal-body>Are you sure?</div>
       <div class="modal__actions">
         <button class="btn btn--ghost" data-modal-close>Never mind</button>
+        <button class="btn btn--ghost" data-modal-secondary hidden></button>
         <button class="btn" data-modal-confirm>Confirm</button>
       </div>
     </div>

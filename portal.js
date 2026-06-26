@@ -158,7 +158,8 @@
       var m = map[sub.status] || ["Active", "pill pill--green"];
       pillEl.textContent = m[0]; pillEl.className = m[1];
     }
-    if (sub.stripe_subscription_id) { /* real card hookup later */ }
+    var resumeBtn = $("[data-resume-btn]"), pauseBtn = $("[data-pause-btn]");
+    if (resumeBtn && pauseBtn) { var paused = sub.status === "paused"; resumeBtn.hidden = !paused; pauseBtn.hidden = paused; }
   }
 
   function renderNext(pk) {
@@ -221,15 +222,22 @@
   });
 
   /* ================= MODAL + ACTIONS ================= */
-  var modal = $("[data-modal]"), modalTitle = $("[data-modal-title]"), modalBody = $("[data-modal-body]"), modalConfirm = $("[data-modal-confirm]");
-  var pending = null;
-  function openModal(title, body, label, onConfirm, danger) {
-    modalTitle.textContent = title; modalBody.textContent = body; modalConfirm.textContent = label || "Confirm";
-    modalConfirm.classList.toggle("btn--danger-ghost", !!danger); pending = onConfirm; modal.hidden = false;
+  var modal = $("[data-modal]"), modalTitle = $("[data-modal-title]"), modalBody = $("[data-modal-body]"), modalConfirm = $("[data-modal-confirm]"), modalSecondary = $("[data-modal-secondary]");
+  var pending = null, pendingSecondary = null;
+  function openModal(o) {
+    modalTitle.textContent = o.title || "";
+    modalBody.innerHTML = o.html || "";
+    modalConfirm.textContent = o.confirmLabel || "Confirm";
+    modalConfirm.classList.toggle("btn--danger-ghost", !!o.danger);
+    pending = o.onConfirm || null;
+    if (o.secondaryLabel) { modalSecondary.textContent = o.secondaryLabel; modalSecondary.hidden = false; modalSecondary.classList.toggle("btn--danger-ghost", !!o.secondaryDanger); pendingSecondary = o.onSecondary || null; }
+    else { modalSecondary.hidden = true; pendingSecondary = null; }
+    modal.hidden = false;
   }
-  function closeModal() { modal.hidden = true; pending = null; modalConfirm.classList.remove("btn--danger-ghost"); }
+  function closeModal() { modal.hidden = true; pending = null; pendingSecondary = null; modalConfirm.classList.remove("btn--danger-ghost"); modalSecondary.classList.remove("btn--danger-ghost"); }
   $all("[data-modal-close]").forEach(function (el) { el.addEventListener("click", closeModal); });
-  modalConfirm.addEventListener("click", function () { var fn = pending; closeModal(); if (fn) fn(); });
+  modalConfirm.addEventListener("click", function () { if (pending && pending() === false) return; closeModal(); });
+  modalSecondary.addEventListener("click", function () { var fn = pendingSecondary; closeModal(); if (fn) fn(); });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !modal.hidden) closeModal(); });
 
   var toast = $("[data-toast]"), toastTimer = null;
@@ -245,12 +253,62 @@
     });
   }
 
+  function callFn(name, body) { return sb.functions.invoke(name, { body: body || {} }); }
+  function callManage(action, extra, okMsg) {
+    showToast("Working...");
+    var body = { action: action };
+    if (extra) Object.keys(extra).forEach(function (k) { body[k] = extra[k]; });
+    return callFn("manage-subscription", body).then(function (res) {
+      if (res.error || !res.data || res.data.error) { showToast("Something went wrong. Please try again."); return; }
+      showToast(okMsg || "Done.");
+      loadData();
+    });
+  }
+
   var ACTIONS = {
-    pause: function () { openModal("Pause your service?", "We'll stop pickups and pause billing until you resume.", "Pause service", function () { updateSub("paused", function () { showToast("Service paused."); }); }); },
-    cancel: function () { openModal("Cancel your plan?", "No contract and no fee. Service ends after your current period.", "Cancel plan", function () { updateSub("canceled", function () { showToast("Plan canceled."); }); }, true); },
-    payment: function () { showToast("Card management opens here once Stripe is connected."); },
-    receipt: function () { showToast("Receipts available once Stripe is connected."); },
-    edit: function () { showToast("Inline editing is coming next."); },
+    payment: function () {
+      showToast("Opening secure billing...");
+      callFn("create-billing-portal-session").then(function (res) {
+        if (res.data && res.data.url) { window.location.href = res.data.url; return; }
+        if (res.data && res.data.no_customer) {
+          callFn("create-checkout-session", { addons: {} }).then(function (r2) {
+            if (r2.data && r2.data.url) { window.location.href = r2.data.url; } else { showToast("Could not open checkout."); }
+          });
+          return;
+        }
+        showToast("Could not open billing. Try again.");
+      });
+    },
+    cancel: function () {
+      openModal({
+        title: "Wait, one month of recycling on us?",
+        html: "We would hate to see you go. Stay and we will credit your next month of the recycling bin, an $8 credit. Or cancel anyway, no contract and no fee, your service runs through the current period.",
+        confirmLabel: "Keep my plan + free month",
+        onConfirm: function () { callManage("recycling_offer", null, "Done. Your $8 recycling credit is applied."); },
+        secondaryLabel: "No, cancel my plan",
+        secondaryDanger: true,
+        onSecondary: function () { callManage("cancel", null, "Your plan will cancel at the end of the period."); }
+      });
+    },
+    pause: function () {
+      var min = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+      openModal({
+        title: "Heading out of town?",
+        html: '<p style="margin-bottom:12px;color:var(--ink-70)">Most folks find pausing is more hassle than it is worth, we just quietly handle trash day for you. But if you are away, give us your return date and we will pause billing until then, you only pay for service you get.</p>'
+          + '<label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:var(--ink-70)"><span>Resume service on</span>'
+          + '<input type="date" data-pause-date min="' + min + '" value="' + min + '" style="font:inherit;font-size:15px;padding:12px 13px;border:1px solid var(--line-strong);border-radius:11px"></label>',
+        confirmLabel: "Pause until then",
+        onConfirm: function () {
+          var d = modalBody.querySelector("[data-pause-date]");
+          var rd = d && d.value;
+          if (!rd) { showToast("Pick a return date."); return false; }
+          callManage("pause", { resume_date: rd }, "Service paused. We resume on " + fmtDate(rd) + ".");
+        }
+      });
+    },
+    resume: function () { callManage("resume", null, "Welcome back. Service resumed."); },
+    receipt: function () { ACTIONS.payment(); },
+    edit: function () { showToast("Profile editing opens here, coming in the next update."); },
     support: function () { if (window.openSupport) { window.openSupport(); } }
   };
   document.addEventListener("click", function (e) {
