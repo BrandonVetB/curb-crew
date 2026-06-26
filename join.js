@@ -144,8 +144,16 @@
           }),
           sb.from("leads").insert(leadRow)
         ]).then(function () {
-          setMsg("Account created. Taking you to your dashboard...", "success");
-          setTimeout(function () { window.location.href = "portal.html"; }, 900);
+          setMsg("Account created. Opening secure checkout...", "success");
+          sb.functions.invoke("create-checkout-session", {
+            body: { addons: { recycling: checked("recycling"), yard: checked("yard"), cleaning: checked("cleaning") } }
+          }).then(function (res) {
+            if (res.error || !res.data || !res.data.url) {
+              nextBtn.disabled = false;
+              return setMsg("Your account is created, but checkout could not start. Sign in to add payment.", "error");
+            }
+            window.location.href = res.data.url;
+          });
         });
       });
   }
