@@ -65,7 +65,7 @@
 
   // Admin "view as": read-only preview of a crew member's route.
   function setupImpersonation(asId) {
-    $all("[data-act]").forEach(function (b) { b.style.display = "none"; });
+    $all("[data-act],[data-connect-payouts]").forEach(function (b) { b.style.display = "none"; });
     var b = document.createElement("div");
     b.className = "offline"; b.style.background = "#0066FF"; b.style.color = "#fff";
     b.textContent = "Admin preview — read-only";
@@ -221,6 +221,20 @@
     }
     var hc = e.target.closest("[data-house-open]");
     if (hc) openHouse(parseInt(hc.getAttribute("data-house-open"), 10));
+  });
+
+  /* ============ STRIPE CONNECT ONBOARDING ============ */
+  var connectBtn = $("[data-connect-payouts]");
+  if (connectBtn) connectBtn.addEventListener("click", function () {
+    connectBtn.disabled = true; connectBtn.textContent = "Opening Stripe...";
+    sb.functions.invoke("stripe-connect-onboard").then(function (r) {
+      var d = r.data;
+      if (r.error || !d || !d.url) {
+        connectBtn.disabled = false; connectBtn.textContent = "Set up payouts (connect your bank)";
+        return toast((d && d.error) || (r.error && r.error.message) || "Could not start onboarding.");
+      }
+      window.location.href = d.url;
+    });
   });
 
   /* ============ UI helpers ============ */

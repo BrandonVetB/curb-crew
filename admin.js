@@ -288,6 +288,32 @@
   $all('[data-search="clients"]').forEach(function (i) { i.addEventListener("input", function () { renderClients(i.value); }); });
   $all('[data-export="payroll"]').forEach(function (b) { b.addEventListener("click", exportPayrollCSV); });
   $all("[data-pay-start],[data-pay-end]").forEach(function (i) { i.addEventListener("change", renderPayroll); });
+  $all("[data-run-payout]").forEach(function (b) { b.addEventListener("click", runPayout); });
+
+  // Preview then send a Stripe Connect payout run for the selected period.
+  // The admin confirms the real send; amounts come from the edge function (server-side).
+  function runPayout() {
+    var per = payPeriod();
+    toast("Calculating payout preview...");
+    sb.functions.invoke("stripe-payout-run", { body: { period_start: per.start, period_end: per.end, dry_run: true } }).then(function (r) {
+      var d = r.data;
+      if (r.error || !d || d.error) return toast((d && d.error) || ("Preview failed: " + (r.error && r.error.message)));
+      if (!d.items || !d.items.length) return toast("No payable actions in this period.");
+      var lines = d.items.map(function (i) { return esc(i.name) + ": " + money(i.amount_cents) + (i.stripe_account_id ? "" : " — no bank connected"); }).join("<br>");
+      openModal("Run payout · " + per.start + " to " + per.end,
+        "<p>This sends real Stripe payments to each connected crew member:</p><p style='line-height:1.8'>" + lines +
+        "</p><p><strong>Total: " + money(d.total_cents) + "</strong></p><p class='muted'>Anyone without a connected bank is skipped and marked failed.</p>",
+        "Send payouts", function () {
+          closeModal(); toast("Sending payouts...");
+          sb.functions.invoke("stripe-payout-run", { body: { period_start: per.start, period_end: per.end } }).then(function (r2) {
+            var d2 = r2.data;
+            if (r2.error || !d2 || d2.error) return toast((d2 && d2.error) || ("Payout failed: " + (r2.error && r2.error.message)));
+            toast("Payout complete: " + d2.paid + " paid" + (d2.failed ? ", " + d2.failed + " failed" : "") + (d2.skipped ? ", " + d2.skipped + " no bank" : ""));
+            loadAll();
+          });
+        });
+    });
+  }
 
   /* ================= MODAL ================= */
   var modal = $("[data-modal]"), mTitle = $("[data-modal-title]"), mBody = $("[data-modal-body]"), mConfirm = $("[data-modal-confirm]"), pending = null;
