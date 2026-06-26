@@ -3,17 +3,14 @@
 //  Admin-only. Computes each crew member's pay for a period from
 //  photo-verified service_events x pay_rates, records a pay_run +
 //  payout_items, and sends each connected crew member their pay
-//  via a Stripe Connect transfer.
+//  via a Stripe Connect transfer (Stripe REST API via fetch).
 //
-//  Deploy (Brandon / org owner):
-//    supabase functions deploy stripe-payout-run
-//  Secret used: Stripe_Payment_Key
+//  Deploy:  supabase functions deploy stripe-payout-run
+//  Secret:  Stripe_Payment_Key
 //
 //  NOTE: transfers move money from the platform's Stripe balance
-//  to each crew member's connected account, so the platform must
-//  hold an available balance. Test in Stripe TEST mode first.
+//  to each connected account. Test in Stripe TEST mode first.
 // ============================================================
-import Stripe from "npm:stripe@^16";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const cors = {
@@ -21,13 +18,25 @@ const cors = {
   "Access-Control-Allow-Headers": "authorization, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
-const json = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), { status, headers: { ...cors, "content-type": "application/json" } });
+const json = (b: unknown, status = 200) =>
+  new Response(JSON.stringify(b), { status, headers: { ...cors, "content-type": "application/json" } });
+
+const STRIPE_KEY = Deno.env.get("Stripe_Payment_Key") || "";
+
+async function stripe(path: string, params: Record<string, string>) {
+  const res = await fetch("https://api.stripe.com/v1/" + path, {
+    method: "POST",
+    headers: { Authorization: "Bearer " + STRIPE_KEY, "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams(params).toString(),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data?.error?.message || ("Stripe error " + res.status));
+  return data;
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   try {
-    const stripe = new Stripe(Deno.env.get("Stripe_Payment_Key")!, { apiVersion: "2024-06-20" });
     const url = Deno.env.get("SUPABASE_URL")!;
     const anon = Deno.env.get("SUPABASE_ANON_KEY")!;
     const service = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -50,7 +59,6 @@ Deno.serve(async (req) => {
     const bi = rates?.brought_in_cents || 0;
     if (ro === 0 && bi === 0) return json({ error: "Set pay rates before running a payout." }, 400);
 
-    // Pull events in the period.
     const startISO = new Date(period_start + "T00:00:00").toISOString();
     const endISO = new Date(period_end + "T23:59:59").toISOString();
     const { data: events } = await db.from("service_events")
@@ -66,23 +74,24 @@ Deno.serve(async (req) => {
     });
 
     const crewIds = Object.keys(agg);
-    const { data: profiles } = await db.from("profiles").select("id, full_name, stripe_account_id").in("id", crewIds.length ? crewIds : ["00000000-0000-0000-0000-000000000000"]);
+    const { data: profiles } = await db.from("profiles")
+      .select("id, full_name, stripe_account_id")
+      .in("id", crewIds.length ? crewIds : ["00000000-0000-0000-0000-000000000000"]);
     const profById: Record<string, any> = {};
     (profiles || []).forEach((p) => (profById[p.id] = p));
 
-    // Build the line items.
     const items = crewIds.map((id) => {
       const a = agg[id], p = profById[id] || {};
-      const amount = a.out * ro + a.in * bi;
-      return { crew_member_id: id, name: p.full_name || "Unknown", stripe_account_id: p.stripe_account_id || null, rolled_out_count: a.out, brought_in_count: a.in, amount_cents: amount };
+      return {
+        crew_member_id: id, name: p.full_name || "Unknown", stripe_account_id: p.stripe_account_id || null,
+        rolled_out_count: a.out, brought_in_count: a.in, amount_cents: a.out * ro + a.in * bi,
+      };
     }).filter((i) => i.amount_cents > 0);
 
-    // Dry run: just return what WOULD be paid, no money moves, no records.
     if (dry_run) {
       return json({ dry_run: true, period_start, period_end, items, total_cents: items.reduce((s, i) => s + i.amount_cents, 0) });
     }
 
-    // Create the pay run.
     const { data: run, error: runErr } = await db.from("pay_runs")
       .insert([{ period_start, period_end, status: "draft", created_by: user.id }]).select().single();
     if (runErr) return json({ error: runErr.message }, 400);
@@ -94,10 +103,10 @@ Deno.serve(async (req) => {
         status = "failed"; errMsg = "No connected Stripe account"; skipped++;
       } else {
         try {
-          const tr = await stripe.transfers.create({
-            amount: it.amount_cents, currency: "usd", destination: it.stripe_account_id,
+          const tr = await stripe("transfers", {
+            amount: String(it.amount_cents), currency: "usd", destination: it.stripe_account_id,
             description: `Curb Crew pay ${period_start} to ${period_end}`,
-            metadata: { crew_member_id: it.crew_member_id, pay_run_id: run.id },
+            "metadata[crew_member_id]": it.crew_member_id, "metadata[pay_run_id]": run.id,
           });
           status = "paid"; transferId = tr.id; paid++;
         } catch (e) {
