@@ -140,6 +140,7 @@
           sb.from("service_addresses").insert({
             profile_id: uid, line1: val("address"), zip: val("zip"),
             can_return_location: val("can_return"), pickup_day: val("pickup_day"),
+            gate_code: val("gate_code"), garage_code: val("garage_code"), access_notes: val("access_notes"),
             is_primary: true, is_prospect: false
           }),
           sb.from("leads").insert(leadRow)

@@ -7,6 +7,7 @@
   var SUPABASE_URL = "https://hezahtnfyhqfucixzqxi.supabase.co";
   var SUPABASE_KEY = "sb_publishable_9l4_Bqgjg7qBapvYlLPJSA_pHOk0nMB";
   var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  var CURRENT = { profile: {}, addr: {} };
 
   function $(s, c) { return (c || document).querySelector(s); }
   function $all(s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); }
@@ -97,6 +98,7 @@
         sb.from("service_events").select("*").eq("profile_id", uid).order("occurred_at", { ascending: false }).limit(5)
       ]).then(function (res) {
         var p = res[0].data || {}, addr = res[1].data, sub = res[2].data, pickups = res[3].data || [], invoices = res[4].data || [], events = res[5].data || [];
+        CURRENT.profile = p; CURRENT.addr = addr || {};
         var name = p.full_name || (email ? email.split("@")[0] : "there");
 
         // identity
@@ -111,6 +113,8 @@
         bind("address", addr ? addr.line1 : "Not set");
         bind("city", addr ? [addr.city, addr.state, addr.zip].filter(Boolean).join(", ") : "Not set");
         bind("can_return", (addr && addr.can_return_location) || "Not set");
+        bind("gate_code", (addr && addr.gate_code) || "Not set");
+        bind("access_notes", (addr && addr.access_notes) || "None");
         bind("crew", "Assigning to your street");
         bind("ontime", "");
 
@@ -308,7 +312,42 @@
     },
     resume: function () { callManage("resume", null, "Welcome back. Service resumed."); },
     receipt: function () { ACTIONS.payment(); },
-    edit: function () { showToast("Profile editing opens here, coming in the next update."); },
+    edit: function () {
+      var p = CURRENT.profile || {}, a = CURRENT.addr || {};
+      function ef(label, key, val, ph) {
+        return '<label style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px;font-size:13px;font-weight:600;color:var(--ink-70)"><span>' + label + '</span>'
+          + '<input data-ef="' + key + '" value="' + (val == null ? "" : String(val).replace(/"/g, "&quot;")) + '" placeholder="' + (ph || "") + '" style="font:inherit;font-size:15px;padding:11px 12px;border:1px solid var(--line-strong);border-radius:10px"></label>';
+      }
+      var html = ef("Full name", "name", p.full_name, "")
+        + ef("Phone", "phone", p.phone, "")
+        + ef("Street address", "line1", a.line1, "123 Maple St")
+        + ef("ZIP", "zip", a.zip, "")
+        + ef("Trash pickup day", "pickup_day", a.pickup_day, "Tuesday")
+        + ef("Where the cans live", "can_return_location", a.can_return_location, "Left side, behind the gate")
+        + ef("Gate / community code", "gate_code", a.gate_code, "optional")
+        + ef("Garage code", "garage_code", a.garage_code, "optional")
+        + ef("Anything else for the crew", "access_notes", a.access_notes, "optional");
+      openModal({
+        title: "Edit your profile",
+        html: '<div style="max-height:54vh;overflow:auto;padding-right:4px">' + html + '</div>',
+        confirmLabel: "Save changes",
+        onConfirm: function () {
+          var g = function (k) { var el = modalBody.querySelector('[data-ef="' + k + '"]'); return el ? el.value.trim() : ""; };
+          showToast("Saving...");
+          sb.auth.getUser().then(function (u) {
+            var uid = u.data.user && u.data.user.id; if (!uid) return;
+            var addrFields = { line1: g("line1"), zip: g("zip"), pickup_day: g("pickup_day"), can_return_location: g("can_return_location"), gate_code: g("gate_code"), garage_code: g("garage_code"), access_notes: g("access_notes") };
+            var aP = (CURRENT.addr && CURRENT.addr.id)
+              ? sb.from("service_addresses").update(addrFields).eq("id", CURRENT.addr.id)
+              : sb.from("service_addresses").insert(Object.assign({ profile_id: uid, is_primary: true, is_prospect: false }, addrFields));
+            Promise.all([
+              sb.from("profiles").update({ full_name: g("name"), phone: g("phone") }).eq("id", uid),
+              aP
+            ]).then(function () { showToast("Saved."); loadData(); });
+          });
+        }
+      });
+    },
     support: function () { if (window.openSupport) { window.openSupport(); } }
   };
   document.addEventListener("click", function (e) {
