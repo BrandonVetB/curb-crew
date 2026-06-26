@@ -107,4 +107,53 @@
 
 @media (max-width: 480px) {
   .join__grid { grid-template-columns: 1fr; }
+  .steps__item { font-size: 11px; }
+}
+
+/* ===== onboarding wizard ===== */
+.steps { display: flex; gap: 8px; list-style: none; padding: 0; margin: 0 0 22px; }
+.steps__item {
+  flex: 1; display: flex; align-items: center; gap: 8px; justify-content: center;
+  font-family: var(--font-display); font-weight: 600; font-size: 13px; color: var(--ink-50);
+  padding: 8px 6px; border-radius: 999px; background: var(--white); border: 1px solid var(--line);
+}
+.steps__item span {
+  width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; flex: none;
+  background: var(--line); color: var(--ink-60); font-size: 12px;
+}
+.steps__item.is-active { color: var(--black); border-color: var(--blue); }
+.steps__item.is-active span { background: var(--blue); color: #fff; }
+.steps__item.is-done span { background: var(--black); color: #fff; }
+
+.step-sub { color: var(--ink-60); font-size: 0.92rem; margin: -6px 0 16px; }
+
+.field-select {
+  font-family: var(--font-body); font-size: 15px; color: var(--black);
+  padding: 13px 14px; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--white);
+}
+.field-select:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px var(--blue-soft); }
+
+.coverage-note { margin-top: 14px; font-weight: 600; font-size: 14px; padding: 12px 14px; border-radius: 12px; }
+.coverage-note.is-ok { color: var(--blue); background: var(--blue-soft); }
+.coverage-note.is-wait { color: #8a6d00; background: #fff6e0; }
+
+.bulk-branch { margin-top: 18px; font-size: 14px; color: var(--ink-60); }
+.bulk-branch a { color: var(--blue); font-weight: 600; }
+
+.wizard-nav { display: flex; gap: 12px; margin-top: 4px; }
+.wizard-nav .btn { flex: 1; }
+.wizard-nav .btn--ghost { flex: 0 0 auto; min-width: 110px; }
+
+.review { list-style: none; padding: 0; margin: 0 0 8px; }
+.review li {
+  display: flex; justify-content: space-between; gap: 16px; padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+.review li:last-child { border-bottom: none; font-family: var(--font-display); font-weight: 700; }
+.review__k { color: var(--ink-60); font-size: 14px; }
+.review__v { font-weight: 600; text-align: right; }
+
+.pay-note {
+  margin-top: 8px; font-size: 13px; color: var(--ink-60); line-height: 1.5;
+  background: var(--mist); border: 1px solid var(--line); border-radius: 12px; padding: 14px;
 }

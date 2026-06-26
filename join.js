@@ -1,92 +1,155 @@
 /* ============================================================
-   CURB CREW - join.js  (QR signup landing page)
-   Plan total calc + capture signup to Supabase.
+   CURB CREWS - join.js  (multi-step onboarding wizard)
+   Address -> Details/Account -> Plan -> Confirm -> Dashboard
    ============================================================ */
 (function () {
   "use strict";
 
   var SUPABASE_URL = "https://hezahtnfyhqfucixzqxi.supabase.co";
   var SUPABASE_KEY = "sb_publishable_9l4_Bqgjg7qBapvYlLPJSA_pHOk0nMB";
-  var BASE = 35;
+  var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // Soft coverage list (placeholder until a real coverage table exists).
+  var SERVED_ZIPS = ["78732", "78730", "78726", "78734", "78738"];
 
   function $(s, c) { return (c || document).querySelector(s); }
   function $all(s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); }
 
-  var form = $("[data-join-form]");
-  if (!form) return;
+  var form = $("[data-onboard]");
+  var nextBtn = $("[data-next]");
+  var backBtn = $("[data-back]");
+  var msg = $("[data-msg]");
   var totalEl = $("[data-total]");
-  var msg = $("[data-join-msg]");
+  var coverageEl = $("[data-coverage]");
+  var reviewEl = $("[data-review]");
 
-  function recalc() {
-    var extra = 0;
-    $all("[data-addon]").forEach(function (cb) { if (cb.checked) extra += parseInt(cb.getAttribute("data-price"), 10); });
-    totalEl.innerHTML = "$" + (BASE + extra) + "<small>/mo</small>";
-  }
-  $all("[data-addon]").forEach(function (cb) { cb.addEventListener("change", recalc); });
-  recalc();
+  var step = 1;
+  var MAX = 4;
+  var BASE = 3500;
+  var ADDON = { recycling: 800, yard: 800, cleaning: 1200 };
 
   function val(name) { var el = form.querySelector('[name="' + name + '"]'); return el ? el.value.trim() : ""; }
+  function checked(name) { var el = form.querySelector('[name="' + name + '"]'); return !!(el && el.checked); }
+  function money(c) { return "$" + (c / 100).toFixed(0); }
 
-  form.addEventListener("submit", function (e) {
-    e.preventDefault();
-    var name = val("name"), email = val("email"), address = val("address"), zip = val("zip");
-
-    if (!name || !email || email.indexOf("@") === -1 || !address) {
-      msg.textContent = "Please add your name, a valid email, and your street address.";
-      msg.className = "join__msg is-error";
-      return;
-    }
-
-    var addons = {
-      recycling: form.querySelector('[name="recycling"]').checked,
-      yard: form.querySelector('[name="yard"]').checked,
-      cleaning: form.querySelector('[name="cleaning"]').checked
-    };
-    var parsedZip = zip || (address.match(/\b\d{5}\b/) || [null])[0];
-
-    var payload = {
-      name: name,
-      email: email,
-      phone: val("phone"),
-      address: address,
-      zip: parsedZip,
-      plan: "Curb Crews Plan",
-      addon_recycling: addons.recycling,
-      addon_yard_waste: addons.yard,
-      addon_cleaning: addons.cleaning,
-      raw_input: address,
-      source: "qr_join",
-      user_agent: navigator.userAgent
-    };
-
-    msg.textContent = "Saving your spot...";
-    msg.className = "join__msg";
-
-    fetch(SUPABASE_URL + "/rest/v1/leads", {
-      method: "POST",
-      headers: {
-        "apikey": SUPABASE_KEY,
-        "Authorization": "Bearer " + SUPABASE_KEY,
-        "Content-Type": "application/json",
-        "Prefer": "return=minimal"
-      },
-      body: JSON.stringify(payload)
-    }).then(function (res) {
-      if (!res.ok) throw new Error("save failed");
-      showDone(name);
-    }).catch(function () {
-      msg.textContent = "Something went wrong. Please try again or email hello@curbcrews.com.";
-      msg.className = "join__msg is-error";
-    });
-  });
-
-  function showDone(name) {
-    form.innerHTML =
-      '<div class="join__done">' +
-      '<div class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>' +
-      '<h2>You are on the list' + (name ? ", " + name.split(" ")[0] : "") + "!</h2>" +
-      "<p>We'll confirm your street and email you to finish setup. Welcome to Curb Crews.</p>" +
-      '<p class="join__fine" style="margin-top:18px"><a href="index.html">Back to the site</a></p>' +
-      "</div>";
+  function totalCents() {
+    var t = BASE;
+    $all("[data-addon]").forEach(function (a) { if (a.checked) t += ADDON[a.getAttribute("data-key")] || 0; });
+    return t;
   }
-})()
+  function refreshTotal() {
+    if (totalEl) totalEl.innerHTML = money(totalCents()) + "<small>/mo</small>";
+  }
+  $all("[data-addon]").forEach(function (a) { a.addEventListener("change", refreshTotal); });
+
+  function setMsg(t, kind) { msg.textContent = t || ""; msg.className = "join__msg" + (kind ? " is-" + kind : ""); }
+
+  function showStep(n) {
+    step = n;
+    $all("[data-step]").forEach(function (s) { s.hidden = s.getAttribute("data-step") !== String(n); });
+    $all("[data-step-dot]").forEach(function (d) {
+      var i = Number(d.getAttribute("data-step-dot"));
+      d.classList.toggle("is-active", i === n);
+      d.classList.toggle("is-done", i < n);
+    });
+    backBtn.hidden = n === 1;
+    nextBtn.textContent = n === MAX ? "Create my account" : "Continue";
+    if (n === MAX) buildReview();
+    setMsg("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function validateStep(n) {
+    if (n === 1) {
+      if (!val("address")) return "Enter your street address.";
+      if (!/^\d{5}$/.test(val("zip"))) return "Enter a valid 5-digit ZIP.";
+      if (!val("pickup_day")) return "Pick your trash pickup day.";
+      // soft coverage note (never blocks)
+      coverageEl.hidden = false;
+      if (SERVED_ZIPS.indexOf(val("zip")) === -1) {
+        coverageEl.className = "coverage-note is-wait";
+        coverageEl.textContent = "We are not on your street yet, but you can still sign up and we will prioritize your area.";
+      } else {
+        coverageEl.className = "coverage-note is-ok";
+        coverageEl.textContent = "Good news, we service your area.";
+      }
+      return "";
+    }
+    if (n === 2) {
+      if (!val("name")) return "Enter your name.";
+      if (val("email").indexOf("@") === -1) return "Enter a valid email.";
+      if (val("password").length < 8) return "Password must be at least 8 characters.";
+      return "";
+    }
+    return "";
+  }
+
+  function buildReview() {
+    var addons = [];
+    if (checked("recycling")) addons.push("Recycling +$8");
+    if (checked("yard")) addons.push("Yard-waste +$8");
+    if (checked("cleaning")) addons.push("Cleaning +$12");
+    var rows = [
+      ["Address", val("address")],
+      ["Pickup day", val("pickup_day")],
+      ["Name", val("name")],
+      ["Email", val("email")],
+      ["Plan", "Curb Crews Plan"],
+      ["Add-ons", addons.length ? addons.join(", ") : "None"],
+      ["Total", money(totalCents()) + " / month"]
+    ];
+    reviewEl.innerHTML = rows.map(function (r) {
+      return '<li><span class="review__k">' + r[0] + '</span><span class="review__v">' + (r[1] || "&mdash;") + "</span></li>";
+    }).join("");
+  }
+
+  nextBtn.addEventListener("click", function () {
+    var err = validateStep(step);
+    if (err) { setMsg(err, "error"); return; }
+    if (step < MAX) { showStep(step + 1); return; }
+    submit();
+  });
+  backBtn.addEventListener("click", function () { if (step > 1) showStep(step - 1); });
+
+  function submit() {
+    nextBtn.disabled = true;
+    setMsg("Creating your account...");
+
+    var email = val("email"), password = val("password"), name = val("name");
+
+    sb.auth.signUp({ email: email, password: password, options: { data: { full_name: name } } })
+      .then(function (r) {
+        if (r.error) {
+          nextBtn.disabled = false;
+          if (/registered|already/i.test(r.error.message)) return setMsg("That email already has an account. Sign in instead.", "error");
+          return setMsg(r.error.message, "error");
+        }
+        var uid = r.data.user && r.data.user.id;
+        if (!uid) { nextBtn.disabled = false; return setMsg("Could not start your account. Try again.", "error"); }
+
+        // Update profile (name, phone) and save the address. Capture plan choice as a lead record.
+        var planLabel = "Curb Crews Plan";
+        var leadRow = {
+          name: name, email: email, phone: val("phone"), address: val("address"), zip: val("zip"),
+          plan: planLabel, addon_recycling: checked("recycling"), addon_yard_waste: checked("yard"),
+          addon_cleaning: checked("cleaning"), source: "onboarding", user_agent: navigator.userAgent
+        };
+
+        Promise.all([
+          sb.from("profiles").update({ full_name: name, phone: val("phone") }).eq("id", uid),
+          sb.from("service_addresses").insert({
+            profile_id: uid, line1: val("address"), zip: val("zip"),
+            can_return_location: val("can_return"), pickup_day: val("pickup_day"),
+            is_primary: true, is_prospect: false
+          }),
+          sb.from("leads").insert(leadRow)
+        ]).then(function () {
+          setMsg("Account created. Taking you to your dashboard...", "success");
+          setTimeout(function () { window.location.href = "portal.html"; }, 900);
+        });
+      });
+  }
+
+  showStep(1);
+  refreshTotal();
+})();

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Join Curb Crews</title>
-  <meta name="description" content="Sign up for Curb Crews. Pick your plan, enter your details, and never touch your trash cans again." />
+  <meta name="description" content="Sign up for Curb Crews. Check your street, pick your plan, and never touch your trash cans again." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -36,17 +36,50 @@
   </header>
 
   <main class="join">
-    <div class="join__intro">
-      <p class="join__eyebrow">Residential trash can valet</p>
-      <h1>Never touch your trash cans again.</h1>
-      <p class="join__sub">Pick your plan, drop your details, and we take it from there. No contracts, cancel anytime.</p>
-    </div>
+    <!-- progress -->
+    <ol class="steps" data-steps>
+      <li class="steps__item is-active" data-step-dot="1"><span>1</span>Address</li>
+      <li class="steps__item" data-step-dot="2"><span>2</span>Details</li>
+      <li class="steps__item" data-step-dot="3"><span>3</span>Plan</li>
+      <li class="steps__item" data-step-dot="4"><span>4</span>Confirm</li>
+    </ol>
 
-    <form class="join__form" data-join-form novalidate>
-      <!-- PLAN -->
-      <section class="join__card">
+    <form class="join__form" data-onboard novalidate>
+
+      <!-- STEP 1: ADDRESS -->
+      <section class="join__card" data-step="1">
+        <h2 class="join__h2">Where do we service?</h2>
+        <p class="step-sub">Enter your address so we can check we cover your street.</p>
+        <div class="join__grid">
+          <label class="field field--wide"><span>Street address</span><input type="text" name="address" autocomplete="street-address" placeholder="123 Maple St, Austin TX" /></label>
+          <label class="field"><span>ZIP code</span><input type="text" name="zip" inputmode="numeric" autocomplete="postal-code" placeholder="78732" /></label>
+          <label class="field"><span>Trash pickup day</span>
+            <select name="pickup_day" class="field-select">
+              <option value="">Select day</option>
+              <option>Monday</option><option>Tuesday</option><option>Wednesday</option>
+              <option>Thursday</option><option>Friday</option>
+            </select>
+          </label>
+        </div>
+        <p class="coverage-note" data-coverage hidden></p>
+      </section>
+
+      <!-- STEP 2: DETAILS + ACCOUNT -->
+      <section class="join__card" data-step="2" hidden>
+        <h2 class="join__h2">Your details</h2>
+        <p class="step-sub">This creates your account so you can manage everything from your dashboard.</p>
+        <div class="join__grid">
+          <label class="field"><span>Full name</span><input type="text" name="name" autocomplete="name" placeholder="Jane Smith" /></label>
+          <label class="field"><span>Phone</span><input type="tel" name="phone" autocomplete="tel" placeholder="(555) 555-5555" /></label>
+          <label class="field"><span>Email</span><input type="email" name="email" autocomplete="email" placeholder="you@email.com" /></label>
+          <label class="field"><span>Password</span><input type="password" name="password" autocomplete="new-password" placeholder="At least 8 characters" /></label>
+          <label class="field field--wide"><span>Where should we put your cans back?</span><input type="text" name="can_return" placeholder="Side of the house, behind the gate, garage..." /></label>
+        </div>
+      </section>
+
+      <!-- STEP 3: PLAN -->
+      <section class="join__card" data-step="3" hidden>
         <h2 class="join__h2">Your plan</h2>
-
         <div class="plan-base">
           <div>
             <strong>The Curb Crews Plan</strong>
@@ -57,19 +90,19 @@
 
         <p class="addons-label">Add-ons (optional)</p>
         <label class="addon-toggle">
-          <input type="checkbox" data-addon data-price="8" name="recycling" />
+          <input type="checkbox" data-addon data-key="recycling" data-price="8" name="recycling" />
           <span class="addon-toggle__box" aria-hidden="true"></span>
           <span class="addon-toggle__name">Recycling can</span>
           <span class="addon-toggle__price">+$8/mo</span>
         </label>
         <label class="addon-toggle">
-          <input type="checkbox" data-addon data-price="8" name="yard" />
+          <input type="checkbox" data-addon data-key="yard" data-price="8" name="yard" />
           <span class="addon-toggle__box" aria-hidden="true"></span>
           <span class="addon-toggle__name">Yard-waste can</span>
           <span class="addon-toggle__price">+$8/mo</span>
         </label>
         <label class="addon-toggle">
-          <input type="checkbox" data-addon data-price="12" name="cleaning" />
+          <input type="checkbox" data-addon data-key="cleaning" data-price="12" name="cleaning" />
           <span class="addon-toggle__box" aria-hidden="true"></span>
           <span class="addon-toggle__name">Monthly can cleaning</span>
           <span class="addon-toggle__price">+$12/mo</span>
@@ -79,25 +112,28 @@
           <span>Your total</span>
           <strong data-total>$35<small>/mo</small></strong>
         </div>
+
+        <p class="bulk-branch">Just need a one-time bulk or junk pickup instead? <a href="bulk.html">Get a bulk quote &rarr;</a></p>
       </section>
 
-      <!-- DETAILS -->
-      <section class="join__card">
-        <h2 class="join__h2">Your details</h2>
-        <div class="join__grid">
-          <label class="field"><span>Full name</span><input type="text" name="name" autocomplete="name" placeholder="Jane Smith" /></label>
-          <label class="field"><span>Email</span><input type="email" name="email" autocomplete="email" placeholder="you@email.com" /></label>
-          <label class="field"><span>Phone</span><input type="tel" name="phone" autocomplete="tel" placeholder="(555) 555-5555" /></label>
-          <label class="field"><span>ZIP code</span><input type="text" name="zip" inputmode="numeric" autocomplete="postal-code" placeholder="78704" /></label>
-          <label class="field field--wide"><span>Street address</span><input type="text" name="address" autocomplete="street-address" placeholder="123 Maple St, Austin TX" /></label>
-        </div>
+      <!-- STEP 4: CONFIRM -->
+      <section class="join__card" data-step="4" hidden>
+        <h2 class="join__h2">Confirm and create your account</h2>
+        <ul class="review" data-review></ul>
+        <p class="pay-note">Card payment runs through Stripe secure checkout. While we finish connecting billing for launch, your account is created now and you can add your card from your dashboard.</p>
       </section>
 
-      <button type="submit" class="btn btn--block">Start my service</button>
-      <p class="join__msg" data-join-msg role="status" aria-live="polite"></p>
-      <p class="join__fine">No charge today. We confirm your street and email you to finish setup. <a href="index.html">See the full site</a></p>
+      <!-- NAV -->
+      <div class="wizard-nav">
+        <button type="button" class="btn btn--ghost" data-back hidden>Back</button>
+        <button type="button" class="btn" data-next>Continue</button>
+      </div>
+      <p class="join__msg" data-msg role="status" aria-live="polite"></p>
+      <p class="join__fine">Already have an account? <a href="portal.html">Sign in</a></p>
     </form>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="join.js" defer></script>
-</
+</body>
+</html>
