@@ -68,6 +68,8 @@
   position: sticky; top: 0; height: 100vh;
 }
 .side__brand { margin-bottom: 4px; }
+.side__brand .wordmark { display: block; }
+.side__brand .wordmark__img { width: 100%; height: auto; max-width: 210px; display: block; }
 .side__nav { display: flex; flex-direction: column; gap: 4px; }
 .side__link {
   text-align: left; font-family: var(--font-display); font-weight: 600; font-size: 15px;
