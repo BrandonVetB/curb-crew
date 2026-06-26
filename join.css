@@ -143,6 +143,7 @@
 .wizard-nav { display: flex; gap: 12px; margin-top: 4px; }
 .wizard-nav .btn { flex: 1; }
 .wizard-nav .btn--ghost { flex: 0 0 auto; min-width: 110px; }
+.wizard-nav .btn[hidden], .join__card[hidden] { display: none !important; }
 
 .review { list-style: none; padding: 0; margin: 0 0 8px; }
 .review li {
