@@ -84,10 +84,29 @@
 
   function loadData() {
     sb.auth.getUser().then(function (u) {
-      var uid = u.data.user && u.data.user.id;
+      var realUid = u.data.user && u.data.user.id;
       var email = u.data.user && u.data.user.email;
-      if (!uid) return;
-
+      if (!realUid) return;
+      var as = new URLSearchParams(location.search).get("as");
+      if (as && as !== realUid) {
+        sb.from("staff_roles").select("role").ilike("email", (email || "").toLowerCase()).maybeSingle().then(function (sr) {
+          if (sr.data && sr.data.role === "admin") { showPortalImpersonation(as); runLoad(as, email); }
+          else runLoad(realUid, email);
+        });
+      } else { runLoad(realUid, email); }
+    });
+  }
+  function showPortalImpersonation(asId) {
+    var b = document.createElement("div");
+    b.textContent = "Admin preview — read-only";
+    b.style.cssText = "background:#0066FF;color:#fff;text-align:center;font-weight:600;font-size:13px;padding:8px;position:relative;z-index:999";
+    document.body.insertBefore(b, document.body.firstChild);
+    sb.from("profiles").select("full_name").eq("id", asId).maybeSingle().then(function (r) {
+      var nm = (r.data && r.data.full_name) || "this client";
+      b.textContent = "Admin preview — viewing " + nm + "'s portal (read-only)";
+    });
+  }
+  function runLoad(uid, email) {
       Promise.all([
         sb.from("profiles").select("*").eq("id", uid).maybeSingle(),
         sb.from("service_addresses").select("*").eq("profile_id", uid).order("is_primary", { ascending: false }).limit(1).maybeSingle(),
@@ -124,7 +143,6 @@
         renderSchedule(pickups);
         renderInvoices(invoices);
       });
-    });
   }
 
   function renderPlan(sub) {

@@ -51,12 +51,30 @@
           showAuth(); fail("This account isn't set up as crew. Ask an admin to add you."); sb.auth.signOut(); return;
         }
         me.role = row.role; me.name = row.full_name || me.email;
+        me.effectiveId = me.uid; me.impersonating = false;
+        var asId = new URLSearchParams(location.search).get("as");
+        if (asId && me.role === "admin" && asId !== me.uid) { me.effectiveId = asId; me.impersonating = true; }
         bind("today_str", new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" }));
-        showApp(); loadRoute();
+        showApp();
+        if (me.impersonating) setupImpersonation(asId);
+        loadRoute();
       });
     });
   }
   sb.auth.getSession().then(function (r) { if (r.data.session) gate(); else showAuth(); });
+
+  // Admin "view as": read-only preview of a crew member's route.
+  function setupImpersonation(asId) {
+    $all("[data-act]").forEach(function (b) { b.style.display = "none"; });
+    var b = document.createElement("div");
+    b.className = "offline"; b.style.background = "#0066FF"; b.style.color = "#fff";
+    b.textContent = "Admin preview — read-only";
+    var app = $('[data-view="app"]'); app.insertBefore(b, app.firstChild);
+    sb.from("profiles").select("full_name").eq("id", asId).maybeSingle().then(function (r) {
+      var nm = (r.data && r.data.full_name) || "this crew member";
+      b.textContent = "Admin preview — viewing " + nm + "'s route (read-only)";
+    });
+  }
   window.addEventListener("online", function () { $("[data-offline]").hidden = true; });
   window.addEventListener("offline", function () { $("[data-offline]").hidden = false; });
 
@@ -70,8 +88,9 @@
     ]).then(function (res) {
       var assigns = res[0].data || [], addrs = res[1].data || [], routes = res[2].data || [], events = res[3].data || [];
       var addrById = {}; addrs.forEach(function (a) { addrById[a.id] = a; });
-      var myRouteIds = routes.filter(function (r) { return r.lead_id === me.uid; }).map(function (r) { return r.id; });
-      var mine = assigns.filter(function (a) { return a.assigned_to === me.uid || (a.route_id && myRouteIds.indexOf(a.route_id) !== -1); });
+      var who = me.effectiveId || me.uid;
+      var myRouteIds = routes.filter(function (r) { return r.lead_id === who; }).map(function (r) { return r.id; });
+      var mine = assigns.filter(function (a) { return a.assigned_to === who || (a.route_id && myRouteIds.indexOf(a.route_id) !== -1); });
       S.events = events;
       S.houses = mine.map(function (a) {
         var addr = addrById[a.address_id] || {};
@@ -181,7 +200,7 @@
   function renderPay() {
     var weekAgo = Date.now() - 7 * 86400000;
     // pay screen counts ALL of my events this week, not just today's cache
-    sb.from("service_events").select("event_type, occurred_at").eq("crew_member_id", me.uid).gte("occurred_at", new Date(weekAgo).toISOString())
+    sb.from("service_events").select("event_type, occurred_at").eq("crew_member_id", me.effectiveId || me.uid).gte("occurred_at", new Date(weekAgo).toISOString())
       .then(function (r) {
         var ev = r.data || [];
         var out = ev.filter(function (e) { return e.event_type === "rolled_out"; }).length;

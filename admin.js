@@ -151,7 +151,8 @@
       var cls = status === "active" ? "pill--green" : status === "paused" ? "pill--amber" : "";
       var plan = sub ? planLabel(sub) : "—";
       return "<tr><td>" + esc(p.full_name || "—") + "</td><td>" + esc(p.email || "—") + "</td><td>" + esc(p.phone || "—") +
-        "</td><td>" + esc(plan) + "</td><td><span class='pill " + cls + "'>" + esc(status) + "</span></td></tr>";
+        "</td><td>" + esc(plan) + "</td><td><span class='pill " + cls + "'>" + esc(status) + "</span></td>" +
+        "<td><button class='link-btn' data-viewas-client='" + esc(p.id) + "'>View as</button></td></tr>";
     }).join("") : "<tr><td colspan='5' class='muted'>No clients yet.</td></tr>";
   }
   function planLabel(s) {
@@ -170,8 +171,8 @@
       var route = asg && asg.route_id && S.routeById[asg.route_id];
       var crew = asg && asg.assigned_to && S.profileById[asg.assigned_to];
       return "<tr><td>" + esc(a.line1 || "—") + "</td><td>" + esc(a.city || "—") +
-        "</td><td>" + esc(route ? route.name : "<span class='muted'>Unassigned</span>") +
-        "</td><td>" + esc(crew ? crew.full_name : "<span class='muted'>—</span>") +
+        "</td><td>" + (route ? esc(route.name) : "<span class='muted'>Unassigned</span>") +
+        "</td><td>" + (crew ? esc(crew.full_name) : "<span class='muted'>—</span>") +
         "</td><td>" + ((asg && asg.cans) || 1) + "</td>" +
         "<td><button class='link-btn' data-assign='" + a.id + "'>Assign</button></td></tr>";
     }).join("") : "<tr><td colspan='6' class='muted'>No houses yet. Add one.</td></tr>";
@@ -193,7 +194,7 @@
     list("crew").innerHTML = S.staff.length ? S.staff.map(function (s) {
       return "<tr><td>" + esc(s.full_name || "—") + "</td><td>" + esc(s.email) +
         "</td><td><span class='pill'>" + esc(s.role) + "</span></td><td class='muted'>" + esc(s.manager_email || "—") +
-        "</td><td><button class='link-btn' data-edituser='" + esc(s.email) + "'>Edit</button></td></tr>";
+        "</td><td><button class='link-btn' data-viewas-staff='" + esc(s.email) + "'>View as</button> &nbsp; <button class='link-btn' data-edituser='" + esc(s.email) + "'>Edit</button></td></tr>";
     }).join("") : "<tr><td colspan='5' class='muted'>No users.</td></tr>";
   }
 
@@ -269,11 +270,13 @@
 
   /* ================= ACTIONS ================= */
   document.addEventListener("click", function (e) {
-    var t = e.target.closest("[data-open],[data-assign],[data-approve],[data-flag],[data-resolve],[data-edituser]");
+    var t = e.target.closest("[data-open],[data-assign],[data-approve],[data-flag],[data-resolve],[data-edituser],[data-viewas-staff],[data-viewas-client]");
     if (!t) return;
     if (t.hasAttribute("data-open")) return openCreate(t.getAttribute("data-open"));
     if (t.hasAttribute("data-assign")) return openAssign(t.getAttribute("data-assign"));
     if (t.hasAttribute("data-edituser")) return openEditUser(t.getAttribute("data-edituser"));
+    if (t.hasAttribute("data-viewas-staff")) return viewAsStaff(t.getAttribute("data-viewas-staff"));
+    if (t.hasAttribute("data-viewas-client")) return window.open("portal.html?as=" + encodeURIComponent(t.getAttribute("data-viewas-client")), "_blank");
     var id = t.getAttribute("data-approve") || t.getAttribute("data-flag") || t.getAttribute("data-resolve");
     if (t.hasAttribute("data-approve")) updateEvent(id, { approved: true, flagged: false }, "Photo approved");
     if (t.hasAttribute("data-flag")) updateEvent(id, { flagged: true }, "Photo flagged");
@@ -358,6 +361,13 @@
           if (r.error) return toast(r.error.message); logAudit("Role changed", email + " -> " + $("#m_role").value); closeModal(); toast("Role updated."); loadAll();
         });
       });
+  }
+
+  // View the crew app as a specific staff member (read-only admin preview).
+  function viewAsStaff(email) {
+    var p = S.profiles.filter(function (x) { return (x.email || "").toLowerCase() === (email || "").toLowerCase(); })[0];
+    if (!p) { return toast("That user hasn't signed up for a login yet, so there's nothing to view. They sign up at the portal with this email."); }
+    window.open("crew.html?as=" + encodeURIComponent(p.id), "_blank");
   }
 
   /* ================= TOAST ================= */
