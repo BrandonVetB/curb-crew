@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Curb Crew OS · Crew</title>
+  <meta name="robots" content="noindex" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="crew.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <!-- AUTH -->
+  <section class="auth" data-view="auth" hidden>
+    <form class="auth__card" data-auth-form novalidate>
+      <div class="brand"><span class="brand__mark"></span> Curb Crew <span class="brand__os">OS</span></div>
+      <h1 class="auth__title">Crew sign in</h1>
+      <label class="field"><span>Email</span><input type="email" name="email" autocomplete="email" placeholder="you@curbcrews.com" required /></label>
+      <label class="field"><span>Password</span><input type="password" name="password" autocomplete="current-password" placeholder="••••••••" required /></label>
+      <button type="submit" class="btn btn--block" data-auth-submit>Sign in</button>
+      <p class="auth__msg" data-auth-msg role="status" aria-live="polite"></p>
+    </form>
+  </section>
+
+  <!-- APP -->
+  <div class="app" data-view="app" hidden>
+    <header class="hdr">
+      <div class="hdr__l"><span class="brand__mark"></span><div><div class="hdr__title" data-bind="screen_title">Today's route</div><div class="hdr__sub" data-bind="today_str"></div></div></div>
+      <button class="iconbtn" data-signout title="Sign out">⎋</button>
+    </header>
+
+    <div class="offline" data-offline hidden>Offline — actions will retry when you reconnect.</div>
+
+    <!-- ROUTE -->
+    <section class="screen" data-screen="route">
+      <div class="progress"><span data-bind="done_count">0</span>/<span data-bind="total_count">0</span> done today</div>
+      <div class="route" data-list="route"></div>
+    </section>
+
+    <!-- PAY -->
+    <section class="screen" data-screen="pay" hidden>
+      <div class="paycard">
+        <div class="paycard__big"><span data-bind="pay_actions">0</span></div>
+        <div class="paycard__lbl">service actions this week</div>
+      </div>
+      <div class="payrow"><span>Cans rolled out</span><strong data-bind="pay_out">0</strong></div>
+      <div class="payrow"><span>Cans brought in</span><strong data-bind="pay_in">0</strong></div>
+      <p class="muted" style="margin-top:14px">Pay is calculated from verified, photo-backed actions.</p>
+    </section>
+
+    <!-- HOUSE detail -->
+    <section class="house" data-house hidden>
+      <button class="house__back" data-house-close>‹ Back to route</button>
+      <h2 class="house__addr" data-bind="h_addr"></h2>
+      <div class="house__sub" data-bind="h_city"></div>
+      <div class="house__chips" data-bind="h_chips"></div>
+      <div class="house__note" data-bind="h_note" hidden></div>
+      <div class="house__status" data-bind="h_status"></div>
+      <div class="house__actions">
+        <button class="btn btn--block" data-act="rolled_out">📷 Mark rolled out</button>
+        <button class="btn btn--block btn--ghost" data-act="brought_in">📷 Mark brought in</button>
+      </div>
+      <input type="file" accept="image/*" capture="environment" data-photo hidden />
+      <div class="house__events" data-list="h_events"></div>
+    </section>
+
+    <!-- tabbar -->
+    <nav class="tabbar">
+      <button class="tabbar__item is-active" data-tab="route"><span>🗺️</span>Route</button>
+      <button class="tabbar__item" data-tab="pay"><span>💵</span>Pay</button>
+    </nav>
+  </div>
+
+  <div class="toast" data-toast></div>
+  <div class="spinner" data-spinner hidden><div class="spinner__dot"></div></div>
+  <script src="crew.js"></script>
+</body>
+</html>

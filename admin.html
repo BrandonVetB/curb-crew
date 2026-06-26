@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Curb Crew OS · Admin</title>
+  <meta name="robots" content="noindex" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="admin.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <!-- ===================== AUTH ===================== -->
+  <section class="auth" data-view="auth" hidden>
+    <form class="auth__card" data-auth-form novalidate>
+      <div class="brand"><span class="brand__mark"></span> Curb Crew <span class="brand__os">OS</span></div>
+      <h1 class="auth__title">Admin sign in</h1>
+      <p class="auth__sub">Staff and owners only.</p>
+      <label class="field"><span>Email</span><input type="email" name="email" autocomplete="email" placeholder="you@curbcrews.com" required /></label>
+      <label class="field"><span>Password</span><input type="password" name="password" autocomplete="current-password" placeholder="••••••••" required /></label>
+      <button type="submit" class="btn btn--block" data-auth-submit>Sign in</button>
+      <p class="auth__msg" data-auth-msg role="status" aria-live="polite"></p>
+    </form>
+  </section>
+
+  <!-- ===================== APP ===================== -->
+  <div class="shell" data-view="app" hidden>
+    <!-- sidebar -->
+    <aside class="side">
+      <div class="brand brand--side"><span class="brand__mark"></span> Curb Crew <span class="brand__os">OS</span></div>
+      <nav class="side__nav">
+        <a class="side__link is-active" data-nav="dashboard">Dashboard</a>
+        <a class="side__link" data-nav="clients">Clients</a>
+        <a class="side__link" data-nav="houses">Houses</a>
+        <a class="side__link" data-nav="routes">Routes</a>
+        <a class="side__link" data-nav="crew">Crew &amp; users</a>
+        <a class="side__link" data-nav="photos">Photos <span class="side__badge" data-bind="flag_count" hidden></span></a>
+        <a class="side__link" data-nav="payroll">Payroll</a>
+        <a class="side__link" data-nav="audit">Audit log</a>
+      </nav>
+      <div class="side__foot">
+        <div class="side__me"><span class="side__avatar" data-bind="avatar">CC</span><span data-bind="me_name">—</span></div>
+        <button class="link-btn" data-signout>Sign out</button>
+      </div>
+    </aside>
+
+    <!-- main -->
+    <main class="main">
+      <header class="topbar">
+        <h2 data-page-title>Dashboard</h2>
+        <div class="topbar__actions">
+          <span class="pill" data-bind="role_pill">admin</span>
+        </div>
+      </header>
+
+      <!-- DASHBOARD -->
+      <section class="panel" data-panel="dashboard">
+        <div class="kpis">
+          <div class="kpi"><span class="kpi__n" data-bind="k_clients">0</span><span class="kpi__l">Clients</span></div>
+          <div class="kpi"><span class="kpi__n" data-bind="k_active">0</span><span class="kpi__l">Active plans</span></div>
+          <div class="kpi"><span class="kpi__n" data-bind="k_houses">0</span><span class="kpi__l">Houses</span></div>
+          <div class="kpi"><span class="kpi__n" data-bind="k_today">0</span><span class="kpi__l">Pickups today</span></div>
+        </div>
+        <div class="card">
+          <div class="card__head"><h3>Flagged service events</h3></div>
+          <table class="tbl"><thead><tr><th>When</th><th>Crew</th><th>Type</th><th>Note</th><th></th></tr></thead>
+            <tbody data-list="flagged"></tbody></table>
+        </div>
+        <div class="card">
+          <div class="card__head"><h3>Recent activity</h3></div>
+          <ul class="feed" data-list="recent"></ul>
+        </div>
+      </section>
+
+      <!-- CLIENTS -->
+      <section class="panel" data-panel="clients" hidden>
+        <div class="card">
+          <div class="card__head"><h3>Clients</h3><input class="search" data-search="clients" placeholder="Search name or email" /></div>
+          <table class="tbl"><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Plan</th><th>Status</th></tr></thead>
+            <tbody data-list="clients"></tbody></table>
+        </div>
+      </section>
+
+      <!-- HOUSES -->
+      <section class="panel" data-panel="houses" hidden>
+        <div class="card">
+          <div class="card__head"><h3>Houses</h3><button class="btn btn--small" data-open="addHouse">+ Add house</button></div>
+          <table class="tbl"><thead><tr><th>Address</th><th>City</th><th>Route</th><th>Crew</th><th>Cans</th><th></th></tr></thead>
+            <tbody data-list="houses"></tbody></table>
+        </div>
+      </section>
+
+      <!-- ROUTES -->
+      <section class="panel" data-panel="routes" hidden>
+        <div class="card">
+          <div class="card__head"><h3>Routes</h3><button class="btn btn--small" data-open="addRoute">+ Add route</button></div>
+          <table class="tbl"><thead><tr><th>Name</th><th>Zone</th><th>Pickup day</th><th>Lead</th><th>Houses</th><th>Active</th></tr></thead>
+            <tbody data-list="routes"></tbody></table>
+        </div>
+      </section>
+
+      <!-- CREW / USERS -->
+      <section class="panel" data-panel="crew" hidden>
+        <div class="card">
+          <div class="card__head"><h3>Crew &amp; users</h3><button class="btn btn--small" data-open="addUser">+ Add user</button></div>
+          <table class="tbl"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Manager</th><th></th></tr></thead>
+            <tbody data-list="crew"></tbody></table>
+        </div>
+      </section>
+
+      <!-- PHOTOS -->
+      <section class="panel" data-panel="photos" hidden>
+        <div class="card">
+          <div class="card__head"><h3>Photo review</h3><span class="muted" data-bind="photos_count"></span></div>
+          <div class="photogrid" data-list="photos"></div>
+        </div>
+      </section>
+
+      <!-- PAYROLL -->
+      <section class="panel" data-panel="payroll" hidden>
+        <div class="card">
+          <div class="card__head"><h3>Payroll (this week)</h3><span class="muted">Based on completed service events</span></div>
+          <table class="tbl"><thead><tr><th>Crew member</th><th>Rolled out</th><th>Brought in</th><th>Total actions</th></tr></thead>
+            <tbody data-list="payroll"></tbody></table>
+        </div>
+      </section>
+
+      <!-- AUDIT -->
+      <section class="panel" data-panel="audit" hidden>
+        <div class="card">
+          <div class="card__head"><h3>Audit log</h3></div>
+          <table class="tbl"><thead><tr><th>When</th><th>Actor</th><th>Action</th><th>Detail</th></tr></thead>
+            <tbody data-list="audit"></tbody></table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ===================== MODAL ===================== -->
+  <div class="modal" data-modal hidden>
+    <div class="modal__box">
+      <h3 data-modal-title>Title</h3>
+      <div data-modal-body></div>
+      <div class="modal__foot">
+        <button class="btn btn--ghost" data-modal-close>Cancel</button>
+        <button class="btn" data-modal-confirm>Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" data-toast></div>
+  <script src="admin.js"></script>
+</body>
+</html>
