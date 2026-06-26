@@ -158,6 +158,17 @@
       });
   }
 
+  // Prefill address/zip when funneled from the homepage (?address=...)
+  try {
+    var qp = new URLSearchParams(location.search);
+    var qAddr = qp.get("address");
+    if (qAddr) {
+      var aEl = form.querySelector('[name="address"]'); if (aEl) aEl.value = qAddr;
+      var z = (qAddr.match(/\b\d{5}\b/) || [])[0];
+      if (z) { var zEl = form.querySelector('[name="zip"]'); if (zEl) zEl.value = z; }
+    }
+  } catch (e) {}
+
   showStep(1);
   refreshTotal();
 })();

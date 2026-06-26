@@ -58,6 +58,9 @@
 .field input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px var(--blue-soft); }
 .auth__msg { min-height: 18px; font-size: 13px; font-weight: 600; color: var(--blue); }
 .auth__demo { margin-top: 22px; font-size: 13px; color: var(--ink-50); }
+.auth__newcard { width: 100%; max-width: 420px; margin: 18px auto 0; background: var(--blue-soft); border: 1px solid var(--blue); border-radius: var(--radius-lg); padding: 22px; text-align: center; box-sizing: border-box; }
+.auth__newcard-title { font-family: var(--font-display); font-weight: 700; font-size: 1.18rem; margin-bottom: 6px; }
+.auth__newcard-sub { color: var(--ink-70); font-size: .92rem; margin-bottom: 14px; line-height: 1.5; }
 
 /* ============ APP LAYOUT ============ */
 .app { display: grid; grid-template-columns: 264px 1fr; min-height: 100vh; }

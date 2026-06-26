@@ -223,7 +223,7 @@
   var SUPABASE_URL = "https://hezahtnfyhqfucixzqxi.supabase.co";
   var SUPABASE_KEY = "sb_publishable_9l4_Bqgjg7qBapvYlLPJSA_pHOk0nMB";
 
-  function captureLead(raw, email) {
+  function captureLead(raw) {
     var zip = (raw.match(/\b\d{5}\b/) || [null])[0];
     try {
       fetch(SUPABASE_URL + "/rest/v1/leads", {
@@ -237,7 +237,6 @@
         body: JSON.stringify({
           raw_input: raw,
           zip: zip,
-          email: email || null,
           source: "homepage",
           user_agent: navigator.userAgent
         })
@@ -251,38 +250,25 @@
     if (v.length >= 6 && /\d/.test(v) && /[a-zA-Z]/.test(v)) return true; // street address
     return false;
   }
-  function isValidEmail(v) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((v || "").trim());
-  }
   $all("[data-address-form]").forEach(function (form) {
-    var addressInput = $('input[name="address"]', form) || $("input", form);
-    var emailInput = $('input[type="email"]', form);
+    var input = $("input", form);
     var msg = $("[data-form-msg]", form);
     form.addEventListener("submit", function (e) {
       e.preventDefault();
-      var val = addressInput.value || "";
-      var emailVal = emailInput ? (emailInput.value || "").trim() : "";
-      if (emailInput && !isValidEmail(emailVal)) {
-        msg.textContent = "Enter a valid email address.";
-        msg.className = "address-form__msg is-error";
-        if (!REDUCED && hasGSAP) gsap.fromTo(form, { x: -6 }, { x: 0, duration: 0.4, ease: "elastic.out(1,0.4)" });
-        emailInput.focus();
-        return;
-      }
+      var val = input.value || "";
       if (!isValidEntry(val)) {
         msg.textContent = "Enter a full street address or a 5-digit ZIP.";
         msg.className = "address-form__msg is-error";
         if (!REDUCED && hasGSAP) gsap.fromTo(form, { x: -6 }, { x: 0, duration: 0.4, ease: "elastic.out(1,0.4)" });
-        addressInput.focus();
+        input.focus();
         return;
       }
-      captureLead(val.trim(), emailVal);
-      msg.textContent = "🎉 Great news, we're serving your area! We've saved your spot, check your email.";
+      captureLead(val.trim());
+      msg.textContent = "Great news, we serve your area! Taking you to sign up...";
       msg.className = "address-form__msg is-success";
-      addressInput.value = "";
-      if (emailInput) emailInput.value = "";
-      addressInput.blur();
+      input.blur();
       fireConfetti();
+      setTimeout(function () { window.location.href = "join.html?address=" + encodeURIComponent(val.trim()); }, 800);
     });
   });
 
