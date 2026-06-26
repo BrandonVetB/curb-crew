@@ -84,29 +84,10 @@
 
   function loadData() {
     sb.auth.getUser().then(function (u) {
-      var realUid = u.data.user && u.data.user.id;
+      var uid = u.data.user && u.data.user.id;
       var email = u.data.user && u.data.user.email;
-      if (!realUid) return;
-      var as = new URLSearchParams(location.search).get("as");
-      if (as && as !== realUid) {
-        sb.from("staff_roles").select("role").ilike("email", (email || "").toLowerCase()).maybeSingle().then(function (sr) {
-          if (sr.data && sr.data.role === "admin") { showPortalImpersonation(as); runLoad(as, email); }
-          else runLoad(realUid, email);
-        });
-      } else { runLoad(realUid, email); }
-    });
-  }
-  function showPortalImpersonation(asId) {
-    var b = document.createElement("div");
-    b.textContent = "Admin preview — read-only";
-    b.style.cssText = "background:#0066FF;color:#fff;text-align:center;font-weight:600;font-size:13px;padding:8px;position:relative;z-index:999";
-    document.body.insertBefore(b, document.body.firstChild);
-    sb.from("profiles").select("full_name").eq("id", asId).maybeSingle().then(function (r) {
-      var nm = (r.data && r.data.full_name) || "this client";
-      b.textContent = "Admin preview — viewing " + nm + "'s portal (read-only)";
-    });
-  }
-  function runLoad(uid, email) {
+      if (!uid) return;
+
       Promise.all([
         sb.from("profiles").select("*").eq("id", uid).maybeSingle(),
         sb.from("service_addresses").select("*").eq("profile_id", uid).order("is_primary", { ascending: false }).limit(1).maybeSingle(),
@@ -125,6 +106,7 @@
         bind("side_addr", addr ? addr.line1 : "No address yet");
         bind("name", p.full_name || "Not set");
         bind("email", p.email || email || "");
+        window.__cc_email = p.email || email || "";
         bind("phone", p.phone || "Not set");
         bind("address", addr ? addr.line1 : "Not set");
         bind("city", addr ? [addr.city, addr.state, addr.zip].filter(Boolean).join(", ") : "Not set");
@@ -143,6 +125,7 @@
         renderSchedule(pickups);
         renderInvoices(invoices);
       });
+    });
   }
 
   function renderPlan(sub) {
@@ -268,7 +251,7 @@
     payment: function () { showToast("Card management opens here once Stripe is connected."); },
     receipt: function () { showToast("Receipts available once Stripe is connected."); },
     edit: function () { showToast("Inline editing is coming next."); },
-    support: function () { window.location.href = "mailto:hello@curbcrews.com?subject=Support"; }
+    support: function () { if (window.openSupport) { window.openSupport(); } }
   };
   document.addEventListener("click", function (e) {
     var a = e.target.closest("[data-action]"); if (!a) return;
