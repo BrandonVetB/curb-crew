@@ -102,6 +102,9 @@
       S.subByProfile = {}; S.subs.forEach(function (s) { S.subByProfile[s.profile_id] = s; });
       S.routeById = {}; S.routes.forEach(function (r) { S.routeById[r.id] = r; });
       renderAll();
+      sb.from("pay_rates").select("*").eq("id", 1).maybeSingle().then(function (r) {
+        if (r.data) { S.rates = r.data; renderPayroll(); }
+      });
     }).catch(function (e) { toast("Load error: " + (e.message || e)); });
   }
 
@@ -214,21 +217,48 @@
   }
 
   /* ---------- payroll ---------- */
+  function payPeriod() {
+    var s = $("[data-pay-start]"), e = $("[data-pay-end]");
+    if (s && !s.value) { var d = new Date(); d.setDate(d.getDate() - 13); s.value = d.toISOString().slice(0, 10); }
+    if (e && !e.value) { e.value = new Date().toISOString().slice(0, 10); }
+    return { start: s ? s.value : null, end: e ? e.value : null };
+  }
   function renderPayroll() {
-    var weekAgo = Date.now() - 7 * 86400000;
+    S.rates = S.rates || { rolled_out_cents: 0, brought_in_cents: 0 };
+    var ro = S.rates.rolled_out_cents || 0, bi = S.rates.brought_in_cents || 0;
+    bind("pay_rates_line", "Rates: " + money(ro) + " per roll-out · " + money(bi) + " per bring-in" + (ro || bi ? "" : "  — set rates to calculate pay"));
+    var per = payPeriod();
+    var startT = per.start ? new Date(per.start + "T00:00:00").getTime() : 0;
+    var endT = per.end ? new Date(per.end + "T23:59:59").getTime() : Date.now();
     var agg = {};
     S.events.forEach(function (e) {
-      if (new Date(e.occurred_at).getTime() < weekAgo) return;
+      var t = new Date(e.occurred_at).getTime();
+      if (t < startT || t > endT) return;
       var id = e.crew_member_id || "unknown";
       agg[id] = agg[id] || { out: 0, in: 0 };
       if (e.event_type === "rolled_out") agg[id].out++; else if (e.event_type === "brought_in") agg[id].in++;
     });
-    var rows = Object.keys(agg).map(function (id) {
-      var p = S.profileById[id];
-      var a = agg[id];
-      return "<tr><td>" + esc((p && p.full_name) || "Unknown") + "</td><td>" + a.out + "</td><td>" + a.in + "</td><td>" + (a.out + a.in) + "</td></tr>";
+    var total = 0;
+    S.payrollRows = Object.keys(agg).map(function (id) {
+      var p = S.profileById[id], a = agg[id], amt = a.out * ro + a.in * bi; total += amt;
+      return { name: (p && p.full_name) || "Unknown", out: a.out, in: a.in, amount_cents: amt };
     });
-    list("payroll").innerHTML = rows.length ? rows.join("") : "<tr><td colspan='4' class='muted'>No service events this week.</td></tr>";
+    list("payroll").innerHTML = S.payrollRows.length ? S.payrollRows.map(function (r) {
+      return "<tr><td>" + esc(r.name) + "</td><td>" + r.out + "</td><td>" + r.in + "</td><td>" + money(r.amount_cents) + "</td></tr>";
+    }).join("") : "<tr><td colspan='4' class='muted'>No service events in this period.</td></tr>";
+    bind("pay_total", S.payrollRows.length ? "Period total: " + money(total) : "");
+  }
+  function exportPayrollCSV() {
+    var rows = S.payrollRows || [];
+    if (!rows.length) return toast("Nothing to export for this period.");
+    var per = payPeriod();
+    var csv = "Crew member,Rolled out,Brought in,Amount\n" + rows.map(function (r) {
+      return '"' + r.name.replace(/"/g, '""') + '",' + r.out + "," + r.in + "," + (r.amount_cents / 100).toFixed(2);
+    }).join("\n");
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+    a.download = "curbcrew-payroll-" + per.start + "_to_" + per.end + ".csv";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
   }
 
   /* ---------- audit ---------- */
@@ -256,6 +286,8 @@
     var n = e.target.closest("[data-nav]"); if (n) { showPanel(n.getAttribute("data-nav")); }
   });
   $all('[data-search="clients"]').forEach(function (i) { i.addEventListener("input", function () { renderClients(i.value); }); });
+  $all('[data-export="payroll"]').forEach(function (b) { b.addEventListener("click", exportPayrollCSV); });
+  $all("[data-pay-start],[data-pay-end]").forEach(function (i) { i.addEventListener("change", renderPayroll); });
 
   /* ================= MODAL ================= */
   var modal = $("[data-modal]"), mTitle = $("[data-modal-title]"), mBody = $("[data-modal-body]"), mConfirm = $("[data-modal-confirm]"), pending = null;
@@ -327,6 +359,20 @@
           sb.from("staff_roles").insert([{ email: email, full_name: $("#m_uname").value.trim() || null, role: $("#m_urole").value }]).then(function (r) {
             if (r.error) return toast(r.error.message);
             logAudit("User added", email + " (" + $("#m_urole").value + ")"); closeModal(); toast("User added."); loadAll();
+          });
+        });
+    } else if (kind === "payRates") {
+      S.rates = S.rates || { rolled_out_cents: 0, brought_in_cents: 0 };
+      openModal("Set per-action pay rates",
+        "<label class='field'><span>Pay per roll-out ($)</span><input id='m_ro' type='number' min='0' step='0.01' value='" + ((S.rates.rolled_out_cents || 0) / 100).toFixed(2) + "'></label>" +
+        "<label class='field'><span>Pay per bring-in ($)</span><input id='m_bi' type='number' min='0' step='0.01' value='" + ((S.rates.brought_in_cents || 0) / 100).toFixed(2) + "'></label>", "Save rates",
+        function () {
+          var ro = Math.round(parseFloat($("#m_ro").value || "0") * 100);
+          var bi = Math.round(parseFloat($("#m_bi").value || "0") * 100);
+          sb.from("pay_rates").upsert({ id: 1, rolled_out_cents: ro, brought_in_cents: bi, updated_at: new Date().toISOString() }).then(function (r) {
+            if (r.error) return toast(r.error.message);
+            S.rates = { rolled_out_cents: ro, brought_in_cents: bi };
+            logAudit("Pay rates updated", money(ro) + " / " + money(bi)); closeModal(); toast("Rates saved."); renderPayroll();
           });
         });
     }

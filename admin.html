@@ -121,9 +121,19 @@
       <!-- PAYROLL -->
       <section class="panel" data-panel="payroll" hidden>
         <div class="card">
-          <div class="card__head"><h3>Payroll (this week)</h3><span class="muted">Based on completed service events</span></div>
-          <table class="tbl"><thead><tr><th>Crew member</th><th>Rolled out</th><th>Brought in</th><th>Total actions</th></tr></thead>
+          <div class="card__head">
+            <h3>Payroll</h3>
+            <div class="pay-controls">
+              <label class="muted">From <input type="date" data-pay-start class="search" /></label>
+              <label class="muted">To <input type="date" data-pay-end class="search" /></label>
+              <button class="btn btn--small btn--ghost" data-open="payRates">Set rates</button>
+              <button class="btn btn--small" data-export="payroll">Export CSV</button>
+            </div>
+          </div>
+          <p class="muted" data-bind="pay_rates_line">Per-action rates not set yet.</p>
+          <table class="tbl"><thead><tr><th>Crew member</th><th>Rolled out</th><th>Brought in</th><th>Amount</th></tr></thead>
             <tbody data-list="payroll"></tbody></table>
+          <div class="pay-total" data-bind="pay_total"></div>
         </div>
       </section>
 
