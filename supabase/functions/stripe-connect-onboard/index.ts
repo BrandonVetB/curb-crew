@@ -45,10 +45,8 @@ Deno.serve(async (req) => {
     if (!user) return json({ error: "Not signed in" }, 401);
 
     const db = createClient(url, service);
-    const { data: role } = await db.from("staff_roles").select("role").ilike("email", (user.email || "").toLowerCase()).maybeSingle();
-    if (!role || !["crew_member", "crew_lead", "admin"].includes(role.role)) return json({ error: "Not a crew member" }, 403);
-
-    const { data: profile } = await db.from("profiles").select("id, stripe_account_id").eq("id", user.id).maybeSingle();
+    const { data: profile } = await db.from("profiles").select("id, stripe_account_id, role").eq("id", user.id).maybeSingle();
+    if (!profile || !["crew_member", "crew_lead", "admin"].includes(profile.role)) return json({ error: "Not a crew member" }, 403);
     let acctId = profile?.stripe_account_id as string | null;
 
     if (!acctId) {

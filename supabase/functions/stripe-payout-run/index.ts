@@ -48,8 +48,8 @@ Deno.serve(async (req) => {
     if (!user) return json({ error: "Not signed in" }, 401);
 
     const db = createClient(url, service);
-    const { data: role } = await db.from("staff_roles").select("role").ilike("email", (user.email || "").toLowerCase()).maybeSingle();
-    if (!role || role.role !== "admin") return json({ error: "Admin only" }, 403);
+    const { data: me } = await db.from("profiles").select("role").eq("id", user.id).maybeSingle();
+    if (!me || me.role !== "admin") return json({ error: "Admin only" }, 403);
 
     const { period_start, period_end, dry_run } = await req.json().catch(() => ({}));
     if (!period_start || !period_end) return json({ error: "period_start and period_end required (YYYY-MM-DD)" }, 400);
