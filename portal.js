@@ -186,8 +186,21 @@
     el.innerHTML = events.map(function (e) {
       var L = labels[e.event_type] || ["dot-ok", e.event_type];
       var d = new Date(e.occurred_at).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
-      return '<li><span class="' + L[0] + '"></span> ' + L[1] + ' &middot; <span class="muted">' + d + "</span></li>";
+      var pu = (e.photo_url || "").replace(/["<>]/g, "");
+      var img = pu ? ' <img data-sign="' + pu + '" alt="photo proof" style="width:46px;height:46px;border-radius:8px;object-fit:cover;vertical-align:middle;margin-left:10px;background:#000;cursor:pointer" onclick="window.open(this.src,\'_blank\')" />' : "";
+      return '<li><span class="' + L[0] + '"></span> ' + L[1] + ' &middot; <span class="muted">' + d + "</span>" + img + "</li>";
     }).join("");
+    signProof(el);
+  }
+  // Resolve private service-photo paths to short-lived signed URLs (legacy http URLs pass through).
+  function signProof(container) {
+    Array.prototype.forEach.call(container.querySelectorAll("img[data-sign]"), function (img) {
+      var p = img.getAttribute("data-sign"); if (!p) return;
+      if (/^https?:/.test(p)) { img.src = p; return; }
+      sb.storage.from("service-photos").createSignedUrl(p, 3600).then(function (r) {
+        var u = r.data && (r.data.signedUrl || r.data.signedURL); if (u) img.src = u;
+      });
+    });
   }
 
   function renderSchedule(pickups) {
