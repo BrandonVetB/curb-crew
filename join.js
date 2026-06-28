@@ -42,6 +42,37 @@
   }
   $all("[data-addon]").forEach(function (a) { a.addEventListener("change", refreshTotal); });
 
+  // Auto-fill trash day + recycling week from the City of Austin schedule dataset.
+  var SCHED = { collection_week: null, schedule_source: null };
+  function runScheduleLookup() {
+    var addr = val("address"), zip = val("zip");
+    if (!addr || !/^\s*\d/.test(addr)) return;
+    sb.functions.invoke("lookup-austin-schedule", { body: { address: addr, zip: zip } }).then(function (res) {
+      var d = res && res.data;
+      if (d && d.matched) {
+        SCHED.collection_week = d.collection_week || null;
+        SCHED.schedule_source = "austin_dataset";
+        var daySel = form.querySelector('[name="pickup_day"]');
+        if (daySel && d.collection_day) daySel.value = d.collection_day;
+        if (d.zip) { var zEl = form.querySelector('[name="zip"]'); if (zEl && !zEl.value) zEl.value = d.zip; }
+        if (coverageEl) {
+          coverageEl.hidden = false;
+          coverageEl.className = "coverage-note is-ok";
+          coverageEl.innerHTML = "Found your City of Austin schedule: trash on <strong>" + d.collection_day + "</strong>" +
+            (d.collection_week ? ", recycling on <strong>week " + d.collection_week + "</strong>" : "") +
+            ". We set your pickup day, adjust below if needed.";
+        }
+      } else {
+        SCHED.collection_week = null;
+        SCHED.schedule_source = "self_reported";
+      }
+    }).catch(function () {});
+  }
+  (function () {
+    var a = form.querySelector('[name="address"]'); if (a) a.addEventListener("blur", runScheduleLookup);
+    var z = form.querySelector('[name="zip"]'); if (z) z.addEventListener("blur", runScheduleLookup);
+  })();
+
   function setMsg(t, kind) { msg.textContent = t || ""; msg.className = "join__msg" + (kind ? " is-" + kind : ""); }
 
   function showStep(n) {
@@ -141,6 +172,7 @@
             profile_id: uid, line1: val("address"), zip: val("zip"),
             can_return_location: val("can_return"), pickup_day: val("pickup_day"),
             gate_code: val("gate_code"), garage_code: val("garage_code"), access_notes: val("access_notes"),
+            collection_week: SCHED.collection_week, schedule_source: SCHED.schedule_source || "self_reported",
             is_primary: true, is_prospect: false
           }),
           sb.from("leads").insert(leadRow)
@@ -167,6 +199,7 @@
       var aEl = form.querySelector('[name="address"]'); if (aEl) aEl.value = qAddr;
       var z = (qAddr.match(/\b\d{5}\b/) || [])[0];
       if (z) { var zEl = form.querySelector('[name="zip"]'); if (zEl) zEl.value = z; }
+      runScheduleLookup();
     }
   } catch (e) {}
 
