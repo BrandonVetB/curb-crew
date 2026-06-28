@@ -10,7 +10,8 @@
   var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   // Soft coverage list (placeholder until a real coverage table exists).
-  var SERVED_ZIPS = ["78732", "78730", "78726", "78734", "78738"];
+  // Greater Austin + Georgetown / Williamson County (soft list; never blocks signup)
+  var SERVED_ZIPS = ["78701","78702","78703","78704","78705","78717","78719","78721","78722","78723","78724","78725","78726","78727","78728","78729","78730","78731","78732","78733","78734","78735","78736","78737","78738","78739","78741","78742","78744","78745","78746","78747","78748","78749","78750","78751","78752","78753","78754","78756","78757","78758","78759","78660","78664","78665","78681","78613","78626","78628","78633","78634"];
 
   function $(s, c) { return (c || document).querySelector(s); }
   function $all(s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); }
@@ -73,6 +74,18 @@
     var z = form.querySelector('[name="zip"]'); if (z) z.addEventListener("blur", runScheduleLookup);
   })();
 
+  // Phone auto-format: digits -> (xxx) xxx-xxxx
+  (function () {
+    var pe = form.querySelector('[name="phone"]');
+    if (!pe) return;
+    pe.addEventListener("input", function () {
+      var d = (pe.value || "").replace(/\D/g, "").slice(0, 10);
+      if (d.length < 4) pe.value = d;
+      else if (d.length < 7) pe.value = "(" + d.slice(0, 3) + ") " + d.slice(3);
+      else pe.value = "(" + d.slice(0, 3) + ") " + d.slice(3, 6) + "-" + d.slice(6);
+    });
+  })();
+
   function setMsg(t, kind) { msg.textContent = t || ""; msg.className = "join__msg" + (kind ? " is-" + kind : ""); }
 
   function showStep(n) {
@@ -107,7 +120,7 @@
       return "";
     }
     if (n === 2) {
-      if (!val("name")) return "Enter your name.";
+      if (!val("first_name") || !val("last_name")) return "Enter your first and last name.";
       if (val("email").indexOf("@") === -1) return "Enter a valid email.";
       if (val("password").length < 8) return "Password must be at least 8 characters.";
       return "";
@@ -123,7 +136,7 @@
     var rows = [
       ["Address", val("address")],
       ["Pickup day", val("pickup_day")],
-      ["Name", val("name")],
+      ["Name", (val("first_name") + " " + val("last_name")).trim()],
       ["Email", val("email")],
       ["Plan", "Curb Crews Plan"],
       ["Add-ons", addons.length ? addons.join(", ") : "None"],
@@ -146,7 +159,7 @@
     nextBtn.disabled = true;
     setMsg("Creating your account...");
 
-    var email = val("email"), password = val("password"), name = val("name");
+    var email = val("email"), password = val("password"), name = (val("first_name") + " " + val("last_name")).trim();
 
     sb.auth.signUp({ email: email, password: password, options: { data: { full_name: name } } })
       .then(function (r) {

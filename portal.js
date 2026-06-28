@@ -117,6 +117,9 @@
         bind("access_notes", (addr && addr.access_notes) || "None");
         bind("crew", "Assigning to your street");
         bind("ontime", "");
+        sb.rpc("get_my_crew_first_name").then(function (cr) {
+          if (cr && cr.data) { bind("crew", cr.data); bind("ontime", "Your crew on the street"); }
+        });
 
         // plan
         renderPlan(sub);
