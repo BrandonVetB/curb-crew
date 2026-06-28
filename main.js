@@ -191,7 +191,7 @@
      ============================================================ */
   if (hasGSAP && !REDUCED && !IS_TOUCH) {
     $all(".magnetic").forEach(function (btn) {
-      var strength = 0.35;
+      var strength = 0.22;
       btn.addEventListener("mousemove", function (e) {
         var r = btn.getBoundingClientRect();
         var mx = e.clientX - (r.left + r.width / 2);
@@ -203,18 +203,9 @@
       });
     });
 
-    // subtle hover lift on cards
-    $all(".magnetic-card").forEach(function (card) {
-      card.addEventListener("mousemove", function (e) {
-        var r = card.getBoundingClientRect();
-        var rx = ((e.clientY - r.top) / r.height - 0.5) * -4;
-        var ry = ((e.clientX - r.left) / r.width - 0.5) * 4;
-        gsap.to(card, { rotateX: rx, rotateY: ry, transformPerspective: 800, duration: 0.4, ease: "power2.out" });
-      });
-      card.addEventListener("mouseleave", function () {
-        gsap.to(card, { rotateX: 0, rotateY: 0, duration: 0.6, ease: "power2.out" });
-      });
-    });
+    // Card hover is handled with a crisp CSS lift (see .benefit:hover / .how-step:hover).
+    // The old 3D perspective tilt was removed because rotating the cards blurred the text
+    // and left the right column looking skewed.
   }
 
   /* ============================================================
