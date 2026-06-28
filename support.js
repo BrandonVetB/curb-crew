@@ -9,6 +9,14 @@
   var FN = "https://hezahtnfyhqfucixzqxi.supabase.co/functions/v1/submit-ticket";
   var ANON = "sb_publishable_9l4_Bqgjg7qBapvYlLPJSA_pHOk0nMB";
 
+  function friendlyPage() {
+    var p = location.pathname.toLowerCase();
+    if (p.indexOf("portal") > -1) return "Customer portal";
+    if (p.indexOf("join") > -1) return "Signup page";
+    if (p.indexOf("bulk") > -1) return "Bulk pickup page";
+    return "Homepage";
+  }
+
   var css =
     '.cs-overlay{position:fixed;inset:0;background:rgba(11,11,15,.55);backdrop-filter:blur(4px);display:grid;place-items:center;z-index:99999;padding:20px}' +
     '.cs-overlay[hidden]{display:none}' +
@@ -56,7 +64,7 @@
     '    </div>' +
     '    <div class="cs-done" data-cs-done hidden>' +
     '      <div class="cs-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>' +
-    '      <h3>Message sent</h3><p class="cs-sub">We got it and will email you back shortly.</p>' +
+    '      <h3>Message received</h3><p class="cs-sub">Thank you, it is in our hands now. You are a top priority and someone from our team will personally reach out to you.</p>' +
     '      <button class="cs-btn cs-btn--primary" data-cs-close style="margin-top:10px">Done</button>' +
     '    </div>' +
     '  </div>' +
@@ -91,7 +99,7 @@
     fetch(FN, {
       method: "POST",
       headers: { "Content-Type": "application/json", "apikey": ANON, "Authorization": "Bearer " + ANON },
-      body: JSON.stringify({ name: name, email: email, category: category, message: message, page: location.pathname })
+      body: JSON.stringify({ name: name, email: email, category: category, message: message, page: friendlyPage() })
     }).then(function (r) { return r.json(); }).then(function (res) {
       sendBtn.disabled = false;
       if (res && res.ok) { formView.hidden = true; doneView.hidden = false; }

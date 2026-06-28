@@ -56,16 +56,23 @@
         <button type="submit" class="btn btn--block" data-auth-submit>Sign in</button>
         <p class="auth__msg" data-auth-msg role="status" aria-live="polite"></p>
       </form>
-
-      <p class="auth__demo">
-        <span data-mode="signin">New to Curb Crews? <a href="#" data-toggle-mode>Create an account</a></span>
-        <span data-mode="signup" hidden>Already have an account? <a href="#" data-toggle-mode>Sign in</a></span>
-      </p>
+      <a href="#" data-toggle-mode hidden aria-hidden="true"></a>
     </div>
 
     <div class="auth__newcard">
-      <p class="auth__newcard-title">Not signed up yet?</p>
-      <p class="auth__newcard-sub">We'd love to take trash day off your hands. Check your street and you can start in about two minutes.</p>
+      <div class="auth__newcard-icon" aria-hidden="true">
+        <svg viewBox="0 0 32 32" width="34" height="34" fill="none">
+          <rect x="5" y="11" width="22" height="3" rx="1.5" fill="currentColor"/>
+          <path d="M8 14h16l-1.7 14.2A2.5 2.5 0 0 1 19.8 30H12.2a2.5 2.5 0 0 1-2.5-1.8z" fill="currentColor"/>
+          <path d="M13 8h6l1 3h-8z" fill="currentColor"/>
+        </svg>
+      </div>
+      <p class="auth__newcard-title">New here? Let us take trash day off your plate.</p>
+      <ul class="auth__newcard-list">
+        <li>Cans out the night before, back in after pickup</li>
+        <li>$35/month, no contracts, cancel anytime</li>
+        <li>Check your street and start in about two minutes</li>
+      </ul>
       <a href="join.html" class="btn btn--block">Get started</a>
     </div>
   </section>
@@ -149,7 +156,7 @@
             <p class="card__label">Crew on your street</p>
             <p class="card__value" data-bind="crew">Assigning</p>
             <p class="card__muted" data-bind="ontime">&nbsp;</p>
-            <button class="link-btn" data-nav="account">Contact support &rarr;</button>
+            <button class="link-btn" data-action="support">Contact support &rarr;</button>
           </article>
         </div>
 
