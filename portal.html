@@ -205,9 +205,11 @@
             <div class="line" data-bind="addons_line" hidden><span>Add-ons</span><strong data-bind="addons_total">&mdash;</strong></div>
             <div class="line line--total"><span>Total monthly</span><strong data-bind="plan_total">&mdash;</strong></div>
             <p class="card__muted" data-bind="next_charge">Not billing yet</p>
-            <div class="actions actions--wrap">
-              <button class="btn" data-action="resume" data-resume-btn hidden>Resume now</button>
+            <div class="actions">
+              <button class="btn" data-action="resume" data-resume-btn hidden>Resume my service</button>
+              <p class="pause-note" data-pause-note hidden></p>
               <button class="btn btn--ghost" data-action="pause" data-pause-btn>Pause for vacation</button>
+              <button class="btn btn--ghost" data-action="hold" data-hold-btn>Hold my membership</button>
               <button class="btn btn--danger-ghost" data-action="cancel" data-cancel-btn>Cancel plan</button>
             </div>
           </article>

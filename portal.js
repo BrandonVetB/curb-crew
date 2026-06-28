@@ -34,7 +34,7 @@
     $('[data-mode="signup"]').hidden = m !== "signup";
     msg.textContent = "";
   }
-  $("[data-toggle-mode]").addEventListener("click", function (e) { e.preventDefault(); setMode(mode === "signin" ? "signup" : "signin"); });
+  var toggleEl = $("[data-toggle-mode]"); if (toggleEl) toggleEl.addEventListener("click", function (e) { e.preventDefault(); setMode(mode === "signin" ? "signup" : "signin"); });
 
   form.addEventListener("submit", function (e) {
     e.preventDefault();
@@ -121,8 +121,9 @@
         // plan
         renderPlan(sub);
 
-        // next pickup
-        renderNext(pickups[0]);
+        // next pickup (skip paused/skipped days)
+        var nextPk = pickups.filter(function (x) { return x.status !== "skipped"; })[0];
+        renderNext(nextPk, sub);
 
         // lists
         renderActivity(events);
@@ -162,12 +163,26 @@
       var m = map[sub.status] || ["Active", "pill pill--green"];
       pillEl.textContent = m[0]; pillEl.className = m[1];
     }
-    var resumeBtn = $("[data-resume-btn]"), pauseBtn = $("[data-pause-btn]");
-    if (resumeBtn && pauseBtn) { var paused = sub.status === "paused"; resumeBtn.hidden = !paused; pauseBtn.hidden = paused; }
+    var paused = sub.status === "paused";
+    var resumeBtn = $("[data-resume-btn]"), pauseBtn = $("[data-pause-btn]"), holdBtn = $("[data-hold-btn]"), cancelBtn = $("[data-cancel-btn]"), pnote = $("[data-pause-note]");
+    if (resumeBtn) resumeBtn.hidden = !paused;
+    if (pauseBtn) pauseBtn.hidden = paused;
+    if (holdBtn) holdBtn.hidden = paused;
+    if (cancelBtn) cancelBtn.hidden = paused;
+    if (pnote) {
+      if (paused) { pnote.hidden = false; pnote.textContent = sub.pause_end ? ("Paused for vacation. Service resumes " + fmtDate(sub.pause_end) + ".") : "Your membership is on hold. Resume whenever you are ready."; }
+      else pnote.hidden = true;
+    }
   }
 
-  function renderNext(pk) {
+  function renderNext(pk, sub) {
     if (!pk) {
+      if (sub && sub.status === "paused") {
+        bind("next_day", "Paused");
+        bind("next_date_rel", sub.pause_end ? ("Service resumes " + fmtDate(sub.pause_end)) : "Membership on hold");
+        bind("next_note", "Your pickups are paused. Resume anytime from Plan & payments.");
+        return;
+      }
       bind("next_day", "—"); bind("next_date_rel", "No pickup scheduled yet");
       bind("next_note", "Your schedule appears here once your service starts.");
       return;
@@ -186,21 +201,8 @@
     el.innerHTML = events.map(function (e) {
       var L = labels[e.event_type] || ["dot-ok", e.event_type];
       var d = new Date(e.occurred_at).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
-      var pu = (e.photo_url || "").replace(/["<>]/g, "");
-      var img = pu ? ' <img data-sign="' + pu + '" alt="photo proof" style="width:46px;height:46px;border-radius:8px;object-fit:cover;vertical-align:middle;margin-left:10px;background:#000;cursor:pointer" onclick="window.open(this.src,\'_blank\')" />' : "";
-      return '<li><span class="' + L[0] + '"></span> ' + L[1] + ' &middot; <span class="muted">' + d + "</span>" + img + "</li>";
+      return '<li><span class="' + L[0] + '"></span> ' + L[1] + ' &middot; <span class="muted">' + d + "</span></li>";
     }).join("");
-    signProof(el);
-  }
-  // Resolve private service-photo paths to short-lived signed URLs (legacy http URLs pass through).
-  function signProof(container) {
-    Array.prototype.forEach.call(container.querySelectorAll("img[data-sign]"), function (img) {
-      var p = img.getAttribute("data-sign"); if (!p) return;
-      if (/^https?:/.test(p)) { img.src = p; return; }
-      sb.storage.from("service-photos").createSignedUrl(p, 3600).then(function (r) {
-        var u = r.data && (r.data.signedUrl || r.data.signedURL); if (u) img.src = u;
-      });
-    });
   }
 
   function renderSchedule(pickups) {
@@ -208,7 +210,11 @@
     if (!el) return;
     if (!pickups.length) { el.innerHTML = '<tr><td colspan="4" class="muted">No upcoming pickups scheduled yet.</td></tr>'; return; }
     el.innerHTML = pickups.map(function (pk) {
-      var tag = pk.is_holiday_shift ? '<span class="tag tag--holiday">Holiday shift</span>' : '<span class="tag tag--scheduled">Scheduled</span>';
+      var tag;
+      if (pk.status === "skipped") tag = '<span class="tag tag--paused">Paused</span>';
+      else if (pk.status === "completed") tag = '<span class="tag tag--done">Done</span>';
+      else if (pk.is_holiday_shift) tag = '<span class="tag tag--holiday">Holiday shift</span>';
+      else tag = '<span class="tag tag--scheduled">Scheduled</span>';
       return "<tr><td>" + fmtShort(pk.pickup_date) + "</td><td>" + (pk.out_night ? fmtShort(pk.out_night) : "—") +
         "</td><td>" + ((pk.types || []).join(" + ") || "Trash") + "</td><td>" + tag + "</td></tr>";
     }).join("");
@@ -311,7 +317,7 @@
       var min = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
       openModal({
         title: "Heading out of town?",
-        html: '<p style="margin-bottom:12px;color:var(--ink-70)">Most folks find pausing is more hassle than it is worth, we just quietly handle trash day for you. But if you are away, give us your return date and we will pause billing until then, you only pay for service you get.</p>'
+        html: '<p style="margin-bottom:12px;color:var(--ink-70)">Away for a bit? Give us your return date and we will pause your pickups and your billing until then, so you only pay for service you actually get. We pick right back up the day you are home.</p>'
           + '<label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:var(--ink-70)"><span>Resume service on</span>'
           + '<input type="date" data-pause-date min="' + min + '" value="' + min + '" style="font:inherit;font-size:15px;padding:12px 13px;border:1px solid var(--line-strong);border-radius:11px"></label>',
         confirmLabel: "Pause until then",
@@ -324,6 +330,14 @@
       });
     },
     resume: function () { callManage("resume", null, "Welcome back. Service resumed."); },
+    hold: function () {
+      openModal({
+        title: "Put your membership on hold?",
+        html: '<p style="margin-bottom:10px;color:var(--ink-70)">This stops your billing right away, we will not charge you again until you choose to resume. Your pickups pause with no end date, so it is perfect if you are not sure when you will be back.</p><p style="color:var(--ink-70)">You can resume anytime from this page.</p>',
+        confirmLabel: "Hold my membership",
+        onConfirm: function () { callManage("hold", null, "Your membership is on hold. Billing is stopped until you resume."); }
+      });
+    },
     receipt: function () { ACTIONS.payment(); },
     edit: function () {
       var p = CURRENT.profile || {}, a = CURRENT.addr || {};
