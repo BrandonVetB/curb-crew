@@ -323,6 +323,63 @@
     });
   }
 
+  var ACCT_DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  function acctFieldsHTML() {
+    var p = CURRENT.profile || {}, a = CURRENT.addr || {};
+    function f(label, key, val, ph) {
+      return '<label class="acct-field"><span>' + label + '</span><input data-ef="' + key + '" value="' + (val == null ? "" : String(val).replace(/"/g, "&quot;")) + '" placeholder="' + (ph || "") + '"></label>';
+    }
+    function fday(label, key, val) {
+      var opts = ACCT_DAYS.map(function (d) { return '<option' + (d === val ? " selected" : "") + ">" + d + "</option>"; }).join("");
+      return '<label class="acct-field"><span>' + label + '</span><select data-ef="' + key + '">' + opts + '</select></label>';
+    }
+    return '<div class="acct-edit-grid">'
+      + f("Full name", "name", p.full_name, "")
+      + f("Phone", "phone", p.phone, "")
+      + f("Street address", "line1", a.line1, "123 Maple St")
+      + f("ZIP", "zip", a.zip, "")
+      + fday("Trash pickup day", "pickup_day", a.pickup_day)
+      + f("Where the cans live", "can_return_location", a.can_return_location, "Left side, behind the gate")
+      + f("Gate / community code", "gate_code", a.gate_code, "optional")
+      + f("Garage code", "garage_code", a.garage_code, "optional")
+      + f("Anything else for the crew", "access_notes", a.access_notes, "optional")
+      + '</div>';
+  }
+  function acctToggle(editing) {
+    var v = $("[data-acct-view]"), e = $("[data-acct-edit]");
+    var eb = $("[data-acct-editbtn]"), cb = $("[data-acct-cancelbtn]"), sv = $("[data-acct-savebtn]");
+    if (v) v.hidden = editing;
+    if (e) e.hidden = !editing;
+    if (eb) eb.hidden = editing;
+    if (cb) cb.hidden = !editing;
+    if (sv) sv.hidden = !editing;
+  }
+  function acctSave() {
+    var root = $("[data-acct-edit]"); if (!root) return;
+    var g = function (k) { var el = root.querySelector('[data-ef="' + k + '"]'); return el ? el.value.trim() : ""; };
+    var a = CURRENT.addr || {};
+    var oldDay = a.pickup_day || "", newDay = g("pickup_day");
+    showToast("Saving...");
+    sb.auth.getUser().then(function (u) {
+      var uid = u.data.user && u.data.user.id; if (!uid) { showToast("Please sign in again."); return; }
+      var addrFields = { line1: g("line1"), zip: g("zip"), pickup_day: newDay, can_return_location: g("can_return_location"), gate_code: g("gate_code"), garage_code: g("garage_code"), access_notes: g("access_notes") };
+      var aP = (CURRENT.addr && CURRENT.addr.id)
+        ? sb.from("service_addresses").update(addrFields).eq("id", CURRENT.addr.id).select()
+        : sb.from("service_addresses").insert(Object.assign({ profile_id: uid, is_primary: true, is_prospect: false }, addrFields)).select();
+      Promise.all([
+        sb.from("profiles").update({ full_name: g("name"), phone: g("phone") }).eq("id", uid).select(),
+        aP
+      ]).then(function (r) {
+        var err = (r[0] && r[0].error) || (r[1] && r[1].error);
+        if (err) { showToast("Could not save: " + (err.message || "please try again.")); return; }
+        acctToggle(false);
+        if (newDay && newDay !== oldDay) {
+          sb.rpc("regenerate_my_pickups").then(function () { showToast("Saved. Your schedule was updated."); loadData(); });
+        } else { showToast("Saved."); loadData(); }
+      });
+    });
+  }
+
   var ACTIONS = {
     payment: function () {
       showToast("Opening secure billing...");
@@ -375,58 +432,10 @@
       });
     },
     receipt: function () { ACTIONS.payment(); },
-    edit: function () {
-      var p = CURRENT.profile || {}, a = CURRENT.addr || {};
-      var DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-      function ef(label, key, val, ph) {
-        return '<label style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px;font-size:13px;font-weight:600;color:var(--ink-70)"><span>' + label + '</span>'
-          + '<input data-ef="' + key + '" value="' + (val == null ? "" : String(val).replace(/"/g, "&quot;")) + '" placeholder="' + (ph || "") + '" style="font:inherit;font-size:15px;padding:11px 12px;border:1px solid var(--line-strong);border-radius:10px"></label>';
-      }
-      function efDay(label, key, val) {
-        var opts = DAYS.map(function (d) { return '<option' + (d === val ? " selected" : "") + ">" + d + "</option>"; }).join("");
-        return '<label style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px;font-size:13px;font-weight:600;color:var(--ink-70)"><span>' + label + '</span>'
-          + '<select data-ef="' + key + '" style="font:inherit;font-size:15px;padding:11px 12px;border:1px solid var(--line-strong);border-radius:10px;background:#fff">' + opts + '</select></label>';
-      }
-      var html = ef("Full name", "name", p.full_name, "")
-        + ef("Phone", "phone", p.phone, "")
-        + ef("Street address", "line1", a.line1, "123 Maple St")
-        + ef("ZIP", "zip", a.zip, "")
-        + efDay("Trash pickup day", "pickup_day", a.pickup_day)
-        + ef("Where the cans live", "can_return_location", a.can_return_location, "Left side, behind the gate")
-        + ef("Gate / community code", "gate_code", a.gate_code, "optional")
-        + ef("Garage code", "garage_code", a.garage_code, "optional")
-        + ef("Anything else for the crew", "access_notes", a.access_notes, "optional");
-      openModal({
-        title: "Edit your profile",
-        html: '<div style="max-height:54vh;overflow:auto;padding-right:4px">' + html + '</div>',
-        confirmLabel: "Save changes",
-        onConfirm: function () {
-          var g = function (k) { var el = modalBody.querySelector('[data-ef="' + k + '"]'); return el ? el.value.trim() : ""; };
-          var oldDay = a.pickup_day || "";
-          var newDay = g("pickup_day");
-          showToast("Saving...");
-          sb.auth.getUser().then(function (u) {
-            var uid = u.data.user && u.data.user.id; if (!uid) { showToast("Please sign in again."); return; }
-            var addrFields = { line1: g("line1"), zip: g("zip"), pickup_day: newDay, can_return_location: g("can_return_location"), gate_code: g("gate_code"), garage_code: g("garage_code"), access_notes: g("access_notes") };
-            var aP = (CURRENT.addr && CURRENT.addr.id)
-              ? sb.from("service_addresses").update(addrFields).eq("id", CURRENT.addr.id).select()
-              : sb.from("service_addresses").insert(Object.assign({ profile_id: uid, is_primary: true, is_prospect: false }, addrFields)).select();
-            Promise.all([
-              sb.from("profiles").update({ full_name: g("name"), phone: g("phone") }).eq("id", uid).select(),
-              aP
-            ]).then(function (r) {
-              var err = (r[0] && r[0].error) || (r[1] && r[1].error);
-              if (err) { showToast("Could not save: " + (err.message || "please try again.")); return; }
-              if (newDay && newDay !== oldDay) {
-                sb.rpc("regenerate_my_pickups").then(function () { showToast("Saved. Your schedule was updated."); loadData(); });
-              } else {
-                showToast("Saved."); loadData();
-              }
-            });
-          });
-        }
-      });
-    },
+    edit: function () { showPanel("account"); if (ACTIONS["account-edit"]) ACTIONS["account-edit"](); },
+    "account-edit": function () { var e = $("[data-acct-edit]"); if (e) e.innerHTML = acctFieldsHTML(); acctToggle(true); },
+    "account-cancel": function () { acctToggle(false); },
+    "account-save": function () { acctSave(); },
     support: function () { if (window.openSupport) { window.openSupport(); } }
   };
   document.addEventListener("click", function (e) {

@@ -239,16 +239,23 @@
         <article class="card">
           <div class="card__row">
             <p class="card__label">Your profile &amp; service</p>
-            <button class="btn btn--ghost btn--sm" data-action="edit">Edit profile</button>
+            <div class="acct-actions">
+              <button class="btn btn--ghost btn--sm" data-action="account-cancel" data-acct-cancelbtn hidden>Cancel</button>
+              <button class="btn btn--ghost btn--sm" data-action="account-edit" data-acct-editbtn>Edit profile</button>
+              <button class="btn btn--sm" data-action="account-save" data-acct-savebtn hidden>Save changes</button>
+            </div>
           </div>
-          <div class="line"><span>Name</span><strong data-bind="name">&mdash;</strong></div>
-          <div class="line"><span>Email</span><strong data-bind="email">&mdash;</strong></div>
-          <div class="line"><span>Phone</span><strong data-bind="phone">&mdash;</strong></div>
-          <div class="line"><span>Address</span><strong data-bind="address">Not set</strong></div>
-          <div class="line"><span>City</span><strong data-bind="city">&mdash;</strong></div>
-          <div class="line"><span>Where the cans live</span><strong data-bind="can_return">&mdash;</strong></div>
-          <div class="line"><span>Gate code</span><strong data-bind="gate_code">&mdash;</strong></div>
-          <div class="line"><span>Crew notes</span><strong data-bind="access_notes">&mdash;</strong></div>
+          <div data-acct-view>
+            <div class="line"><span>Name</span><strong data-bind="name">&mdash;</strong></div>
+            <div class="line"><span>Email</span><strong data-bind="email">&mdash;</strong></div>
+            <div class="line"><span>Phone</span><strong data-bind="phone">&mdash;</strong></div>
+            <div class="line"><span>Address</span><strong data-bind="address">Not set</strong></div>
+            <div class="line"><span>City</span><strong data-bind="city">&mdash;</strong></div>
+            <div class="line"><span>Where the cans live</span><strong data-bind="can_return">&mdash;</strong></div>
+            <div class="line"><span>Gate code</span><strong data-bind="gate_code">&mdash;</strong></div>
+            <div class="line"><span>Crew notes</span><strong data-bind="access_notes">&mdash;</strong></div>
+          </div>
+          <div data-acct-edit hidden></div>
         </article>
         <article class="card">
           <div class="card__row">

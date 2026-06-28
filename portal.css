@@ -198,6 +198,12 @@
 .tag--done { background: rgba(22,163,74,0.12); color: #16a34a; }
 .pause-note { margin: 0; padding: 10px 12px; background: var(--blue-soft); border: 1px solid var(--blue); border-radius: 10px; font-size: .9rem; color: var(--blue); text-align: center; font-weight: 600; }
 .pay-card { font-family: var(--font-display); font-weight: 600; letter-spacing: .02em; }
+.acct-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.acct-edit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 8px; }
+.acct-field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; color: var(--ink-70); }
+.acct-field input, .acct-field select { font: inherit; font-size: 15px; padding: 12px 13px; border: 1px solid var(--line-strong); border-radius: 11px; background: #fff; color: var(--ink); width: 100%; box-sizing: border-box; }
+.acct-field input:focus, .acct-field select:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px var(--blue-soft); }
+@media (max-width: 640px) { .acct-edit-grid { grid-template-columns: 1fr; } }
 
 /* ============ MODAL ============ */
 .modal { position: fixed; inset: 0; z-index: 500; display: grid; place-items: center; padding: 20px; }
