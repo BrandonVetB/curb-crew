@@ -68,6 +68,8 @@
 /* Make [hidden] win over class display rules so hidden buttons/fields truly disappear */
 .btn[hidden] { display: none !important; }
 .field[hidden] { display: none !important; }
+/* On small screens let button text wrap inside the pill instead of overflowing it */
+@media (max-width: 560px) { .btn { white-space: normal; } }
 
 /* ============ APP LAYOUT ============ */
 .app { display: grid; grid-template-columns: 264px 1fr; min-height: 100vh; }

@@ -81,11 +81,13 @@
      ============================================================ */
   var words = $all(".hero__title .word");
   if (hasGSAP && !REDUCED && words.length) {
-    gsap.set(words, { yPercent: 115, opacity: 0 });
-    gsap.to(words, {
+    gsap.fromTo(words, { yPercent: 115, opacity: 0 }, {
       yPercent: 0, opacity: 1, duration: 0.9, ease: "power4.out",
       stagger: 0.07, delay: 0.15
     });
+    // Safety net: if the tab was throttled (common on mobile) and the reveal never
+    // ran, force the headline visible so it never gets stuck hidden.
+    setTimeout(function () { gsap.set(words, { opacity: 1, yPercent: 0 }); }, 1600);
   }
 
   /* ============================================================

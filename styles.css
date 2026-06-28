@@ -173,6 +173,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .btn:active { transform: translateY(0); }
 
 .btn--small { padding: 11px 18px; font-size: 14px; }
+@media (max-width: 560px) { .btn { white-space: normal; } }
 .btn--block { width: 100%; }
 .btn--invert { background: var(--white); color: var(--blue); box-shadow: 0 8px 24px rgba(0,0,0,0.18); }
 .btn--invert:hover { box-shadow: 0 14px 40px rgba(0,0,0,0.26); }
