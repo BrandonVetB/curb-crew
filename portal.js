@@ -132,6 +132,7 @@
         renderActivity(events);
         renderSchedule(pickups);
         renderInvoices(invoices);
+        callFn("get-billing-info").then(function (rb) { if (rb && rb.data && !rb.data.error) renderBilling(rb.data); });
       });
     });
   }
@@ -140,7 +141,7 @@
     var pillEl = $('[data-bind="plan_pill"]');
     if (!sub || sub.status === "pending") {
       bind("plan_name", "No active plan yet");
-      bind("plan_name2", "Curb Crews Plan");
+      bind("plan_name2", "Base plan");
       bind("plan_price", "Add payment to start");
       bind("plan_base", "$35.00");
       bind("plan_total", "$35.00");
@@ -154,12 +155,18 @@
     if (sub.addon_cleaning) addons.push("Cleaning");
     var label = "Curb Crews" + (addons.length ? " + " + addons.join(" + ") : "");
     bind("plan_name", label);
-    bind("plan_name2", "Curb Crews Plan");
+    bind("plan_name2", "Base plan");
     bind("plan_price", money(sub.monthly_total_cents) + " / month");
     bind("plan_base", money(sub.base_price_cents));
     bind("plan_total", money(sub.monthly_total_cents));
-    var addonCents = (sub.monthly_total_cents || 0) - (sub.base_price_cents || 0);
-    if (addonCents > 0) { var l = $('[data-bind="addons_line"]'); if (l) l.hidden = false; bind("addons_total", money(addonCents)); }
+    var alist = $("[data-addons-list]");
+    if (alist) {
+      var items = [];
+      if (sub.addon_recycling) items.push(["Recycling can", 800]);
+      if (sub.addon_yard_waste) items.push(["Yard-waste can", 800]);
+      if (sub.addon_cleaning) items.push(["Monthly can cleaning", 2500]);
+      alist.innerHTML = items.map(function (it) { return '<div class="line"><span>' + it[0] + '</span><strong>' + money(it[1]) + "</strong></div>"; }).join("");
+    }
     bind("next_charge", sub.current_period_end ? "Next charge: " + fmtDate(sub.current_period_end) : "Billing starts when Stripe is connected");
     if (pillEl) {
       var map = { active: ["Active", "pill pill--green"], paused: ["Paused", "pill"], canceled: ["Canceled", "pill"] };
@@ -229,8 +236,33 @@
     if (!invoices.length) { el.innerHTML = '<tr><td colspan="4" class="muted">No invoices yet.</td></tr>'; return; }
     el.innerHTML = invoices.map(function (inv) {
       return "<tr><td>" + fmtDate(inv.invoice_date) + "</td><td>" + (inv.description || "Monthly subscription") +
-        "</td><td>" + money(inv.amount_cents) + '</td><td><button class="link-btn" data-action="receipt">Download</button></td></tr>';
+        "</td><td>" + money(inv.amount_cents) + '</td><td><button class="link-btn" data-action="receipt">View</button></td></tr>';
     }).join("");
+  }
+
+  // Live card + invoices straight from Stripe (overrides the DB invoice table once loaded).
+  function renderBilling(b) {
+    var payEl = $('[data-bind="pay"]');
+    if (payEl) {
+      if (b.card) {
+        var brand = String(b.card.brand || "Card").replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+        var yy = String(b.card.exp_year || "").slice(-2);
+        payEl.innerHTML = '<span class="pay-card">' + brand + ' &bull;&bull;&bull;&bull; ' + b.card.last4 + '</span> <span class="muted">exp ' + b.card.exp_month + '/' + yy + '</span>';
+      } else {
+        payEl.innerHTML = '<span class="muted">No card on file yet. Add one to start service.</span>';
+      }
+    }
+    var el = $('[data-list="invoices"]');
+    if (el) {
+      if (!b.invoices || !b.invoices.length) { el.innerHTML = '<tr><td colspan="4" class="muted">No invoices yet.</td></tr>'; }
+      else {
+        el.innerHTML = b.invoices.map(function (inv) {
+          var d = inv.date ? new Date(inv.date * 1000).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—";
+          var receipt = inv.url ? '<a class="link-btn" href="' + inv.url + '" target="_blank" rel="noopener">View</a>' : '<span class="muted">—</span>';
+          return "<tr><td>" + d + "</td><td>" + (inv.description || "Subscription") + "</td><td>" + money(inv.amount_cents) + "</td><td>" + receipt + "</td></tr>";
+        }).join("");
+      }
+    }
   }
 
   /* ================= NAV ================= */

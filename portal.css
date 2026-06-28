@@ -197,6 +197,7 @@
 .tag--paused { background: rgba(245,158,11,0.14); color: #b45309; }
 .tag--done { background: rgba(22,163,74,0.12); color: #16a34a; }
 .pause-note { margin: 0; padding: 10px 12px; background: var(--blue-soft); border: 1px solid var(--blue); border-radius: 10px; font-size: .9rem; color: var(--blue); text-align: center; font-weight: 600; }
+.pay-card { font-family: var(--font-display); font-weight: 600; letter-spacing: .02em; }
 
 /* ============ MODAL ============ */
 .modal { position: fixed; inset: 0; z-index: 500; display: grid; place-items: center; padding: 20px; }
