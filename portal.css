@@ -65,8 +65,9 @@
 .auth__newcard-list { list-style: none; padding: 0; margin: 0 auto 16px; text-align: left; display: inline-block; }
 .auth__newcard-list li { position: relative; padding-left: 26px; margin: 9px 0; font-size: .92rem; color: var(--ink-70); line-height: 1.4; }
 .auth__newcard-list li::before { content: ""; position: absolute; left: 6px; top: 3px; width: 6px; height: 11px; border-right: 2.5px solid var(--blue); border-bottom: 2.5px solid var(--blue); transform: rotate(45deg); }
-/* Make [hidden] win over .btn so hidden modal/action buttons truly disappear */
+/* Make [hidden] win over class display rules so hidden buttons/fields truly disappear */
 .btn[hidden] { display: none !important; }
+.field[hidden] { display: none !important; }
 
 /* ============ APP LAYOUT ============ */
 .app { display: grid; grid-template-columns: 264px 1fr; min-height: 100vh; }
