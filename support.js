@@ -48,7 +48,7 @@
     '<div class="cs-overlay" data-cs-overlay hidden>' +
     '  <div class="cs-modal" role="dialog" aria-modal="true">' +
     '    <div data-cs-form>' +
-    '      <div class="cs-head"><div><h3>Contact us</h3><p class="cs-sub">Goes straight to hello@curbcrews.com. We reply fast.</p></div>' +
+    '      <div class="cs-head"><div><h3>Contact us</h3><p class="cs-sub">hello@curbcrews.com &middot; we will respond as soon as possible.</p></div>' +
     '        <button class="cs-btn--ghost" data-cs-close aria-label="Close">&#10005;</button></div>' +
     '      <div class="cs-row">' +
     '        <label class="cs-field"><span>Your name</span><input type="text" data-cs-name placeholder="Jane Smith" /></label>' +
@@ -128,7 +128,7 @@
     '        <label class="cs-field"><span>Email</span><input type="email" data-op-email placeholder="you@email.com" /></label>' +
     '      </div>' +
     '      <div class="cs-row">' +
-    '        <label class="cs-field"><span>Phone</span><input type="tel" data-op-phone placeholder="(512) 555-0148" /></label>' +
+    '        <label class="cs-field"><span>Best number to reach you</span><input type="tel" data-op-phone placeholder="Your phone number" /></label>' +
     '        <label class="cs-field"><span>Your area / neighborhood</span><input type="text" data-op-area placeholder="Steiner Ranch, 78732" /></label>' +
     '      </div>' +
     '      <label class="cs-field"><span>Tell us about you</span><textarea data-op-message placeholder="Why you want to work with us, your availability, whether you have a vehicle, anything helpful..."></textarea></label>' +

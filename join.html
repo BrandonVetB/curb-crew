@@ -72,15 +72,9 @@
           <label class="field"><span>First name</span><input type="text" name="first_name" autocomplete="given-name" placeholder="Jane" /></label>
           <label class="field"><span>Last name</span><input type="text" name="last_name" autocomplete="family-name" placeholder="Smith" /></label>
           <label class="field"><span>Email</span><input type="email" name="email" autocomplete="email" placeholder="you@email.com" /></label>
-          <label class="field"><span>Phone</span><input type="tel" name="phone" autocomplete="tel" placeholder="(555) 555-5555" /></label>
+          <label class="field"><span>Phone</span><input type="tel" name="phone" autocomplete="tel" placeholder="Your mobile number" /></label>
           <label class="field field--wide"><span>Password</span><input type="password" name="password" autocomplete="new-password" placeholder="At least 8 characters" /></label>
           <label class="field field--wide"><span>Where exactly do the cans live? (side of house, behind fence, garage)</span><input type="text" name="can_return" placeholder="e.g. Left side of the house, behind the wooden gate" /></label>
-          <label class="field field--wide" style="display:flex;flex-direction:row;align-items:center;gap:8px"><input type="checkbox" data-cans-split style="width:auto" /> <span style="font-weight:500">My cans are kept in different spots</span></label>
-          <div data-cans-split-fields style="display:none;width:100%">
-            <label class="field field--wide"><span>Trash can location</span><input type="text" name="can_loc_trash" placeholder="e.g. Left side of the house" /></label>
-            <label class="field field--wide"><span>Recycling can location</span><input type="text" name="can_loc_recycling" placeholder="e.g. Behind the garage" /></label>
-            <label class="field field--wide"><span>Yard-waste can location</span><input type="text" name="can_loc_yard" placeholder="e.g. By the side gate" /></label>
-          </div>
           <label class="field"><span>Gate / community code (optional)</span><input type="text" name="gate_code" placeholder="e.g. #1234" /></label>
           <label class="field"><span>Garage code, if we go through it (optional)</span><input type="text" name="garage_code" placeholder="e.g. 5678" /></label>
           <label class="field field--wide"><span>Anything else the crew should know? (optional)</span><input type="text" name="access_notes" placeholder="Friendly dog in the yard, cans are heavy, etc." /></label>
@@ -121,6 +115,14 @@
         <div class="plan-total">
           <span>Your total</span>
           <strong data-total>$35<small>/mo</small></strong>
+        </div>
+
+        <p class="addons-label" style="margin-top:20px">Where your cans live</p>
+        <label class="field" style="display:flex;flex-direction:row;align-items:center;gap:8px"><input type="checkbox" data-cans-split style="width:auto" /> <span style="font-weight:500">My cans are kept in different spots</span></label>
+        <div data-cans-split-fields style="display:none">
+          <label data-canfield="trash" class="field field--wide"><span>Trash can location</span><input type="text" name="can_loc_trash" placeholder="e.g. Left side of the house" /></label>
+          <label data-canfield="recycling" class="field field--wide" hidden><span>Recycling can location</span><input type="text" name="can_loc_recycling" placeholder="e.g. Behind the garage" /></label>
+          <label data-canfield="yard" class="field field--wide" hidden><span>Yard-waste can location</span><input type="text" name="can_loc_yard" placeholder="e.g. By the side gate" /></label>
         </div>
 
         <p class="bulk-branch">Just need a one-time bulk or junk pickup instead? <a href="bulk.html">Get a bulk quote &rarr;</a></p>

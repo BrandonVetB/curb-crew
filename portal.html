@@ -222,6 +222,16 @@
         </div>
 
         <article class="card">
+          <p class="card__label">Manage add-ons</p>
+          <p class="card__muted" style="margin:-2px 0 14px">Add or remove services anytime. Changes are prorated on your next bill.</p>
+          <label class="addon"><input type="checkbox" data-addon="recycling" /><span class="addon__name">Recycling can</span><strong class="addon__price">+$8/mo</strong></label>
+          <label class="addon"><input type="checkbox" data-addon="yard" /><span class="addon__name">Yard-waste can</span><strong class="addon__price">+$8/mo</strong></label>
+          <label class="addon"><input type="checkbox" data-addon="cleaning" /><span class="addon__name">Monthly can cleaning</span><strong class="addon__price">+$25/mo</strong></label>
+          <div class="line line--total"><span>New monthly total</span><strong data-addon-total>$35.00</strong></div>
+          <div class="actions"><button class="btn" data-action="save-addons" data-addon-save disabled>Save changes</button></div>
+        </article>
+
+        <article class="card">
           <p class="card__label">Billing history</p>
           <table class="table">
             <thead><tr><th>Date</th><th>Description</th><th>Amount</th><th>Receipt</th></tr></thead>
@@ -282,7 +292,7 @@
       <h2 id="modal-title" data-modal-title>Confirm</h2>
       <div data-modal-body>Are you sure?</div>
       <div class="modal__actions">
-        <button class="btn btn--ghost" data-modal-close>Never mind</button>
+        <button class="btn btn--ghost" data-modal-close data-modal-cancelbtn>Never mind</button>
         <button class="btn btn--ghost" data-modal-secondary hidden></button>
         <button class="btn" data-modal-confirm>Confirm</button>
       </div>

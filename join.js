@@ -86,11 +86,17 @@
     });
   })();
 
-  // Per-can locations toggle
+  // Per-can locations: only show boxes for cans on the plan; update as add-ons change.
   (function () {
     var sp = form.querySelector("[data-cans-split]");
     var spf = form.querySelector("[data-cans-split-fields]");
-    if (sp && spf) sp.addEventListener("change", function () { spf.style.display = sp.checked ? "block" : "none"; });
+    function syncCanFields() {
+      var rf = form.querySelector('[data-canfield="recycling"]'); if (rf) rf.hidden = !checked("recycling");
+      var yf = form.querySelector('[data-canfield="yard"]'); if (yf) yf.hidden = !checked("yard");
+    }
+    if (sp && spf) sp.addEventListener("change", function () { spf.style.display = sp.checked ? "block" : "none"; syncCanFields(); });
+    $all("[data-addon]").forEach(function (a) { a.addEventListener("change", syncCanFields); });
+    syncCanFields();
   })();
 
   function setMsg(t, kind) { msg.textContent = t || ""; msg.className = "join__msg" + (kind ? " is-" + kind : ""); }

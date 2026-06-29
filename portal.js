@@ -98,7 +98,7 @@
         sb.from("service_events").select("*").eq("profile_id", uid).order("occurred_at", { ascending: false }).limit(5)
       ]).then(function (res) {
         var p = res[0].data || {}, addr = res[1].data, sub = res[2].data, pickups = res[3].data || [], invoices = res[4].data || [], events = res[5].data || [];
-        CURRENT.profile = p; CURRENT.addr = addr || {};
+        CURRENT.profile = p; CURRENT.addr = addr || {}; CURRENT.sub = sub || {};
         var name = p.full_name || (email ? email.split("@")[0] : "there");
 
         // identity
@@ -112,9 +112,14 @@
         bind("phone", p.phone || "Not set");
         bind("address", addr ? addr.line1 : "Not set");
         bind("city", addr ? [addr.city, addr.state, addr.zip].filter(Boolean).join(", ") : "Not set");
-        bind("can_return", (addr && addr.cans_split)
-          ? ["Trash: " + (addr.can_loc_trash || "—"), "Recycling: " + (addr.can_loc_recycling || "—"), "Yard: " + (addr.can_loc_yard || "—")].join(" · ")
-          : ((addr && addr.can_return_location) || "Not set"));
+        if (addr && addr.cans_split) {
+          var parts = ["Trash: " + (addr.can_loc_trash || "—")];
+          if (sub && sub.addon_recycling) parts.push("Recycling: " + (addr.can_loc_recycling || "—"));
+          if (sub && sub.addon_yard_waste) parts.push("Yard: " + (addr.can_loc_yard || "—"));
+          bind("can_return", parts.join(" · "));
+        } else {
+          bind("can_return", (addr && addr.can_return_location) || "Not set");
+        }
         bind("gate_code", (addr && addr.gate_code) || "Not set");
         bind("access_notes", (addr && addr.access_notes) || "None");
         bind("crew", "Assigning to your street");
@@ -149,6 +154,7 @@
       bind("plan_total", "$35.00");
       bind("next_charge", "Not billing yet");
       if (pillEl) { pillEl.textContent = "Inactive"; pillEl.className = "pill"; }
+      setAddonControls(null);
       return;
     }
     var addons = [];
@@ -185,6 +191,7 @@
       if (paused) { pnote.hidden = false; pnote.textContent = sub.pause_end ? ("Paused for vacation. Service resumes " + fmtDate(sub.pause_end) + ".") : "Your membership is on hold. Resume whenever you are ready."; }
       else pnote.hidden = true;
     }
+    setAddonControls(sub);
   }
 
   function renderNext(pk, sub) {
@@ -282,7 +289,7 @@
   });
 
   /* ================= MODAL + ACTIONS ================= */
-  var modal = $("[data-modal]"), modalTitle = $("[data-modal-title]"), modalBody = $("[data-modal-body]"), modalConfirm = $("[data-modal-confirm]"), modalSecondary = $("[data-modal-secondary]");
+  var modal = $("[data-modal]"), modalTitle = $("[data-modal-title]"), modalBody = $("[data-modal-body]"), modalConfirm = $("[data-modal-confirm]"), modalSecondary = $("[data-modal-secondary]"), modalCancel = $("[data-modal-cancelbtn]");
   var pending = null, pendingSecondary = null;
   function openModal(o) {
     modalTitle.textContent = o.title || "";
@@ -290,6 +297,7 @@
     modalConfirm.textContent = o.confirmLabel || "Confirm";
     modalConfirm.classList.toggle("btn--danger-ghost", !!o.danger);
     pending = o.onConfirm || null;
+    if (modalCancel) { modalCancel.textContent = o.cancelLabel || "Never mind"; modalCancel.hidden = !!o.hideCancel; }
     if (o.secondaryLabel) { modalSecondary.textContent = o.secondaryLabel; modalSecondary.hidden = false; modalSecondary.classList.toggle("btn--danger-ghost", !!o.secondaryDanger); pendingSecondary = o.onSecondary || null; }
     else { modalSecondary.hidden = true; pendingSecondary = null; }
     modal.hidden = false;
@@ -325,9 +333,52 @@
     });
   }
 
+  function planLabel() {
+    var s = CURRENT.sub || {};
+    if (!s.status || s.status === "pending") return "Curb Crews";
+    var addons = [];
+    if (s.addon_recycling) addons.push("Recycling");
+    if (s.addon_yard_waste) addons.push("Yard-waste");
+    if (s.addon_cleaning) addons.push("Cleaning");
+    return "Curb Crews" + (addons.length ? " + " + addons.join(" + ") : "");
+  }
+  function showRetentionOffer() {
+    openModal({
+      title: "Before you go: 3 months of recycling, free?",
+      html: '<p style="margin-bottom:10px;color:var(--ink-70)">We would hate to see you go. Stay with us and your recycling pickup is <strong>free for 3 months</strong> (a $24 value), credited to your bills automatically.</p>'
+        + '<p style="color:var(--ink-70)">Or cancel anyway, no contract and no fee. Your service runs through the period you have already paid for.</p>',
+      confirmLabel: "Keep my plan",
+      hideCancel: true,
+      onConfirm: function () { callManage("recycling_offer", null, "Done. 3 months of free recycling applied."); },
+      secondaryLabel: "Cancel anyway",
+      secondaryDanger: true,
+      onSecondary: function () { callManage("cancel", null, "Your plan will cancel at the end of the period."); }
+    });
+  }
+
+  /* ---- Manage add-ons ---- */
+  var ADDON_CENTS = { recycling: 800, yard: 800, cleaning: 2500 };
+  function refreshAddonTotal() {
+    var total = 3500;
+    $all("[data-addon]").forEach(function (cb) { if (cb.checked) total += ADDON_CENTS[cb.getAttribute("data-addon")] || 0; });
+    var t = $("[data-addon-total]"); if (t) t.textContent = money(total);
+    var s = CURRENT.sub || {};
+    var cur = { recycling: !!s.addon_recycling, yard: !!s.addon_yard_waste, cleaning: !!s.addon_cleaning };
+    var changed = false;
+    $all("[data-addon]").forEach(function (cb) { if (cb.checked !== cur[cb.getAttribute("data-addon")]) changed = true; });
+    var sv = $("[data-addon-save]"); if (sv) sv.disabled = !changed;
+  }
+  function setAddonControls(sub) {
+    var s = sub || {};
+    var map = { recycling: !!s.addon_recycling, yard: !!s.addon_yard_waste, cleaning: !!s.addon_cleaning };
+    $all("[data-addon]").forEach(function (cb) { cb.checked = !!map[cb.getAttribute("data-addon")]; });
+    refreshAddonTotal();
+  }
+  document.addEventListener("change", function (e) { if (e.target && e.target.matches && e.target.matches("[data-addon]")) refreshAddonTotal(); });
+
   var ACCT_DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   function acctFieldsHTML() {
-    var p = CURRENT.profile || {}, a = CURRENT.addr || {};
+    var p = CURRENT.profile || {}, a = CURRENT.addr || {}, s = CURRENT.sub || {};
     function f(label, key, val, ph) {
       return '<label class="acct-field"><span>' + label + '</span><input data-ef="' + key + '" value="' + (val == null ? "" : String(val).replace(/"/g, "&quot;")) + '" placeholder="' + (ph || "") + '"></label>';
     }
@@ -345,8 +396,8 @@
       + '<label class="acct-field" style="grid-column:1 / -1;flex-direction:row;align-items:center;gap:8px"><input type="checkbox" data-ef-split style="width:auto"' + (a.cans_split ? " checked" : "") + ' /> <span>My cans are kept in different spots</span></label>'
       + '<div data-ef-split-fields style="grid-column:1 / -1;display:' + (a.cans_split ? "grid" : "none") + ';gap:14px">'
       + f("Trash can location", "can_loc_trash", a.can_loc_trash, "")
-      + f("Recycling can location", "can_loc_recycling", a.can_loc_recycling, "")
-      + f("Yard-waste can location", "can_loc_yard", a.can_loc_yard, "")
+      + (s.addon_recycling ? f("Recycling can location", "can_loc_recycling", a.can_loc_recycling, "") : "")
+      + (s.addon_yard_waste ? f("Yard-waste can location", "can_loc_yard", a.can_loc_yard, "") : "")
       + '</div>'
       + f("Gate / community code", "gate_code", a.gate_code, "optional")
       + f("Garage code", "garage_code", a.garage_code, "optional")
@@ -405,14 +456,34 @@
     },
     cancel: function () {
       openModal({
-        title: "Before you go: 3 months of recycling, free?",
-        html: '<p style="margin-bottom:10px;color:var(--ink-70)">We would hate to see you go. Stay with us and your recycling pickup is <strong>free for 3 months</strong> (a $24 value), credited to your bills automatically.</p>'
-          + '<p style="color:var(--ink-70)">Or cancel anyway, no contract and no fee. Your service runs through the period you have already paid for.</p>',
-        confirmLabel: "Keep my plan",
-        onConfirm: function () { callManage("recycling_offer", null, "Done. 3 months of free recycling applied."); },
-        secondaryLabel: "Cancel anyway",
-        secondaryDanger: true,
-        onSecondary: function () { callManage("cancel", null, "Your plan will cancel at the end of the period."); }
+        title: "Cancel your subscription?",
+        html: '<p style="color:var(--ink-70)">You are about to cancel your <strong>' + planLabel() + '</strong> plan'
+          + (CURRENT.sub && CURRENT.sub.monthly_total_cents ? ' (' + money(CURRENT.sub.monthly_total_cents) + '/month)' : '') + '.'
+          + ' Your service stays active through the period you have already paid for, then stops. No contract, no cancellation fee.</p>',
+        confirmLabel: "Continue to cancel",
+        danger: true,
+        cancelLabel: "Keep my plan",
+        onConfirm: function () { setTimeout(showRetentionOffer, 0); }
+      });
+    },
+    "save-addons": function () {
+      var want = {};
+      $all("[data-addon]").forEach(function (cb) { want[cb.getAttribute("data-addon")] = cb.checked; });
+      var sv = $("[data-addon-save]"); if (sv) sv.disabled = true;
+      // No live subscription yet: send them to checkout with these add-ons selected.
+      if (!CURRENT.sub || !CURRENT.sub.stripe_subscription_id) {
+        showToast("Starting secure checkout...");
+        callFn("create-checkout-session", { addons: want }).then(function (r2) {
+          if (r2.data && r2.data.url) { window.location.href = r2.data.url; } else { showToast("Could not start checkout. Try again."); if (sv) sv.disabled = false; }
+        });
+        return;
+      }
+      showToast("Updating your plan...");
+      callFn("manage-subscription", { action: "update_addons", addons: want }).then(function (res) {
+        var d = res && res.data;
+        if (res.error || !d || d.error) { showToast("Could not update your plan. Please try again."); if (sv) sv.disabled = false; return; }
+        showToast("Plan updated. Changes are prorated on your next bill.");
+        loadData();
       });
     },
     pause: function () {

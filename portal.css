@@ -180,6 +180,11 @@
 .addon-row div { display: flex; flex-direction: column; }
 .addon-row span { color: var(--ink-50); font-size: 0.86rem; }
 .addon-row--on strong { color: var(--black); }
+.addon { display: flex; align-items: center; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--line); cursor: pointer; }
+.addon:last-of-type { border-bottom: none; }
+.addon input { width: 20px; height: 20px; accent-color: var(--blue); flex: none; cursor: pointer; }
+.addon__name { flex: 1; }
+.addon__price { color: var(--ink-60); font-weight: 600; white-space: nowrap; }
 
 .pay { display: flex; align-items: center; gap: 14px; font-family: var(--font-display); font-size: 1.05rem; margin-top: 4px; }
 .pay__brand { background: var(--black); color: #fff; font-weight: 700; font-size: 12px; padding: 5px 9px; border-radius: 6px; letter-spacing: 0.05em; }
