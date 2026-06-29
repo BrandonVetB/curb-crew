@@ -245,6 +245,33 @@
     msg.textContent = text; msg.className = "address-form__msg is-error";
     if (!REDUCED && hasGSAP) gsap.fromTo(form, { x: -6 }, { x: 0, duration: 0.4, ease: "elastic.out(1,0.4)" });
   }
+  function fireConfetti() {
+    try {
+      var c = document.createElement("canvas");
+      c.style.cssText = "position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:100000";
+      document.body.appendChild(c);
+      var ctx = c.getContext("2d");
+      var W = c.width = window.innerWidth, H = c.height = window.innerHeight;
+      var colors = ["#0066FF", "#22C55E", "#FFD23F", "#FF5DA2", "#7C3AED", "#FFFFFF"];
+      var parts = [];
+      for (var i = 0; i < 150; i++) {
+        parts.push({ x: W / 2 + (Math.random() - 0.5) * 140, y: H * 0.4, vx: (Math.random() - 0.5) * 15, vy: -9 - Math.random() * 11, g: 0.28 + Math.random() * 0.12, size: 5 + Math.random() * 6, color: colors[(Math.random() * colors.length) | 0], rot: Math.random() * 6.28, vr: (Math.random() - 0.5) * 0.4 });
+      }
+      var start = Date.now(), DUR = 2600;
+      (function frame() {
+        var t = Date.now() - start;
+        ctx.clearRect(0, 0, W, H);
+        parts.forEach(function (p) {
+          p.vy += p.g; p.x += p.vx; p.y += p.vy; p.vx *= 0.99; p.rot += p.vr;
+          ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+          ctx.globalAlpha = Math.max(0, 1 - t / DUR); ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6); ctx.restore();
+        });
+        if (t < DUR) requestAnimationFrame(frame); else c.remove();
+      })();
+    } catch (e) {}
+  }
+
   $all("[data-address-form]").forEach(function (form) {
     var msg = $("[data-form-msg]", form);
     var get = function (sel) { var el = form.querySelector(sel); return el ? el.value.trim() : ""; };
