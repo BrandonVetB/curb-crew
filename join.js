@@ -16,6 +16,9 @@
   function $(s, c) { return (c || document).querySelector(s); }
   function $all(s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); }
 
+  var SESSION_ID = (function () { try { var k = "cc_sess", s = sessionStorage.getItem(k); if (!s) { s = Math.random().toString(36).slice(2) + Date.now().toString(36); sessionStorage.setItem(k, s); } return s; } catch (e) { return null; } })();
+  function track(event, props) { try { sb.from("analytics_events").insert({ event: event, session_id: SESSION_ID, page: "signup", props: props || null, user_agent: navigator.userAgent }); } catch (e) {} }
+
   var form = $("[data-onboard]");
   var nextBtn = $("[data-next]");
   var backBtn = $("[data-back]");
@@ -32,6 +35,17 @@
   function val(name) { var el = form.querySelector('[name="' + name + '"]'); return el ? el.value.trim() : ""; }
   function checked(name) { var el = form.querySelector('[name="' + name + '"]'); return !!(el && el.checked); }
   function money(c) { return "$" + (c / 100).toFixed(0); }
+
+  // Recycling runs every other week. Map the This/Next choice to an absolute
+  // alternating-week letter (A = even week since epoch, B = odd). This anchor
+  // never drifts. The OS scheduler rolls recycling on weeks whose parity matches.
+  function recycleWeekLetter() {
+    var sel = form.querySelector('[name="recycle_week"]:checked');
+    if (!sel) return null;
+    var parity = Math.floor(Date.now() / (7 * 86400000)) % 2; // 0 even, 1 odd (this week)
+    var thisLetter = parity === 0 ? "A" : "B";
+    return sel.value === "this" ? thisLetter : (thisLetter === "A" ? "B" : "A");
+  }
 
   function totalCents() {
     var t = BASE;
@@ -93,6 +107,7 @@
     function syncCanFields() {
       var rf = form.querySelector('[data-canfield="recycling"]'); if (rf) rf.hidden = !checked("recycling");
       var yf = form.querySelector('[data-canfield="yard"]'); if (yf) yf.hidden = !checked("yard");
+      var rw = form.querySelector("[data-recycle-week-wrap]"); if (rw) rw.hidden = !checked("recycling");
     }
     if (sp && spf) sp.addEventListener("change", function () { spf.style.display = sp.checked ? "block" : "none"; syncCanFields(); });
     $all("[data-addon]").forEach(function (a) { a.addEventListener("change", syncCanFields); });
@@ -181,8 +196,8 @@
       nextBtn.disabled = true; setMsg("Checking your area...");
       checkServed(val("zip")).then(function (served) {
         nextBtn.disabled = false; setMsg("");
-        if (served) { showStep(2); }
-        else { recordWaitlist("coverage_block"); showWaitlist(); }
+        if (served) { track("signup_zip_served", { zip: val("zip") }); showStep(2); }
+        else { track("signup_zip_blocked", { zip: val("zip") }); recordWaitlist("coverage_block"); showWaitlist(); }
       });
       return;
     }
@@ -197,6 +212,7 @@
     var msgEl = $("[data-waitlist-msg]");
     if (em.indexOf("@") === -1) { if (msgEl) { msgEl.textContent = "Enter a valid email."; msgEl.className = "join__msg is-error"; } return; }
     wlBtn.disabled = true;
+    track("waitlist_join", { zip: val("zip") });
     recordWaitlist("waitlist_email", { email: em }).then(function () {
       var wl = $("[data-waitlist]");
       if (wl) wl.innerHTML = '<div style="text-align:center;padding:10px 0"><h2 class="join__h2">You are on the list</h2><p class="step-sub">We will email you the moment Curb Crews reaches your area. Thanks for your interest.</p></div>';
@@ -239,7 +255,8 @@
             cans_split: !!((form.querySelector("[data-cans-split]") || {}).checked),
             can_loc_trash: val("can_loc_trash") || null, can_loc_recycling: val("can_loc_recycling") || null, can_loc_yard: val("can_loc_yard") || null,
             gate_code: val("gate_code"), garage_code: val("garage_code"), access_notes: val("access_notes"),
-            collection_week: SCHED.collection_week, schedule_source: SCHED.schedule_source || "self_reported",
+            collection_week: (checked("recycling") && recycleWeekLetter()) || SCHED.collection_week,
+            schedule_source: SCHED.schedule_source || "self_reported",
             is_primary: true, is_prospect: false
           }),
           sb.from("leads").insert(leadRow)
@@ -252,6 +269,7 @@
               nextBtn.disabled = false;
               return setMsg("Your account is created, but checkout could not start. Sign in to add payment.", "error");
             }
+            track("checkout_start", { recycling: checked("recycling"), yard: checked("yard"), cleaning: checked("cleaning") });
             window.location.href = res.data.url;
           });
         });
@@ -282,4 +300,5 @@
 
   showStep(1);
   refreshTotal();
+  track("signup_start");
 })();

@@ -234,6 +234,8 @@
       }).catch(function () {});
     } catch (e) {}
   }
+  var SESSION_ID = (function () { try { var k = "cc_sess", s = sessionStorage.getItem(k); if (!s) { s = Math.random().toString(36).slice(2) + Date.now().toString(36); sessionStorage.setItem(k, s); } return s; } catch (e) { return null; } })();
+  function track(event, props) { try { saveLead({ event: event, session_id: SESSION_ID, page: "homepage", props: props || null, user_agent: navigator.userAgent }, "analytics_events"); } catch (e) {} }
   function checkServedZip(zip) {
     return fetch(SUPABASE_URL + "/rest/v1/served_zips?select=zip&active=eq.true&zip=eq." + encodeURIComponent(zip), {
       headers: { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY }
@@ -262,6 +264,7 @@
         var lead = { name: name, email: email, zip: zip, address: address || null, source: "coverage_check" };
         if (served) {
           saveLead(lead, "leads");
+          track("coverage_check_served", { zip: zip });
           msg.textContent = "Great news, we serve " + zip + "! Taking you to sign up...";
           msg.className = "address-form__msg is-success";
           if (typeof fireConfetti === "function") fireConfetti();
@@ -269,6 +272,7 @@
           setTimeout(function () { window.location.href = "join.html" + q; }, 900);
         } else {
           saveLead(lead, "waitlist");
+          track("coverage_check_blocked", { zip: zip });
           msg.innerHTML = "We are not in " + zip + " yet, but you are on the list. We will reach out the moment we expand to your street. <a href=\"#\" onclick=\"return window.openSupport ? (window.openSupport(), false) : false\" style=\"text-decoration:underline\">Contact us</a> with any questions.";
           msg.className = "address-form__msg is-success";
         }

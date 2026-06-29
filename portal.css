@@ -180,11 +180,13 @@
 .addon-row div { display: flex; flex-direction: column; }
 .addon-row span { color: var(--ink-50); font-size: 0.86rem; }
 .addon-row--on strong { color: var(--black); }
-.addon { display: flex; align-items: center; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--line); cursor: pointer; }
+.addon { display: flex; align-items: center; gap: 14px; padding: 14px 10px; border-bottom: 1px solid var(--line); cursor: pointer; border-radius: 10px; }
+.addon:hover { background: var(--wash, rgba(0,102,255,0.04)); }
 .addon:last-of-type { border-bottom: none; }
-.addon input { width: 20px; height: 20px; accent-color: var(--blue); flex: none; cursor: pointer; }
+.addon input { width: 20px; height: 20px; accent-color: var(--blue); flex: none; cursor: pointer; margin-left: 4px; }
 .addon__name { flex: 1; }
 .addon__price { color: var(--ink-60); font-weight: 600; white-space: nowrap; }
+.gift-badge { display: inline-block; background: linear-gradient(135deg, #0066FF, #22C55E); color: #fff; font-family: var(--font-display); font-weight: 700; letter-spacing: 0.04em; font-size: 1.15rem; padding: 11px 20px; border-radius: 999px; box-shadow: 0 10px 24px rgba(0,102,255,0.32); }
 
 .pay { display: flex; align-items: center; gap: 14px; font-family: var(--font-display); font-size: 1.05rem; margin-top: 4px; }
 .pay__brand { background: var(--black); color: #fff; font-weight: 700; font-size: 12px; padding: 5px 9px; border-radius: 6px; letter-spacing: 0.05em; }

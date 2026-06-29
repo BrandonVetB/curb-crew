@@ -9,9 +9,16 @@
   var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   var CURRENT = { profile: {}, addr: {} };
 
+  // ---- lightweight analytics ----
+  var SESSION_ID = (function () { try { var k = "cc_sess", s = sessionStorage.getItem(k); if (!s) { s = Math.random().toString(36).slice(2) + Date.now().toString(36); sessionStorage.setItem(k, s); } return s; } catch (e) { return null; } })();
+  function track(event, props) {
+    try { sb.from("analytics_events").insert({ event: event, profile_id: (CURRENT.profile && CURRENT.profile.id) || null, session_id: SESSION_ID, page: "portal", props: props || null, user_agent: navigator.userAgent }); } catch (e) {}
+  }
+
   function $(s, c) { return (c || document).querySelector(s); }
   function $all(s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); }
   function money(cents) { return cents == null ? "$0" : "$" + (cents / 100).toFixed(2); }
+  function curWeekLetter() { return (Math.floor(Date.now() / (7 * 86400000)) % 2) === 0 ? "A" : "B"; }
   function bind(key, val) { var el = $('[data-bind="' + key + '"]'); if (el) el.textContent = val; }
   function bindHTML(key, html) { var el = $('[data-bind="' + key + '"]'); if (el) el.innerHTML = html; }
 
@@ -343,17 +350,48 @@
     return "Curb Crews" + (addons.length ? " + " + addons.join(" + ") : "");
   }
   function showRetentionOffer() {
+    track("cancel_offer_shown");
     openModal({
-      title: "Before you go: 3 months of recycling, free?",
-      html: '<p style="margin-bottom:10px;color:var(--ink-70)">We would hate to see you go. Stay with us and your recycling pickup is <strong>free for 3 months</strong> (a $24 value), credited to your bills automatically.</p>'
-        + '<p style="color:var(--ink-70)">Or cancel anyway, no contract and no fee. Your service runs through the period you have already paid for.</p>',
-      confirmLabel: "Keep my plan",
+      title: "🎁 A gift, just for you",
+      html: '<div style="text-align:center">'
+        + '<div class="gift-badge">3 MONTHS FREE</div>'
+        + '<p style="margin:16px 0 8px;color:var(--ink-80);font-size:1.05rem">Your <strong>recycling pickup is on us</strong> for the next 3 months, a <strong>$24 value</strong>, credited to your bills automatically.</p>'
+        + '<p style="color:var(--ink-60);font-size:.92rem">No catch and no contract. Stay with us and keep trash day handled.</p></div>',
+      confirmLabel: "Claim my 3 months free",
       hideCancel: true,
-      onConfirm: function () { callManage("recycling_offer", null, "Done. 3 months of free recycling applied."); },
-      secondaryLabel: "Cancel anyway",
+      onConfirm: function () { track("cancel_offer_accepted"); callManage("recycling_offer", null, "Enjoy! 3 months of free recycling is on your account."); },
+      secondaryLabel: "No thanks, cancel anyway",
       secondaryDanger: true,
-      onSecondary: function () { callManage("cancel", null, "Your plan will cancel at the end of the period."); }
+      onSecondary: function () { track("cancel_confirmed"); callManage("cancel", null, "Your plan will cancel at the end of the period."); }
     });
+    fireConfetti();
+  }
+
+  function fireConfetti() {
+    try {
+      var c = document.createElement("canvas");
+      c.style.cssText = "position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:100000";
+      document.body.appendChild(c);
+      var ctx = c.getContext("2d");
+      var W = c.width = window.innerWidth, H = c.height = window.innerHeight;
+      var colors = ["#0066FF", "#22C55E", "#FFD23F", "#FF5DA2", "#7C3AED", "#FFFFFF"];
+      var parts = [];
+      for (var i = 0; i < 150; i++) {
+        parts.push({ x: W / 2 + (Math.random() - 0.5) * 140, y: H * 0.4, vx: (Math.random() - 0.5) * 15, vy: -9 - Math.random() * 11, g: 0.28 + Math.random() * 0.12, size: 5 + Math.random() * 6, color: colors[(Math.random() * colors.length) | 0], rot: Math.random() * 6.28, vr: (Math.random() - 0.5) * 0.4 });
+      }
+      var start = Date.now(), DUR = 2600;
+      (function frame() {
+        var t = Date.now() - start;
+        ctx.clearRect(0, 0, W, H);
+        parts.forEach(function (p) {
+          p.vy += p.g; p.x += p.vx; p.y += p.vy; p.vx *= 0.99; p.rot += p.vr;
+          ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+          ctx.globalAlpha = Math.max(0, 1 - t / DUR); ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6); ctx.restore();
+        });
+        if (t < DUR) requestAnimationFrame(frame); else c.remove();
+      })();
+    } catch (e) {}
   }
 
   /* ---- Manage add-ons ---- */
@@ -386,12 +424,19 @@
       var opts = ACCT_DAYS.map(function (d) { return '<option' + (d === val ? " selected" : "") + ">" + d + "</option>"; }).join("");
       return '<label class="acct-field"><span>' + label + '</span><select data-ef="' + key + '">' + opts + '</select></label>';
     }
+    function frecycle(val) {
+      var cur = curWeekLetter(), isThis = (val || cur) === cur;
+      return '<label class="acct-field"><span>Recycling week (every other week)</span><select data-ef="recycle_week">'
+        + '<option value="this"' + (isThis ? " selected" : "") + '>This week</option>'
+        + '<option value="next"' + (!isThis ? " selected" : "") + '>Next week</option></select></label>';
+    }
     return '<div class="acct-edit-grid">'
       + f("Full name", "name", p.full_name, "")
       + f("Phone", "phone", p.phone, "")
       + f("Street address", "line1", a.line1, "123 Maple St")
       + f("ZIP", "zip", a.zip, "")
       + fday("Trash pickup day", "pickup_day", a.pickup_day)
+      + (s.addon_recycling ? frecycle(a.collection_week) : "")
       + f("Where the cans live (default)", "can_return_location", a.can_return_location, "Left side, behind the gate")
       + '<label class="acct-field" style="grid-column:1 / -1;flex-direction:row;align-items:center;gap:8px"><input type="checkbox" data-ef-split style="width:auto"' + (a.cans_split ? " checked" : "") + ' /> <span>My cans are kept in different spots</span></label>'
       + '<div data-ef-split-fields style="grid-column:1 / -1;display:' + (a.cans_split ? "grid" : "none") + ';gap:14px">'
@@ -423,6 +468,8 @@
       var uid = u.data.user && u.data.user.id; if (!uid) { showToast("Please sign in again."); return; }
       var splitEl = root.querySelector("[data-ef-split]");
     var addrFields = { line1: g("line1"), zip: g("zip"), pickup_day: newDay, can_return_location: g("can_return_location"), cans_split: !!(splitEl && splitEl.checked), can_loc_trash: g("can_loc_trash") || null, can_loc_recycling: g("can_loc_recycling") || null, can_loc_yard: g("can_loc_yard") || null, gate_code: g("gate_code"), garage_code: g("garage_code"), access_notes: g("access_notes") };
+      var recSel = root.querySelector('[data-ef="recycle_week"]');
+      if (recSel) { var cw = curWeekLetter(); addrFields.collection_week = recSel.value === "this" ? cw : (cw === "A" ? "B" : "A"); }
       var aP = (CURRENT.addr && CURRENT.addr.id)
         ? sb.from("service_addresses").update(addrFields).eq("id", CURRENT.addr.id).select()
         : sb.from("service_addresses").insert(Object.assign({ profile_id: uid, is_primary: true, is_prospect: false }, addrFields)).select();
@@ -442,6 +489,7 @@
 
   var ACTIONS = {
     payment: function () {
+      track("payment_opened");
       showToast("Opening secure billing...");
       callFn("create-billing-portal-session").then(function (res) {
         if (res.data && res.data.url) { window.location.href = res.data.url; return; }
@@ -455,6 +503,7 @@
       });
     },
     cancel: function () {
+      track("cancel_click");
       openModal({
         title: "Cancel your subscription?",
         html: '<p style="color:var(--ink-70)">You are about to cancel your <strong>' + planLabel() + '</strong> plan'
@@ -482,6 +531,7 @@
       callFn("manage-subscription", { action: "update_addons", addons: want }).then(function (res) {
         var d = res && res.data;
         if (res.error || !d || d.error) { showToast("Could not update your plan. Please try again."); if (sv) sv.disabled = false; return; }
+        track("addon_update", want);
         showToast("Plan updated. Changes are prorated on your next bill.");
         loadData();
       });
@@ -498,17 +548,17 @@
           var d = modalBody.querySelector("[data-pause-date]");
           var rd = d && d.value;
           if (!rd) { showToast("Pick a return date."); return false; }
-          callManage("pause", { resume_date: rd }, "Service paused. We resume on " + fmtDate(rd) + ".");
+          track("pause"); callManage("pause", { resume_date: rd }, "Service paused. We resume on " + fmtDate(rd) + ".");
         }
       });
     },
-    resume: function () { callManage("resume", null, "Welcome back. Service resumed."); },
+    resume: function () { track("resume"); callManage("resume", null, "Welcome back. Service resumed."); },
     hold: function () {
       openModal({
         title: "Put your membership on hold?",
         html: '<p style="margin-bottom:10px;color:var(--ink-70)">This stops your billing right away, we will not charge you again until you choose to resume. Your pickups pause with no end date, so it is perfect if you are not sure when you will be back.</p><p style="color:var(--ink-70)">You can resume anytime from this page.</p>',
         confirmLabel: "Hold my membership",
-        onConfirm: function () { callManage("hold", null, "Your membership is on hold. Billing is stopped until you resume."); }
+        onConfirm: function () { track("hold"); callManage("hold", null, "Your membership is on hold. Billing is stopped until you resume."); }
       });
     },
     receipt: function () { ACTIONS.payment(); },

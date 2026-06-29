@@ -96,7 +96,7 @@
         <label class="addon-toggle">
           <input type="checkbox" data-addon data-key="recycling" data-price="8" name="recycling" />
           <span class="addon-toggle__box" aria-hidden="true"></span>
-          <span class="addon-toggle__name">Recycling can</span>
+          <span class="addon-toggle__name">Recycling can <span style="opacity:.55;font-weight:500">&middot; every other week</span></span>
           <span class="addon-toggle__price">+$8/mo</span>
         </label>
         <label class="addon-toggle">
@@ -115,6 +115,15 @@
         <div class="plan-total">
           <span>Your total</span>
           <strong data-total>$35<small>/mo</small></strong>
+        </div>
+
+        <div data-recycle-week-wrap hidden style="margin-top:20px">
+          <p class="addons-label">Which week is your recycling collected?</p>
+          <div style="display:flex;gap:18px;margin-top:2px">
+            <label class="field" style="flex-direction:row;align-items:center;gap:7px;margin:0"><input type="radio" name="recycle_week" value="this" style="width:auto" /> <span style="font-weight:500">This week</span></label>
+            <label class="field" style="flex-direction:row;align-items:center;gap:7px;margin:0"><input type="radio" name="recycle_week" value="next" style="width:auto" /> <span style="font-weight:500">Next week</span></label>
+          </div>
+          <p class="step-sub" style="margin-top:6px">Recycling runs every other week. Tell us which week yours goes out so we only roll it on the right weeks.</p>
         </div>
 
         <p class="addons-label" style="margin-top:20px">Where your cans live</p>
