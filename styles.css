@@ -216,6 +216,15 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .address-form input::placeholder { color: var(--ink-50); }
 .address-form input:focus { outline: none; }
 .address-form__msg { min-height: 22px; margin-top: 12px; font-size: 14px; font-weight: 600; padding-left: 8px; }
+.address-form__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.address-form__grid input { font: inherit; font-size: 15px; padding: 14px 16px; border: 1px solid var(--line-strong); border-radius: 14px; background: var(--white); color: var(--black); width: 100%; box-sizing: border-box; }
+.address-form__grid input::placeholder { color: var(--ink-50); }
+.address-form__grid input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px var(--blue-soft); }
+.address-form__grid .btn { grid-column: 1 / -1; width: 100%; }
+.address-form--light .address-form__grid input { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.4); color: var(--white); }
+.address-form--light .address-form__grid input::placeholder { color: rgba(255,255,255,0.78); }
+.address-form--light .address-form__grid input:focus { border-color: var(--white); box-shadow: 0 0 0 4px rgba(255,255,255,0.25); }
+@media (max-width: 560px) { .address-form__grid { grid-template-columns: 1fr; } }
 .address-form__msg.is-success { color: var(--blue); }
 .address-form__msg.is-error { color: #d61f3a; }
 

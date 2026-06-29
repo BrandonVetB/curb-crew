@@ -86,18 +86,12 @@
           </p>
 
           <form class="address-form reveal" data-address-form novalidate>
-            <label class="visually-hidden" for="hero-address">Your address or ZIP code</label>
-            <div class="address-form__row">
-              <input
-                id="hero-address"
-                type="text"
-                name="address"
-                inputmode="text"
-                autocomplete="street-address"
-                placeholder="Enter your address or ZIP"
-                required
-              />
-              <button type="submit" class="btn magnetic">Get started</button>
+            <div class="address-form__grid">
+              <input type="text" data-lf-name autocomplete="name" placeholder="Your name" />
+              <input type="email" data-lf-email autocomplete="email" placeholder="Email" />
+              <input type="text" data-lf-zip inputmode="numeric" maxlength="10" autocomplete="postal-code" placeholder="ZIP code" />
+              <input type="text" data-lf-address autocomplete="street-address" placeholder="Street address (optional)" />
+              <button type="submit" class="btn magnetic">Check availability</button>
             </div>
             <p class="address-form__msg" data-form-msg role="status" aria-live="polite"></p>
           </form>
@@ -372,17 +366,12 @@
         <p class="final-cta__sub">Enter your address. We'll tell you in seconds, or save your spot on the waitlist.</p>
 
         <form class="address-form address-form--light" data-address-form novalidate>
-          <label class="visually-hidden" for="final-address">Your address or ZIP code</label>
-          <div class="address-form__row">
-            <input
-              id="final-address"
-              type="text"
-              name="address"
-              autocomplete="street-address"
-              placeholder="Enter your address or ZIP"
-              required
-            />
-            <button type="submit" class="btn btn--invert magnetic">Get started</button>
+          <div class="address-form__grid">
+            <input type="text" data-lf-name autocomplete="name" placeholder="Your name" />
+            <input type="email" data-lf-email autocomplete="email" placeholder="Email" />
+            <input type="text" data-lf-zip inputmode="numeric" maxlength="10" autocomplete="postal-code" placeholder="ZIP code" />
+            <input type="text" data-lf-address autocomplete="street-address" placeholder="Street address (optional)" />
+            <button type="submit" class="btn btn--invert magnetic">Check availability</button>
           </div>
           <p class="address-form__msg" data-form-msg role="status" aria-live="polite"></p>
         </form>

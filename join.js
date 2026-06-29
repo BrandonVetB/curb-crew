@@ -262,6 +262,16 @@
       if (z) { var zEl = form.querySelector('[name="zip"]'); if (zEl) zEl.value = z; }
       runScheduleLookup();
     }
+    var qZip = qp.get("zip");
+    if (qZip) { var zEl2 = form.querySelector('[name="zip"]'); if (zEl2 && !zEl2.value) zEl2.value = qZip; }
+    var qName = qp.get("name");
+    if (qName) {
+      var parts = qName.trim().split(/\s+/);
+      var fnEl = form.querySelector('[name="first_name"]'); if (fnEl) fnEl.value = parts.shift() || "";
+      var lnEl = form.querySelector('[name="last_name"]'); if (lnEl) lnEl.value = parts.join(" ");
+    }
+    var qEmail = qp.get("email");
+    if (qEmail) { var emEl = form.querySelector('[name="email"]'); if (emEl) emEl.value = qEmail; }
   } catch (e) {}
 
   showStep(1);

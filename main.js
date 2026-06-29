@@ -216,52 +216,54 @@
   var SUPABASE_URL = "https://hezahtnfyhqfucixzqxi.supabase.co";
   var SUPABASE_KEY = "sb_publishable_9l4_Bqgjg7qBapvYlLPJSA_pHOk0nMB";
 
-  function captureLead(raw) {
-    var zip = (raw.match(/\b\d{5}\b/) || [null])[0];
+  function saveLead(data, table) {
     try {
-      fetch(SUPABASE_URL + "/rest/v1/leads", {
+      fetch(SUPABASE_URL + "/rest/v1/" + table, {
         method: "POST",
-        headers: {
-          "apikey": SUPABASE_KEY,
-          "Authorization": "Bearer " + SUPABASE_KEY,
-          "Content-Type": "application/json",
-          "Prefer": "return=minimal"
-        },
-        body: JSON.stringify({
-          raw_input: raw,
-          zip: zip,
-          source: "homepage",
-          user_agent: navigator.userAgent
-        })
+        headers: { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY, "Content-Type": "application/json", "Prefer": "return=minimal" },
+        body: JSON.stringify(data)
       }).catch(function () {});
     } catch (e) {}
   }
-
-  function isValidEntry(v) {
-    v = v.trim();
-    if (/^\d{5}(-\d{4})?$/.test(v)) return true;      // ZIP
-    if (v.length >= 6 && /\d/.test(v) && /[a-zA-Z]/.test(v)) return true; // street address
-    return false;
+  function checkServedZip(zip) {
+    return fetch(SUPABASE_URL + "/rest/v1/served_zips?select=zip&active=eq.true&zip=eq." + encodeURIComponent(zip), {
+      headers: { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY }
+    }).then(function (r) { return r.json(); }).then(function (rows) { return !!(rows && rows.length); }).catch(function () { return false; });
+  }
+  function leadFail(msg, form, text) {
+    msg.textContent = text; msg.className = "address-form__msg is-error";
+    if (!REDUCED && hasGSAP) gsap.fromTo(form, { x: -6 }, { x: 0, duration: 0.4, ease: "elastic.out(1,0.4)" });
   }
   $all("[data-address-form]").forEach(function (form) {
-    var input = $("input", form);
     var msg = $("[data-form-msg]", form);
+    var get = function (sel) { var el = form.querySelector(sel); return el ? el.value.trim() : ""; };
     form.addEventListener("submit", function (e) {
       e.preventDefault();
-      var val = input.value || "";
-      if (!isValidEntry(val)) {
-        msg.textContent = "Enter a full street address or a 5-digit ZIP.";
-        msg.className = "address-form__msg is-error";
-        if (!REDUCED && hasGSAP) gsap.fromTo(form, { x: -6 }, { x: 0, duration: 0.4, ease: "elastic.out(1,0.4)" });
-        input.focus();
-        return;
-      }
-      captureLead(val.trim());
-      msg.textContent = "Great news, we serve your area! Taking you to sign up...";
-      msg.className = "address-form__msg is-success";
-      input.blur();
-      fireConfetti();
-      setTimeout(function () { window.location.href = "join.html?address=" + encodeURIComponent(val.trim()); }, 800);
+      var name = get("[data-lf-name]");
+      var email = get("[data-lf-email]");
+      var zip = (get("[data-lf-zip]").match(/\d{5}/) || [""])[0];
+      var address = get("[data-lf-address]");
+      if (!name) { leadFail(msg, form, "Enter your name."); return; }
+      if (email.indexOf("@") === -1) { leadFail(msg, form, "Enter a valid email."); return; }
+      if (!zip) { leadFail(msg, form, "Enter a 5-digit ZIP."); return; }
+      var btn = $("button", form); if (btn) btn.disabled = true;
+      msg.textContent = "Checking your area..."; msg.className = "address-form__msg";
+      checkServedZip(zip).then(function (served) {
+        if (btn) btn.disabled = false;
+        var lead = { name: name, email: email, zip: zip, address: address || null, source: "coverage_check" };
+        if (served) {
+          saveLead(lead, "leads");
+          msg.textContent = "Great news, we serve " + zip + "! Taking you to sign up...";
+          msg.className = "address-form__msg is-success";
+          if (typeof fireConfetti === "function") fireConfetti();
+          var q = "?zip=" + encodeURIComponent(zip) + "&name=" + encodeURIComponent(name) + "&email=" + encodeURIComponent(email) + (address ? "&address=" + encodeURIComponent(address) : "");
+          setTimeout(function () { window.location.href = "join.html" + q; }, 900);
+        } else {
+          saveLead(lead, "waitlist");
+          msg.textContent = "We are not in " + zip + " yet, but you are on the list. We will reach out the moment we expand to your street.";
+          msg.className = "address-form__msg is-success";
+        }
+      });
     });
   });
 
