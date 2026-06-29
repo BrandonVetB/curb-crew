@@ -108,15 +108,6 @@
       if (!val("address")) return "Enter your street address.";
       if (!/^\d{5}$/.test(val("zip"))) return "Enter a valid 5-digit ZIP.";
       if (!val("pickup_day")) return "Pick your trash pickup day.";
-      // soft coverage note (never blocks)
-      coverageEl.hidden = false;
-      if (SERVED_ZIPS.indexOf(val("zip")) === -1) {
-        coverageEl.className = "coverage-note is-wait";
-        coverageEl.textContent = "We are not on your street yet, but you can still sign up and we will prioritize your area.";
-      } else {
-        coverageEl.className = "coverage-note is-ok";
-        coverageEl.textContent = "Good news, we service your area.";
-      }
       return "";
     }
     if (n === 2) {
@@ -147,13 +138,61 @@
     }).join("");
   }
 
+  function checkServed(zip) {
+    return sb.from("served_zips").select("zip").eq("zip", zip).eq("active", true).limit(1).maybeSingle()
+      .then(function (r) { return !!(r && r.data); }).catch(function () { return false; });
+  }
+  function recordWaitlist(source, extra) {
+    var row = { zip: val("zip") || null, address: val("address") || null, source: source };
+    if (extra) Object.keys(extra).forEach(function (k) { row[k] = extra[k]; });
+    return sb.from("waitlist").insert(row);
+  }
+  function showWaitlist() {
+    if (form) form.hidden = true;
+    var steps = $("[data-steps]"); if (steps) steps.style.display = "none";
+    var wl = $("[data-waitlist]"); if (wl) wl.hidden = false;
+    var zEl = $("[data-waitlist-zip]"); if (zEl) zEl.textContent = val("zip") || "your area";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  function hideWaitlist() {
+    var wl = $("[data-waitlist]"); if (wl) wl.hidden = true;
+    var steps = $("[data-steps]"); if (steps) steps.style.display = "";
+    if (form) form.hidden = false;
+    showStep(1);
+  }
+
   nextBtn.addEventListener("click", function () {
     var err = validateStep(step);
     if (err) { setMsg(err, "error"); return; }
+    if (step === 1) {
+      nextBtn.disabled = true; setMsg("Checking your area...");
+      checkServed(val("zip")).then(function (served) {
+        nextBtn.disabled = false; setMsg("");
+        if (served) { showStep(2); }
+        else { recordWaitlist("coverage_block"); showWaitlist(); }
+      });
+      return;
+    }
     if (step < MAX) { showStep(step + 1); return; }
     submit();
   });
   backBtn.addEventListener("click", function () { if (step > 1) showStep(step - 1); });
+
+  var wlBtn = $("[data-waitlist-submit]");
+  if (wlBtn) wlBtn.addEventListener("click", function () {
+    var emEl = $("[data-waitlist-email]"); var em = (emEl && emEl.value || "").trim();
+    var msgEl = $("[data-waitlist-msg]");
+    if (em.indexOf("@") === -1) { if (msgEl) { msgEl.textContent = "Enter a valid email."; msgEl.className = "join__msg is-error"; } return; }
+    wlBtn.disabled = true;
+    recordWaitlist("waitlist_email", { email: em }).then(function () {
+      var wl = $("[data-waitlist]");
+      if (wl) wl.innerHTML = '<div style="text-align:center;padding:10px 0"><h2 class="join__h2">You are on the list</h2><p class="step-sub">We will email you the moment Curb Crews reaches your area. Thanks for your interest.</p></div>';
+    });
+  });
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-waitlist-back]"); if (!b) return;
+    e.preventDefault(); hideWaitlist();
+  });
 
   function submit() {
     nextBtn.disabled = true;

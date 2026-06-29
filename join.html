@@ -136,6 +136,17 @@
       <p class="join__msg" data-msg role="status" aria-live="polite"></p>
       <p class="join__fine">Already have an account? <a href="portal.html">Sign in</a> &middot; <a href="#" data-support>Need help?</a></p>
     </form>
+
+    <section class="join__card" data-waitlist hidden>
+      <h2 class="join__h2">We're not on your street yet</h2>
+      <p class="step-sub">Curb Crews is rolling out neighborhood by neighborhood. Drop your email and we'll tell you the moment we reach <strong data-waitlist-zip>your area</strong>.</p>
+      <div class="join__grid">
+        <label class="field field--wide"><span>Email</span><input type="email" data-waitlist-email autocomplete="email" placeholder="you@email.com" /></label>
+      </div>
+      <button type="button" class="btn btn--block" data-waitlist-submit>Join the waitlist</button>
+      <p class="join__msg" data-waitlist-msg role="status" aria-live="polite"></p>
+      <p class="join__fine"><a href="#" data-waitlist-back>&larr; Try a different address</a></p>
+    </section>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
