@@ -332,15 +332,8 @@
     else { ctx.clearRect(0, 0, canvas.width, canvas.height); rafId = null; }
   }
 
-  /* ============================================================
-     Placeholder links (contact / terms) -> gentle message
-     ============================================================ */
-  $all("[data-contact]").forEach(function (el) {
-    el.addEventListener("click", function (e) {
-      e.preventDefault();
-      window.location.href = "mailto:hello@curbcrews.com?subject=Running%20a%20route";
-    });
-  });
+  /* "Get in touch" (data-contact) is handled by support.js, which opens the
+     operator interest form. No mailto. data-noop kept as a safe no-op. */
   $all("[data-noop]").forEach(function (el) {
     el.addEventListener("click", function (e) { e.preventDefault(); });
   });
