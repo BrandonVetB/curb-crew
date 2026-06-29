@@ -104,22 +104,31 @@
     gsap.set(bin, { transformOrigin: "9.7px 49.7px" });
 
     {
+      var shadow = $(".sc-binshadow") || {};
       var tl = gsap.timeline({ repeat: -1, defaults: { ease: "power1.inOut" } });
 
-      tl.to({}, { duration: 0.8 })
-        // tip back onto the wheel
-        .to(bin,    { rotation: -10, duration: 0.5, ease: "power2.out" })
-        // roll down the driveway and out onto the street, against the curb
-        .to(binGrp, { x: 100.7, y: 134.1, duration: 2.1 })
-        // set it down at the curb
-        .to(bin,    { rotation: 0, duration: 0.5, ease: "power2.out" })
-        .to({},     { duration: 1.8 })
+      tl.to({}, { duration: 0.7 })
+        // little anticipation lean, then tip back onto the wheel with momentum
+        .to(bin, { rotation: 3, duration: 0.16, ease: "power2.out" })
+        .to(bin, { rotation: -11, duration: 0.45, ease: "back.out(2.2)" })
+        .addLabel("out")
+        // roll down the driveway and out to the curb
+        .to(binGrp, { x: 100.7, y: 134.1, duration: 2.0, ease: "power1.inOut" }, "out")
+        .to(shadow, { opacity: 0.3, duration: 1.0, ease: "power1.inOut" }, "out")
+        // set it down: overshoot forward (overhang against the curb) then settle with a bounce
+        .to(bin, { rotation: 5, duration: 0.35, ease: "power2.out" })
+        .to(bin, { rotation: 2, duration: 0.7, ease: "elastic.out(1, 0.4)" })
+        .to(shadow, { opacity: 0.55, duration: 0.5, ease: "power2.out" }, "<")
+        .to({}, { duration: 1.7 })
 
         // bring it back up to the garage
-        .to(bin,    { rotation: -10, duration: 0.5, ease: "power2.out" })
-        .to(binGrp, { x: 23.9, y: 87.1, duration: 2.1 })
-        .to(bin,    { rotation: 0, duration: 0.5, ease: "power2.out" })
-        .to({},     { duration: 0.8 });
+        .to(bin, { rotation: -11, duration: 0.45, ease: "back.out(2.2)" })
+        .addLabel("back")
+        .to(binGrp, { x: 23.9, y: 87.1, duration: 2.0, ease: "power1.inOut" }, "back")
+        .to(shadow, { opacity: 0.35, duration: 1.0, ease: "power1.inOut" }, "back")
+        .to(bin, { rotation: 0, duration: 0.5, ease: "back.out(1.6)" })
+        .to(shadow, { opacity: 0.55, duration: 0.5 }, "<")
+        .to({}, { duration: 0.7 });
     }
   }
 
