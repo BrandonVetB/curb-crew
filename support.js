@@ -172,6 +172,7 @@
       else { oStatus.className = "cs-msg err"; oStatus.textContent = "Could not send. Please try again."; }
     }).catch(function () { oSend.disabled = false; oStatus.className = "cs-msg err"; oStatus.textContent = "Could not send. Please try again."; });
   });
+  window.openContact = openOp;
   document.addEventListener("click", function (e) {
     var t = e.target.closest("[data-contact]");
     if (t) { e.preventDefault(); openOp(); }

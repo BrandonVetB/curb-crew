@@ -103,7 +103,7 @@
     gsap.set(binGrp, { x: 23.9, y: 87.1 });
     gsap.set(bin, { transformOrigin: "9.7px 49.7px" });
 
-    if (!REDUCED) {
+    {
       var tl = gsap.timeline({ repeat: -1, defaults: { ease: "power1.inOut" } });
 
       tl.to({}, { duration: 0.8 })
@@ -133,7 +133,7 @@
     var set = $(".marquee__set", track);
     if (!set) return;
     var setWidth = set.getBoundingClientRect().width;
-    if (!setWidth) return;
+    if (!setWidth) { setTimeout(buildMarquee, 300); return; }
     var needed = window.innerWidth + setWidth;
     var guard = 0;
     while (track.getBoundingClientRect().width < needed && guard < 40) {
@@ -148,7 +148,7 @@
       modifiers: { x: gsap.utils.unitize(gsap.utils.wrap(-setWidth, 0)) }
     });
   }
-  if (track && hasGSAP && !REDUCED) {
+  if (track && hasGSAP) {
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(buildMarquee);
     } else {
@@ -260,7 +260,7 @@
           setTimeout(function () { window.location.href = "join.html" + q; }, 900);
         } else {
           saveLead(lead, "waitlist");
-          msg.textContent = "We are not in " + zip + " yet, but you are on the list. We will reach out the moment we expand to your street.";
+          msg.innerHTML = "We are not in " + zip + " yet, but you are on the list. We will reach out the moment we expand to your street. <a href=\"#\" onclick=\"return window.openSupport ? (window.openSupport(), false) : false\" style=\"text-decoration:underline\">Contact us</a> with any questions.";
           msg.className = "address-form__msg is-success";
         }
       });
