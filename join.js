@@ -148,7 +148,7 @@
     return sb.from("waitlist").insert(row);
   }
   function showWaitlist() {
-    if (form) form.hidden = true;
+    if (form) form.style.display = "none";
     var steps = $("[data-steps]"); if (steps) steps.style.display = "none";
     var wl = $("[data-waitlist]"); if (wl) wl.hidden = false;
     var zEl = $("[data-waitlist-zip]"); if (zEl) zEl.textContent = val("zip") || "your area";
@@ -157,7 +157,7 @@
   function hideWaitlist() {
     var wl = $("[data-waitlist]"); if (wl) wl.hidden = true;
     var steps = $("[data-steps]"); if (steps) steps.style.display = "";
-    if (form) form.hidden = false;
+    if (form) form.style.display = "";
     showStep(1);
   }
 
