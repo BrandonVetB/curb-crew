@@ -31,6 +31,7 @@
   var MAX = 4;
   var BASE = 3500;
   var ADDON = { recycling: 800, yard: 800, cleaning: 2500 };
+  var PROMO = "";
 
   function val(name) { var el = form.querySelector('[name="' + name + '"]'); return el ? el.value.trim() : ""; }
   function checked(name) { var el = form.querySelector('[name="' + name + '"]'); return !!(el && el.checked); }
@@ -263,7 +264,7 @@
         ]).then(function () {
           setMsg("Account created. Opening secure checkout...", "success");
           sb.functions.invoke("create-checkout-session", {
-            body: { addons: { recycling: checked("recycling"), yard: checked("yard"), cleaning: checked("cleaning") } }
+            body: { addons: { recycling: checked("recycling"), yard: checked("yard"), cleaning: checked("cleaning") }, promo: PROMO }
           }).then(function (res) {
             if (res.error || !res.data || !res.data.url) {
               nextBtn.disabled = false;
@@ -296,6 +297,14 @@
     }
     var qEmail = qp.get("email");
     if (qEmail) { var emEl = form.querySelector('[name="email"]'); if (emEl) emEl.value = qEmail; }
+    PROMO = (qp.get("promo") || "").toLowerCase();
+    if (PROMO === "flyer50") {
+      var b = document.createElement("div");
+      b.className = "join-promo";
+      b.innerHTML = "&#127881; <strong>50% off your first 2 months</strong> applied. Finish signing up to lock it in.";
+      var steps = $("[data-steps]");
+      if (steps && steps.parentNode) steps.parentNode.insertBefore(b, steps);
+    }
   } catch (e) {}
 
   showStep(1);

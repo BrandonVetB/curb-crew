@@ -1,0 +1,87 @@
+/* ============================================================
+   CURB CREWS - start.css  (flyer / door-hanger QR landing page)
+   Mobile-first single-purpose conversion page. Builds on styles.css.
+   ============================================================ */
+
+.lp-body { background: var(--white); min-height: 100vh; color: var(--black); }
+
+.lp-top { display: flex; justify-content: center; padding: 20px 18px; }
+.lp-top .wordmark__img { height: 52px; }
+.lp-top .wordmark__mark { color: var(--blue); }
+
+.lp-wrap { max-width: 560px; margin: 0 auto; padding: 6px 22px 60px; }
+
+/* hero */
+.lp-hero { text-align: center; padding-top: 6px; }
+.lp-offer {
+  display: inline-block; background: linear-gradient(135deg, #0066FF, #22C55E);
+  color: #fff; font-family: var(--font-display); font-weight: 700;
+  letter-spacing: 0.03em; font-size: 0.95rem; padding: 9px 18px;
+  border-radius: 999px; box-shadow: 0 8px 20px rgba(0,102,255,0.28);
+}
+.lp-hero h1 {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(2rem, 8vw, 2.7rem); line-height: 1.05;
+  letter-spacing: -0.02em; margin: 18px 0 12px;
+}
+.lp-hero h1 .accent { color: var(--blue); }
+.lp-sub { color: var(--ink-70); font-size: 1.05rem; line-height: 1.5; margin: 0 auto 22px; max-width: 30rem; }
+
+/* price */
+.lp-price {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  background: var(--mist); border: 1px solid var(--line);
+  border-radius: 16px; padding: 18px 20px; margin-bottom: 20px;
+}
+.lp-price__now { font-family: var(--font-display); font-weight: 700; font-size: 2.3rem; letter-spacing: -0.02em; }
+.lp-price__now small { font-size: 1rem; font-weight: 600; color: var(--ink-60); }
+.lp-price__was { color: var(--ink-50); text-decoration: line-through; font-size: 0.95rem; }
+.lp-price__note { color: var(--ink-60); font-size: 0.9rem; }
+
+/* CTA */
+.lp-cta {
+  display: block; width: 100%; box-sizing: border-box; text-align: center;
+  background: var(--blue); color: #fff; text-decoration: none;
+  font-family: var(--font-display); font-weight: 700; font-size: 1.15rem;
+  padding: 17px 22px; border-radius: 14px;
+  box-shadow: 0 12px 26px rgba(0,102,255,0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.lp-cta:active { transform: translateY(1px); }
+.lp-micro { color: var(--ink-50); font-size: 0.85rem; margin-top: 10px; }
+
+/* benefits */
+.lp-section { margin-top: 42px; }
+.lp-section h2 {
+  font-family: var(--font-display); font-weight: 700; font-size: 1.35rem;
+  letter-spacing: -0.01em; margin-bottom: 16px; text-align: center;
+}
+.lp-benefit {
+  display: flex; gap: 14px; align-items: flex-start;
+  padding: 14px 0; border-bottom: 1px solid var(--line);
+}
+.lp-benefit:last-child { border-bottom: none; }
+.lp-benefit__ic {
+  flex: none; width: 38px; height: 38px; border-radius: 10px;
+  background: rgba(0,102,255,0.1); display: grid; place-items: center;
+}
+.lp-benefit__ic svg { width: 21px; height: 21px; fill: none; stroke: var(--blue); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.lp-benefit__t { font-weight: 700; margin-bottom: 2px; }
+.lp-benefit__d { color: var(--ink-60); font-size: 0.92rem; line-height: 1.45; }
+
+/* trust */
+.lp-trust {
+  margin-top: 36px; background: var(--mist); border-radius: 16px;
+  padding: 22px; text-align: center;
+}
+.lp-trust__area { font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; margin-bottom: 14px; }
+.lp-trust__row { display: flex; justify-content: center; gap: 26px; flex-wrap: wrap; }
+.lp-trust__stat strong { display: block; font-family: var(--font-display); font-size: 1.5rem; color: var(--blue); }
+.lp-trust__stat span { color: var(--ink-60); font-size: 0.82rem; }
+
+/* final cta */
+.lp-final { margin-top: 36px; text-align: center; }
+.lp-final h2 { font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; margin-bottom: 16px; }
+
+.lp-foot { text-align: center; color: var(--ink-50); font-size: 0.85rem; margin-top: 40px; }
+.lp-foot a { color: var(--ink-60); }

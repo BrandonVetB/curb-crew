@@ -5,6 +5,14 @@
 
 .join-body { background: var(--mist); min-height: 100vh; }
 
+.join-promo {
+  max-width: 640px; margin: 16px auto -4px; padding: 12px 16px;
+  background: linear-gradient(135deg, #0066FF, #22C55E); color: #fff;
+  border-radius: 12px; font-size: 0.95rem; text-align: center;
+  box-shadow: 0 8px 20px rgba(0,102,255,0.22);
+}
+.join-promo strong { font-weight: 700; }
+
 .join-top {
   display: flex; justify-content: center; padding: 22px 20px;
   border-bottom: 1px solid var(--line); background: var(--white);
