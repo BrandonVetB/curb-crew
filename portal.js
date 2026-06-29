@@ -112,7 +112,9 @@
         bind("phone", p.phone || "Not set");
         bind("address", addr ? addr.line1 : "Not set");
         bind("city", addr ? [addr.city, addr.state, addr.zip].filter(Boolean).join(", ") : "Not set");
-        bind("can_return", (addr && addr.can_return_location) || "Not set");
+        bind("can_return", (addr && addr.cans_split)
+          ? ["Trash: " + (addr.can_loc_trash || "—"), "Recycling: " + (addr.can_loc_recycling || "—"), "Yard: " + (addr.can_loc_yard || "—")].join(" · ")
+          : ((addr && addr.can_return_location) || "Not set"));
         bind("gate_code", (addr && addr.gate_code) || "Not set");
         bind("access_notes", (addr && addr.access_notes) || "None");
         bind("crew", "Assigning to your street");
@@ -339,7 +341,13 @@
       + f("Street address", "line1", a.line1, "123 Maple St")
       + f("ZIP", "zip", a.zip, "")
       + fday("Trash pickup day", "pickup_day", a.pickup_day)
-      + f("Where the cans live", "can_return_location", a.can_return_location, "Left side, behind the gate")
+      + f("Where the cans live (default)", "can_return_location", a.can_return_location, "Left side, behind the gate")
+      + '<label class="acct-field" style="grid-column:1 / -1;flex-direction:row;align-items:center;gap:8px"><input type="checkbox" data-ef-split style="width:auto"' + (a.cans_split ? " checked" : "") + ' /> <span>My cans are kept in different spots</span></label>'
+      + '<div data-ef-split-fields style="grid-column:1 / -1;display:' + (a.cans_split ? "grid" : "none") + ';gap:14px">'
+      + f("Trash can location", "can_loc_trash", a.can_loc_trash, "")
+      + f("Recycling can location", "can_loc_recycling", a.can_loc_recycling, "")
+      + f("Yard-waste can location", "can_loc_yard", a.can_loc_yard, "")
+      + '</div>'
       + f("Gate / community code", "gate_code", a.gate_code, "optional")
       + f("Garage code", "garage_code", a.garage_code, "optional")
       + f("Anything else for the crew", "access_notes", a.access_notes, "optional")
@@ -362,7 +370,8 @@
     showToast("Saving...");
     sb.auth.getUser().then(function (u) {
       var uid = u.data.user && u.data.user.id; if (!uid) { showToast("Please sign in again."); return; }
-      var addrFields = { line1: g("line1"), zip: g("zip"), pickup_day: newDay, can_return_location: g("can_return_location"), gate_code: g("gate_code"), garage_code: g("garage_code"), access_notes: g("access_notes") };
+      var splitEl = root.querySelector("[data-ef-split]");
+    var addrFields = { line1: g("line1"), zip: g("zip"), pickup_day: newDay, can_return_location: g("can_return_location"), cans_split: !!(splitEl && splitEl.checked), can_loc_trash: g("can_loc_trash") || null, can_loc_recycling: g("can_loc_recycling") || null, can_loc_yard: g("can_loc_yard") || null, gate_code: g("gate_code"), garage_code: g("garage_code"), access_notes: g("access_notes") };
       var aP = (CURRENT.addr && CURRENT.addr.id)
         ? sb.from("service_addresses").update(addrFields).eq("id", CURRENT.addr.id).select()
         : sb.from("service_addresses").insert(Object.assign({ profile_id: uid, is_primary: true, is_prospect: false }, addrFields)).select();
@@ -433,7 +442,12 @@
     },
     receipt: function () { ACTIONS.payment(); },
     edit: function () { showPanel("account"); if (ACTIONS["account-edit"]) ACTIONS["account-edit"](); },
-    "account-edit": function () { var e = $("[data-acct-edit]"); if (e) e.innerHTML = acctFieldsHTML(); acctToggle(true); },
+    "account-edit": function () {
+      var e = $("[data-acct-edit]"); if (e) e.innerHTML = acctFieldsHTML();
+      var sp = e && e.querySelector("[data-ef-split]"), spf = e && e.querySelector("[data-ef-split-fields]");
+      if (sp && spf) sp.addEventListener("change", function () { spf.style.display = sp.checked ? "grid" : "none"; });
+      acctToggle(true);
+    },
     "account-cancel": function () { acctToggle(false); },
     "account-save": function () { acctSave(); },
     support: function () { if (window.openSupport) { window.openSupport(); } }

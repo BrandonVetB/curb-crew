@@ -86,6 +86,13 @@
     });
   })();
 
+  // Per-can locations toggle
+  (function () {
+    var sp = form.querySelector("[data-cans-split]");
+    var spf = form.querySelector("[data-cans-split-fields]");
+    if (sp && spf) sp.addEventListener("change", function () { spf.style.display = sp.checked ? "block" : "none"; });
+  })();
+
   function setMsg(t, kind) { msg.textContent = t || ""; msg.className = "join__msg" + (kind ? " is-" + kind : ""); }
 
   function showStep(n) {
@@ -223,6 +230,8 @@
           sb.from("service_addresses").insert({
             profile_id: uid, line1: val("address"), zip: val("zip"),
             can_return_location: val("can_return"), pickup_day: val("pickup_day"),
+            cans_split: !!((form.querySelector("[data-cans-split]") || {}).checked),
+            can_loc_trash: val("can_loc_trash") || null, can_loc_recycling: val("can_loc_recycling") || null, can_loc_yard: val("can_loc_yard") || null,
             gate_code: val("gate_code"), garage_code: val("garage_code"), access_notes: val("access_notes"),
             collection_week: SCHED.collection_week, schedule_source: SCHED.schedule_source || "self_reported",
             is_primary: true, is_prospect: false

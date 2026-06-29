@@ -114,4 +114,66 @@
     var t = e.target.closest("[data-support]");
     if (t) { e.preventDefault(); open(); }
   });
+
+  /* ---- Operator / "Get in touch" inquiry (data-contact) ---- */
+  var oHost = document.createElement("div");
+  oHost.innerHTML =
+    '<div class="cs-overlay" data-op-overlay hidden>' +
+    '  <div class="cs-modal" role="dialog" aria-modal="true">' +
+    '    <div data-op-form>' +
+    '      <div class="cs-head"><div><h3>Want to run a route?</h3><p class="cs-sub">Tell us a bit about you and where you are. We will reach out to talk.</p></div>' +
+    '        <button class="cs-btn--ghost" data-op-close aria-label="Close">&#10005;</button></div>' +
+    '      <div class="cs-row">' +
+    '        <label class="cs-field"><span>Your name</span><input type="text" data-op-name placeholder="Jane Smith" /></label>' +
+    '        <label class="cs-field"><span>Email</span><input type="email" data-op-email placeholder="you@email.com" /></label>' +
+    '      </div>' +
+    '      <div class="cs-row">' +
+    '        <label class="cs-field"><span>Phone</span><input type="tel" data-op-phone placeholder="(512) 555-0148" /></label>' +
+    '        <label class="cs-field"><span>Your area / neighborhood</span><input type="text" data-op-area placeholder="Steiner Ranch, 78732" /></label>' +
+    '      </div>' +
+    '      <label class="cs-field"><span>Tell us about you</span><textarea data-op-message placeholder="Why you want to work with us, your availability, whether you have a vehicle, anything helpful..."></textarea></label>' +
+    '      <button class="cs-btn cs-btn--primary" data-op-send>Send</button>' +
+    '      <p class="cs-msg" data-op-status role="status"></p>' +
+    '    </div>' +
+    '    <div class="cs-done" data-op-done hidden>' +
+    '      <div class="cs-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>' +
+    '      <h3>Thanks, we got it</h3><p class="cs-sub">We will review and reach out about running a route in your area.</p>' +
+    '      <button class="cs-btn cs-btn--primary" data-op-close style="margin-top:10px">Done</button>' +
+    '    </div>' +
+    '  </div>' +
+    '</div>';
+  document.body.appendChild(oHost);
+  var oOverlay = oHost.querySelector("[data-op-overlay]");
+  var oForm = oHost.querySelector("[data-op-form]");
+  var oDone = oHost.querySelector("[data-op-done]");
+  var oStatus = oHost.querySelector("[data-op-status]");
+  var oSend = oHost.querySelector("[data-op-send]");
+  function openOp() { oOverlay.hidden = false; oForm.hidden = false; oDone.hidden = true; oStatus.textContent = ""; oStatus.className = "cs-msg"; }
+  function closeOp() { oOverlay.hidden = true; }
+  oOverlay.addEventListener("click", function (e) { if (e.target === oOverlay) closeOp(); });
+  oHost.querySelectorAll("[data-op-close]").forEach(function (b) { b.addEventListener("click", closeOp); });
+  oSend.addEventListener("click", function () {
+    var name = (oHost.querySelector("[data-op-name]").value || "").trim();
+    var email = (oHost.querySelector("[data-op-email]").value || "").trim();
+    var phone = (oHost.querySelector("[data-op-phone]").value || "").trim();
+    var area = (oHost.querySelector("[data-op-area]").value || "").trim();
+    var msg = (oHost.querySelector("[data-op-message]").value || "").trim();
+    if (email.indexOf("@") === -1) { oStatus.className = "cs-msg err"; oStatus.textContent = "Enter a valid email."; return; }
+    if (msg.length < 3 && !area) { oStatus.className = "cs-msg err"; oStatus.textContent = "Tell us a bit more."; return; }
+    oSend.disabled = true; oStatus.className = "cs-msg ok"; oStatus.textContent = "Sending...";
+    var fullMsg = "OPERATOR / RUN-A-ROUTE INQUIRY\nArea: " + (area || "n/a") + "\nPhone: " + (phone || "n/a") + "\n\n" + msg;
+    fetch(FN, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "apikey": ANON, "Authorization": "Bearer " + ANON },
+      body: JSON.stringify({ name: name, email: email, category: "Run a route (operator)", message: fullMsg, page: "Get in touch (operator)" })
+    }).then(function (r) { return r.json(); }).then(function (res) {
+      oSend.disabled = false;
+      if (res && res.ok) { oForm.hidden = true; oDone.hidden = false; }
+      else { oStatus.className = "cs-msg err"; oStatus.textContent = "Could not send. Please try again."; }
+    }).catch(function () { oSend.disabled = false; oStatus.className = "cs-msg err"; oStatus.textContent = "Could not send. Please try again."; });
+  });
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest("[data-contact]");
+    if (t) { e.preventDefault(); openOp(); }
+  });
 })();
