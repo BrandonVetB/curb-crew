@@ -258,10 +258,7 @@
       else {
         el.innerHTML = b.invoices.map(function (inv) {
           var d = inv.date ? new Date(inv.date * 1000).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—";
-          var parts = [];
-          if (inv.url) parts.push('<a class="link-btn" href="' + inv.url + '" target="_blank" rel="noopener">View</a>');
-          if (inv.id) parts.push('<a class="link-btn" href="#" data-email-receipt="' + inv.id + '">Email</a>');
-          var receipt = parts.length ? parts.join(" ") : '<span class="muted">—</span>';
+          var receipt = inv.url ? '<a class="link-btn" href="' + inv.url + '" target="_blank" rel="noopener">Download</a>' : '<span class="muted">—</span>';
           return "<tr><td>" + d + "</td><td>" + (inv.description || "Subscription") + "</td><td>" + money(inv.amount_cents) + "</td><td>" + receipt + "</td></tr>";
         }).join("");
       }
@@ -444,13 +441,5 @@
   document.addEventListener("click", function (e) {
     var a = e.target.closest("[data-action]"); if (!a) return;
     var fn = ACTIONS[a.getAttribute("data-action")]; if (fn) fn();
-  });
-  document.addEventListener("click", function (e) {
-    var t = e.target.closest("[data-email-receipt]"); if (!t) return;
-    e.preventDefault();
-    showToast("Emailing your receipt...");
-    sb.functions.invoke("send-receipt", { body: { invoice_id: t.getAttribute("data-email-receipt") } }).then(function (r) {
-      if (r && r.data && r.data.sent) showToast("Receipt emailed to you."); else showToast("Could not send the receipt. Try again.");
-    });
   });
 })();
