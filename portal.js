@@ -418,6 +418,66 @@
   }
   document.addEventListener("change", function (e) { if (e.target && e.target.matches && e.target.matches("[data-addon]")) refreshAddonTotal(); });
 
+  /* ---- Manage cans modal (add/remove cans + locations together) ---- */
+  function escAttr(v) { return v == null ? "" : String(v).replace(/"/g, "&quot;"); }
+  function cansTotal() { var total = 3500; if (CURRENT.sub && CURRENT.sub.addon_cleaning) total += 2500; $all("[data-can]").forEach(function (cb) { if (cb.checked) total += 800; }); return total; }
+  function refreshCansTotal() { var t = $("[data-cans-total]"); if (t) t.textContent = money(cansTotal()); }
+  function openCansModal() {
+    var s = CURRENT.sub || {}, a = CURRENT.addr || {};
+    function loc(key, val, on) { return '<input class="cans-loc" data-canloc="' + key + '" placeholder="Where this can lives (optional)" value="' + escAttr(val) + '"' + (on ? "" : " hidden") + ">"; }
+    function row(key, label, on, val) {
+      return '<label class="cans-row"><input type="checkbox" data-can="' + key + '"' + (on ? " checked" : "") + '><span class="cans-row__name">' + label + '</span><strong class="cans-row__price">+$8/mo</strong></label>' + loc(key, val, on);
+    }
+    var html = '<p style="color:var(--ink-70);margin-bottom:14px">Add or remove cans and tell us where each one lives. Plan changes are prorated on your next bill.</p>'
+      + '<div class="cans-list">'
+      + '<div class="cans-row cans-row--base"><span class="cans-row__name">Trash can</span><strong class="cans-row__price">Included</strong></div>'
+      + loc("trash", a.can_loc_trash, true)
+      + row("trash2", "Second trash can", s.addon_second_trash, a.can_loc_trash2)
+      + row("recycling", "Recycling can", s.addon_recycling, a.can_loc_recycling)
+      + row("yard", "Yard-waste can", s.addon_yard_waste, a.can_loc_yard)
+      + '</div>'
+      + '<div class="line line--total" style="margin-top:14px"><span>New monthly total</span><strong data-cans-total>' + money(cansTotal()) + '</strong></div>';
+    openModal({ title: "Manage your cans", html: html, confirmLabel: "Save cans", cancelLabel: "Cancel", onConfirm: function () { saveCans(); } });
+    $all("[data-can]").forEach(function (cb) {
+      cb.addEventListener("change", function () {
+        var l = modalBody.querySelector('[data-canloc="' + cb.getAttribute("data-can") + '"]');
+        if (l) l.hidden = !cb.checked;
+        refreshCansTotal();
+      });
+    });
+    refreshCansTotal();
+  }
+  function saveCans() {
+    var s = CURRENT.sub || {};
+    var want = { cleaning: !!s.addon_cleaning };
+    $all("[data-can]").forEach(function (cb) { want[cb.getAttribute("data-can")] = cb.checked; });
+    function lv(key) { var el = modalBody.querySelector('[data-canloc="' + key + '"]'); return el ? el.value.trim() : ""; }
+    showToast("Saving your cans...");
+    sb.auth.getUser().then(function (u) {
+      var uid = u.data.user && u.data.user.id; if (!uid) { showToast("Please sign in again."); return; }
+      var addrFields = { cans_split: true, can_loc_trash: lv("trash") || null, can_loc_trash2: want.trash2 ? (lv("trash2") || null) : null, can_loc_recycling: want.recycling ? (lv("recycling") || null) : null, can_loc_yard: want.yard ? (lv("yard") || null) : null };
+      var aP = (CURRENT.addr && CURRENT.addr.id)
+        ? sb.from("service_addresses").update(addrFields).eq("id", CURRENT.addr.id).select()
+        : sb.from("service_addresses").insert(Object.assign({ profile_id: uid, is_primary: true, is_prospect: false }, addrFields)).select();
+      var changed = (want.trash2 !== !!s.addon_second_trash) || (want.recycling !== !!s.addon_recycling) || (want.yard !== !!s.addon_yard_waste);
+      aP.then(function () {
+        if (!changed) { showToast("Your cans are saved."); loadData(); return; }
+        track("addon_update", want);
+        if (!CURRENT.sub || !CURRENT.sub.stripe_subscription_id) {
+          showToast("Starting secure checkout...");
+          callFn("create-checkout-session", { addons: want }).then(function (r2) { if (r2.data && r2.data.url) { window.location.href = r2.data.url; } else { showToast("Could not start checkout."); loadData(); } });
+          return;
+        }
+        callFn("manage-subscription", { action: "update_addons", addons: want }).then(function (res) {
+          var d = res && res.data;
+          if (res.error || !d || d.error) { showToast("Cans saved, but the plan update failed. Please try again."); loadData(); return; }
+          showToast("Cans updated. Plan changes are prorated on your next bill.");
+          loadData();
+        });
+      });
+    });
+  }
+
   var ACCT_DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   function acctFieldsHTML() {
     var p = CURRENT.profile || {}, a = CURRENT.addr || {}, s = CURRENT.sub || {};
@@ -567,7 +627,7 @@
       });
     },
     receipt: function () { ACTIONS.payment(); },
-    edit: function () { showPanel("account"); if (ACTIONS["account-edit"]) ACTIONS["account-edit"](); },
+    edit: function () { openCansModal(); },
     "account-edit": function () {
       var e = $("[data-acct-edit]"); if (e) e.innerHTML = acctFieldsHTML();
       var sp = e && e.querySelector("[data-ef-split]"), spf = e && e.querySelector("[data-ef-split-fields]");

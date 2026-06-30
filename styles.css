@@ -158,7 +158,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   position: relative; display: inline-flex; align-items: center; justify-content: center;
   font-family: var(--font-display); font-weight: 600; font-size: 16px;
   padding: 16px 26px; border-radius: 999px;
-  background: var(--blue); color: var(--white); white-space: nowrap;
+  background: var(--blue); color: var(--white); white-space: normal; text-align: center; line-height: 1.2;
   transition: transform .25s var(--ease), box-shadow .25s var(--ease), background .2s var(--ease);
   box-shadow: 0 6px 18px rgba(0,102,255,0.18);
   overflow: hidden; isolation: isolate;

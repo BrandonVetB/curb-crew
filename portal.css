@@ -188,6 +188,18 @@
 .addon__price { color: var(--ink-60); font-weight: 600; white-space: nowrap; }
 .gift-badge { display: inline-block; background: linear-gradient(135deg, #0066FF, #22C55E); color: #fff; font-family: var(--font-display); font-weight: 700; letter-spacing: 0.04em; font-size: 1.15rem; padding: 11px 20px; border-radius: 999px; box-shadow: 0 10px 24px rgba(0,102,255,0.32); }
 
+/* Manage cans modal */
+.cans-list { display: flex; flex-direction: column; }
+.cans-row { display: flex; align-items: center; gap: 12px; padding: 12px 2px 8px; cursor: pointer; }
+.cans-row--base { cursor: default; }
+.cans-row input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--blue); flex: none; cursor: pointer; }
+.cans-row__name { flex: 1; font-weight: 600; }
+.cans-row__price { color: var(--ink-60); white-space: nowrap; font-weight: 600; }
+.cans-row--base .cans-row__price { color: var(--ink-50); font-weight: 500; }
+.cans-loc { width: 100%; box-sizing: border-box; font: inherit; font-size: 15px; padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: 10px; margin: 0 0 6px 32px; max-width: calc(100% - 32px); }
+.cans-loc[hidden] { display: none; }
+.modal__card { max-height: 88vh; overflow-y: auto; }
+
 .pay { display: flex; align-items: center; gap: 14px; font-family: var(--font-display); font-size: 1.05rem; margin-top: 4px; }
 .pay__brand { background: var(--black); color: #fff; font-weight: 700; font-size: 12px; padding: 5px 9px; border-radius: 6px; letter-spacing: 0.05em; }
 
@@ -222,7 +234,8 @@
 }
 .modal__card h2 { font-family: var(--font-display); font-size: 1.4rem; letter-spacing: -0.01em; margin-bottom: 10px; }
 .modal__card p { color: var(--ink-60); }
-.modal__actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 26px; }
+.modal__actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: flex-end; align-items: center; margin-top: 26px; }
+.modal__actions .btn { flex: 0 1 auto; }
 
 /* toast */
 .toast {
