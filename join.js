@@ -17,7 +17,7 @@
   function $all(s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); }
 
   var SESSION_ID = (function () { try { var k = "cc_sess", s = sessionStorage.getItem(k); if (!s) { s = Math.random().toString(36).slice(2) + Date.now().toString(36); sessionStorage.setItem(k, s); } return s; } catch (e) { return null; } })();
-  function track(event, props) { try { sb.from("analytics_events").insert({ event: event, session_id: SESSION_ID, page: "signup", props: props || null, user_agent: navigator.userAgent }); } catch (e) {} }
+  function track(event, props) { try { sb.from("analytics_events").insert({ event: event, session_id: SESSION_ID, page: "signup", props: props || null, user_agent: navigator.userAgent }).then(function () {}, function () {}); } catch (e) {} }
 
   var form = $("[data-onboard]");
   var nextBtn = $("[data-next]");

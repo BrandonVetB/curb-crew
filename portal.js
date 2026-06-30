@@ -12,7 +12,7 @@
   // ---- lightweight analytics ----
   var SESSION_ID = (function () { try { var k = "cc_sess", s = sessionStorage.getItem(k); if (!s) { s = Math.random().toString(36).slice(2) + Date.now().toString(36); sessionStorage.setItem(k, s); } return s; } catch (e) { return null; } })();
   function track(event, props) {
-    try { sb.from("analytics_events").insert({ event: event, profile_id: (CURRENT.profile && CURRENT.profile.id) || null, session_id: SESSION_ID, page: "portal", props: props || null, user_agent: navigator.userAgent }); } catch (e) {}
+    try { sb.from("analytics_events").insert({ event: event, profile_id: (CURRENT.profile && CURRENT.profile.id) || null, session_id: SESSION_ID, page: "portal", props: props || null, user_agent: navigator.userAgent }).then(function () {}, function () {}); } catch (e) {}
   }
 
   function $(s, c) { return (c || document).querySelector(s); }
