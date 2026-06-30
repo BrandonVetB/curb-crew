@@ -94,6 +94,12 @@
 
         <p class="addons-label">Add-ons (optional)</p>
         <label class="addon-toggle">
+          <input type="checkbox" data-addon data-key="trash2" data-price="8" name="trash2" />
+          <span class="addon-toggle__box" aria-hidden="true"></span>
+          <span class="addon-toggle__name">Second trash can</span>
+          <span class="addon-toggle__price">+$8/mo</span>
+        </label>
+        <label class="addon-toggle">
           <input type="checkbox" data-addon data-key="recycling" data-price="8" name="recycling" />
           <span class="addon-toggle__box" aria-hidden="true"></span>
           <span class="addon-toggle__name">Recycling can <span style="opacity:.55;font-weight:500">&middot; every other week</span></span>
@@ -130,6 +136,7 @@
         <label class="field" style="display:flex;flex-direction:row;align-items:center;gap:8px"><input type="checkbox" data-cans-split style="width:auto" /> <span style="font-weight:500">My cans are kept in different spots</span></label>
         <div data-cans-split-fields style="display:none">
           <label data-canfield="trash" class="field field--wide"><span>Trash can location</span><input type="text" name="can_loc_trash" placeholder="e.g. Left side of the house" /></label>
+          <label data-canfield="trash2" class="field field--wide" hidden><span>Second trash can location</span><input type="text" name="can_loc_trash2" placeholder="e.g. Right side of the garage" /></label>
           <label data-canfield="recycling" class="field field--wide" hidden><span>Recycling can location</span><input type="text" name="can_loc_recycling" placeholder="e.g. Behind the garage" /></label>
           <label data-canfield="yard" class="field field--wide" hidden><span>Yard-waste can location</span><input type="text" name="can_loc_yard" placeholder="e.g. By the side gate" /></label>
         </div>

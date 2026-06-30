@@ -30,7 +30,7 @@
   var step = 1;
   var MAX = 4;
   var BASE = 3500;
-  var ADDON = { recycling: 800, yard: 800, cleaning: 2500 };
+  var ADDON = { trash2: 800, recycling: 800, yard: 800, cleaning: 2500 };
   var PROMO = "";
 
   function val(name) { var el = form.querySelector('[name="' + name + '"]'); return el ? el.value.trim() : ""; }
@@ -106,6 +106,7 @@
     var sp = form.querySelector("[data-cans-split]");
     var spf = form.querySelector("[data-cans-split-fields]");
     function syncCanFields() {
+      var t2 = form.querySelector('[data-canfield="trash2"]'); if (t2) t2.hidden = !checked("trash2");
       var rf = form.querySelector('[data-canfield="recycling"]'); if (rf) rf.hidden = !checked("recycling");
       var yf = form.querySelector('[data-canfield="yard"]'); if (yf) yf.hidden = !checked("yard");
       var rw = form.querySelector("[data-recycle-week-wrap]"); if (rw) rw.hidden = !checked("recycling");
@@ -150,6 +151,7 @@
 
   function buildReview() {
     var addons = [];
+    if (checked("trash2")) addons.push("2nd trash can +$8");
     if (checked("recycling")) addons.push("Recycling +$8");
     if (checked("yard")) addons.push("Yard-waste +$8");
     if (checked("cleaning")) addons.push("Cleaning +$25");
@@ -245,7 +247,7 @@
         var leadRow = {
           name: name, email: email, phone: val("phone"), address: val("address"), zip: val("zip"),
           plan: planLabel, addon_recycling: checked("recycling"), addon_yard_waste: checked("yard"),
-          addon_cleaning: checked("cleaning"), source: "onboarding", user_agent: navigator.userAgent
+          addon_cleaning: checked("cleaning"), addon_second_trash: checked("trash2"), source: "onboarding", user_agent: navigator.userAgent
         };
 
         Promise.all([
@@ -254,7 +256,7 @@
             profile_id: uid, line1: val("address"), zip: val("zip"),
             can_return_location: val("can_return"), pickup_day: val("pickup_day"),
             cans_split: !!((form.querySelector("[data-cans-split]") || {}).checked),
-            can_loc_trash: val("can_loc_trash") || null, can_loc_recycling: val("can_loc_recycling") || null, can_loc_yard: val("can_loc_yard") || null,
+            can_loc_trash: val("can_loc_trash") || null, can_loc_trash2: val("can_loc_trash2") || null, can_loc_recycling: val("can_loc_recycling") || null, can_loc_yard: val("can_loc_yard") || null,
             gate_code: val("gate_code"), garage_code: val("garage_code"), access_notes: val("access_notes"),
             collection_week: (checked("recycling") && recycleWeekLetter()) || SCHED.collection_week,
             schedule_source: SCHED.schedule_source || "self_reported",
@@ -264,7 +266,7 @@
         ]).then(function () {
           setMsg("Account created. Opening secure checkout...", "success");
           sb.functions.invoke("create-checkout-session", {
-            body: { addons: { recycling: checked("recycling"), yard: checked("yard"), cleaning: checked("cleaning") }, promo: PROMO }
+            body: { addons: { trash2: checked("trash2"), recycling: checked("recycling"), yard: checked("yard"), cleaning: checked("cleaning") }, promo: PROMO }
           }).then(function (res) {
             if (res.error || !res.data || !res.data.url) {
               nextBtn.disabled = false;

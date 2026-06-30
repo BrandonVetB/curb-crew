@@ -121,6 +121,7 @@
         bind("city", addr ? [addr.city, addr.state, addr.zip].filter(Boolean).join(", ") : "Not set");
         if (addr && addr.cans_split) {
           var parts = ["Trash: " + (addr.can_loc_trash || "—")];
+          if (sub && sub.addon_second_trash) parts.push("Trash 2: " + (addr.can_loc_trash2 || "—"));
           if (sub && sub.addon_recycling) parts.push("Recycling: " + (addr.can_loc_recycling || "—"));
           if (sub && sub.addon_yard_waste) parts.push("Yard: " + (addr.can_loc_yard || "—"));
           bind("can_return", parts.join(" · "));
@@ -165,6 +166,7 @@
       return;
     }
     var addons = [];
+    if (sub.addon_second_trash) addons.push("2nd trash");
     if (sub.addon_recycling) addons.push("Recycling");
     if (sub.addon_yard_waste) addons.push("Yard-waste");
     if (sub.addon_cleaning) addons.push("Cleaning");
@@ -177,6 +179,7 @@
     var alist = $("[data-addons-list]");
     if (alist) {
       var items = [];
+      if (sub.addon_second_trash) items.push(["Second trash can", 800]);
       if (sub.addon_recycling) items.push(["Recycling can", 800]);
       if (sub.addon_yard_waste) items.push(["Yard-waste can", 800]);
       if (sub.addon_cleaning) items.push(["Monthly can cleaning", 2500]);
@@ -344,6 +347,7 @@
     var s = CURRENT.sub || {};
     if (!s.status || s.status === "pending") return "Curb Crews";
     var addons = [];
+    if (s.addon_second_trash) addons.push("2nd trash");
     if (s.addon_recycling) addons.push("Recycling");
     if (s.addon_yard_waste) addons.push("Yard-waste");
     if (s.addon_cleaning) addons.push("Cleaning");
@@ -395,20 +399,20 @@
   }
 
   /* ---- Manage add-ons ---- */
-  var ADDON_CENTS = { recycling: 800, yard: 800, cleaning: 2500 };
+  var ADDON_CENTS = { trash2: 800, recycling: 800, yard: 800, cleaning: 2500 };
   function refreshAddonTotal() {
     var total = 3500;
     $all("[data-addon]").forEach(function (cb) { if (cb.checked) total += ADDON_CENTS[cb.getAttribute("data-addon")] || 0; });
     var t = $("[data-addon-total]"); if (t) t.textContent = money(total);
     var s = CURRENT.sub || {};
-    var cur = { recycling: !!s.addon_recycling, yard: !!s.addon_yard_waste, cleaning: !!s.addon_cleaning };
+    var cur = { trash2: !!s.addon_second_trash, recycling: !!s.addon_recycling, yard: !!s.addon_yard_waste, cleaning: !!s.addon_cleaning };
     var changed = false;
     $all("[data-addon]").forEach(function (cb) { if (cb.checked !== cur[cb.getAttribute("data-addon")]) changed = true; });
     var sv = $("[data-addon-save]"); if (sv) sv.disabled = !changed;
   }
   function setAddonControls(sub) {
     var s = sub || {};
-    var map = { recycling: !!s.addon_recycling, yard: !!s.addon_yard_waste, cleaning: !!s.addon_cleaning };
+    var map = { trash2: !!s.addon_second_trash, recycling: !!s.addon_recycling, yard: !!s.addon_yard_waste, cleaning: !!s.addon_cleaning };
     $all("[data-addon]").forEach(function (cb) { cb.checked = !!map[cb.getAttribute("data-addon")]; });
     refreshAddonTotal();
   }
@@ -441,6 +445,7 @@
       + '<label class="acct-field" style="grid-column:1 / -1;flex-direction:row;align-items:center;gap:8px"><input type="checkbox" data-ef-split style="width:auto"' + (a.cans_split ? " checked" : "") + ' /> <span>My cans are kept in different spots</span></label>'
       + '<div data-ef-split-fields style="grid-column:1 / -1;display:' + (a.cans_split ? "grid" : "none") + ';gap:14px">'
       + f("Trash can location", "can_loc_trash", a.can_loc_trash, "")
+      + (s.addon_second_trash ? f("Second trash can location", "can_loc_trash2", a.can_loc_trash2, "") : "")
       + (s.addon_recycling ? f("Recycling can location", "can_loc_recycling", a.can_loc_recycling, "") : "")
       + (s.addon_yard_waste ? f("Yard-waste can location", "can_loc_yard", a.can_loc_yard, "") : "")
       + '</div>'
@@ -467,7 +472,7 @@
     sb.auth.getUser().then(function (u) {
       var uid = u.data.user && u.data.user.id; if (!uid) { showToast("Please sign in again."); return; }
       var splitEl = root.querySelector("[data-ef-split]");
-    var addrFields = { line1: g("line1"), zip: g("zip"), pickup_day: newDay, can_return_location: g("can_return_location"), cans_split: !!(splitEl && splitEl.checked), can_loc_trash: g("can_loc_trash") || null, can_loc_recycling: g("can_loc_recycling") || null, can_loc_yard: g("can_loc_yard") || null, gate_code: g("gate_code"), garage_code: g("garage_code"), access_notes: g("access_notes") };
+    var addrFields = { line1: g("line1"), zip: g("zip"), pickup_day: newDay, can_return_location: g("can_return_location"), cans_split: !!(splitEl && splitEl.checked), can_loc_trash: g("can_loc_trash") || null, can_loc_trash2: g("can_loc_trash2") || null, can_loc_recycling: g("can_loc_recycling") || null, can_loc_yard: g("can_loc_yard") || null, gate_code: g("gate_code"), garage_code: g("garage_code"), access_notes: g("access_notes") };
       var recSel = root.querySelector('[data-ef="recycle_week"]');
       if (recSel) { var cw = curWeekLetter(); addrFields.collection_week = recSel.value === "this" ? cw : (cw === "A" ? "B" : "A"); }
       var aP = (CURRENT.addr && CURRENT.addr.id)
