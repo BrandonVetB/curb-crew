@@ -321,15 +321,9 @@
   var toast = $("[data-toast]"), toastTimer = null;
   function showToast(t) { toast.textContent = t; toast.classList.add("is-show"); clearTimeout(toastTimer); toastTimer = setTimeout(function () { toast.classList.remove("is-show"); }, 3200); }
 
-  function updateSub(status, done) {
-    sb.auth.getUser().then(function (u) {
-      var uid = u.data.user && u.data.user.id; if (!uid) return;
-      sb.from("subscriptions").update({ status: status, updated_at: new Date().toISOString() }).eq("profile_id", uid).select().then(function (r) {
-        if (r.error || !r.data || !r.data.length) { showToast("No active plan to update yet."); return; }
-        loadData(); if (done) done();
-      });
-    });
-  }
+  // NOTE: subscription writes must go through the manage-subscription edge function
+  // (service role), never directly from the client. RLS now allows customers to
+  // SELECT their subscription only. callManage() below is the single write path.
 
   function callFn(name, body) { return sb.functions.invoke(name, { body: body || {} }); }
   function callManage(action, extra, okMsg) {
