@@ -135,6 +135,9 @@
         sb.rpc("get_my_crew_first_name").then(function (cr) {
           if (cr && cr.data) { bind("crew", cr.data); bind("ontime", "Your crew on the street"); }
         });
+        sb.rpc("get_my_referral_code").then(function (rc) {
+          if (rc && rc.data) { var link = "https://curbcrews.com/join.html?ref=" + rc.data; CURRENT.refer_link = link; var el = $('[data-bind="refer_link"]'); if (el) el.value = link; }
+        });
 
         // plan
         renderPlan(sub);
@@ -630,7 +633,18 @@
     },
     "account-cancel": function () { acctToggle(false); },
     "account-save": function () { acctSave(); },
-    support: function () { if (window.openSupport) { window.openSupport(); } }
+    support: function () { if (window.openSupport) { window.openSupport(); } },
+    "copy-refer": function () {
+      var el = $('[data-bind="refer_link"]');
+      var link = CURRENT.refer_link || (el && el.value) || "";
+      if (!link || link.indexOf("http") !== 0) { showToast("Your link is still loading, try again in a second."); return; }
+      function done() { showToast("Referral link copied. Send it to a friend!"); }
+      function fallback() { if (el) { el.focus(); el.select(); try { document.execCommand("copy"); done(); } catch (e) { showToast("Copy your link: " + link); } } }
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(link).then(done, fallback); }
+        else fallback();
+      } catch (e) { fallback(); }
+    }
   };
   document.addEventListener("click", function (e) {
     var a = e.target.closest("[data-action]"); if (!a) return;
