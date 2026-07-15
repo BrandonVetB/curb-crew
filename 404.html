@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Page not found | Curb Crews</title>
+  <meta name="robots" content="noindex" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="curb-crew-favicon.png?v=3" />
+  <style>
+    :root { --ink: #0b0b0f; --blue: #0066ff; --muted: #5a5a66; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; display: grid; place-items: center;
+      background: #f7f8fa; color: var(--ink);
+      font-family: Inter, system-ui, sans-serif; padding: 24px; text-align: center;
+    }
+    .wrap { max-width: 440px; }
+    .logo { height: 34px; margin-bottom: 28px; }
+    h1 { font-family: "Space Grotesk", sans-serif; font-size: 2rem; margin: 0 0 10px; }
+    p { color: var(--muted); font-size: 1.05rem; line-height: 1.55; margin: 0 0 26px; }
+    .btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      font-family: "Space Grotesk", sans-serif; font-weight: 600; font-size: 15px;
+      border-radius: 999px; padding: 13px 22px; text-decoration: none; display: inline-block;
+    }
+    .btn--primary { background: var(--blue); color: #fff; }
+    .btn--ghost { background: #fff; color: var(--ink); border: 1px solid #d7d7df; }
+    .code { margin-top: 30px; font-size: 13px; color: #9aa0ac; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <img class="logo" src="curb-crew-logo.png" alt="Curb Crews" onerror="this.remove()" />
+    <h1>This page took the day off.</h1>
+    <p>We could not find the page you were looking for. The link may be old or mistyped. Let us get you back on track.</p>
+    <div class="btns">
+      <a class="btn btn--primary" href="/">Back to home</a>
+      <a class="btn btn--ghost" href="/join.html">Check my street &amp; start</a>
+    </div>
+    <p class="code">Error 404</p>
+  </div>
+</body>
+</html>

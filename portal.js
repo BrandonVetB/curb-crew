@@ -76,10 +76,56 @@
 
   function enterApp() { authView.hidden = true; appView.hidden = false; window.scrollTo(0, 0); loadData(); }
 
+  // ---- password reset (forgot password + set new password) ----
+  var forgotLink = $("[data-forgot]");
+  var resetReq = $("[data-reset-request]");
+  var resetNew = $("[data-reset-new]");
+  // Supabase puts "#access_token=...&type=recovery" in the URL when the user
+  // clicks the reset email link. Detect it so we show "set new password"
+  // instead of dropping them straight into the app.
+  var isRecovery = (location.hash || "").indexOf("type=recovery") > -1;
+
+  function authScreen(which) {
+    if (form) form.hidden = which !== "signin";
+    if (forgotLink) forgotLink.hidden = which !== "signin";
+    if (resetReq) resetReq.hidden = which !== "request";
+    if (resetNew) resetNew.hidden = which !== "new";
+  }
+  if (forgotLink) forgotLink.addEventListener("click", function (e) { e.preventDefault(); authScreen("request"); });
+  var resetBack = $("[data-reset-back]");
+  if (resetBack) resetBack.addEventListener("click", function (e) { e.preventDefault(); authScreen("signin"); });
+
+  var resetSend = $("[data-reset-send]");
+  if (resetSend) resetSend.addEventListener("click", function () {
+    var emEl = $("[data-reset-email]"); var em = (emEl && emEl.value || "").trim();
+    var rm = $("[data-reset-msg]");
+    if (em.indexOf("@") === -1) { if (rm) { rm.className = "auth__msg is-error"; rm.textContent = "Enter a valid email."; } return; }
+    resetSend.disabled = true; if (rm) { rm.className = "auth__msg"; rm.textContent = "Sending..."; }
+    // Always show the same success message (do not reveal whether the email exists).
+    function done() { resetSend.disabled = false; if (rm) { rm.className = "auth__msg is-success"; rm.textContent = "If that email has an account, a reset link is on its way. Check your inbox."; } }
+    sb.auth.resetPasswordForEmail(em, { redirectTo: location.origin + "/portal.html" }).then(done, done);
+  });
+
+  var newpassSave = $("[data-newpass-save]");
+  if (newpassSave) newpassSave.addEventListener("click", function () {
+    var pEl = $("[data-newpass]"); var pw = (pEl && pEl.value) || "";
+    var nm = $("[data-newpass-msg]");
+    if (pw.length < 8) { if (nm) { nm.className = "auth__msg is-error"; nm.textContent = "Password must be at least 8 characters."; } return; }
+    newpassSave.disabled = true; if (nm) { nm.className = "auth__msg"; nm.textContent = "Updating..."; }
+    sb.auth.updateUser({ password: pw }).then(function (r) {
+      newpassSave.disabled = false;
+      if (r.error) { if (nm) { nm.className = "auth__msg is-error"; nm.textContent = r.error.message; } return; }
+      if (nm) { nm.className = "auth__msg is-success"; nm.textContent = "Password updated. Taking you in..."; }
+      try { history.replaceState(null, "", location.pathname); } catch (e) {}
+      setTimeout(enterApp, 700);
+    });
+  });
+
   // session on load
   sb.auth.getSession().then(function (r) {
+    if (isRecovery) { authView.hidden = false; appView.hidden = true; authScreen("new"); return; }
     if (r.data.session) { authView.hidden = true; appView.hidden = false; loadData(); }
-    else { authView.hidden = false; appView.hidden = true; }
+    else { authView.hidden = false; appView.hidden = true; authScreen("signin"); }
   });
 
   /* ================= LOAD DATA ================= */
@@ -185,7 +231,7 @@
       if (sub.addon_second_trash) items.push(["Second trash can", 800]);
       if (sub.addon_recycling) items.push(["Recycling can", 800]);
       if (sub.addon_yard_waste) items.push(["Yard-waste can", 800]);
-      if (sub.addon_cleaning) items.push(["Monthly can cleaning", 2500]);
+      if (sub.addon_cleaning) items.push(["Monthly can cleaning", 4500]);
       alist.innerHTML = items.map(function (it) { return '<div class="line"><span>' + it[0] + '</span><strong>' + money(it[1]) + "</strong></div>"; }).join("");
     }
     bind("next_charge", sub.current_period_end ? "Next charge: " + fmtDate(sub.current_period_end) : "Billing starts when Stripe is connected");
@@ -396,7 +442,7 @@
   }
 
   /* ---- Manage add-ons ---- */
-  var ADDON_CENTS = { trash2: 800, recycling: 800, yard: 800, cleaning: 2500 };
+  var ADDON_CENTS = { trash2: 800, recycling: 800, yard: 800, cleaning: 4500 };
   function refreshAddonTotal() {
     var total = 3500;
     $all("[data-addon]").forEach(function (cb) { if (cb.checked) total += ADDON_CENTS[cb.getAttribute("data-addon")] || 0; });
@@ -417,7 +463,7 @@
 
   /* ---- Manage cans modal (add/remove cans + locations together) ---- */
   function escAttr(v) { return v == null ? "" : String(v).replace(/"/g, "&quot;"); }
-  function cansTotal() { var total = 3500; if (CURRENT.sub && CURRENT.sub.addon_cleaning) total += 2500; $all("[data-can]").forEach(function (cb) { if (cb.checked) total += 800; }); return total; }
+  function cansTotal() { var total = 3500; if (CURRENT.sub && CURRENT.sub.addon_cleaning) total += 4500; $all("[data-can]").forEach(function (cb) { if (cb.checked) total += 800; }); return total; }
   function refreshCansTotal() { var t = $("[data-cans-total]"); if (t) t.textContent = money(cansTotal()); }
   function openCansModal() {
     var s = CURRENT.sub || {}, a = CURRENT.addr || {};

@@ -137,19 +137,19 @@
      Clone the set until the track is wider than viewport + one set,
      then wrap x by exactly one set width so it never breaks.
      ============================================================ */
-  var track = $("[data-marquee]");
+  var marqueeEl = $("[data-marquee]");
   function buildMarquee() {
-    var set = $(".marquee__set", track);
+    var set = $(".marquee__set", marqueeEl);
     if (!set) return;
     var setWidth = set.getBoundingClientRect().width;
     if (!setWidth) { setTimeout(buildMarquee, 300); return; }
     var needed = window.innerWidth + setWidth;
     var guard = 0;
-    while (track.getBoundingClientRect().width < needed && guard < 40) {
-      track.appendChild(set.cloneNode(true));
+    while (marqueeEl.getBoundingClientRect().width < needed && guard < 40) {
+      marqueeEl.appendChild(set.cloneNode(true));
       guard++;
     }
-    gsap.to(track, {
+    gsap.to(marqueeEl, {
       x: "-=" + setWidth,
       duration: setWidth / 70,
       ease: "none",
@@ -157,7 +157,7 @@
       modifiers: { x: gsap.utils.unitize(gsap.utils.wrap(-setWidth, 0)) }
     });
   }
-  if (track && hasGSAP) {
+  if (marqueeEl && hasGSAP) {
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(buildMarquee);
     } else {
@@ -237,9 +237,24 @@
   var SESSION_ID = (function () { try { var k = "cc_sess", s = sessionStorage.getItem(k); if (!s) { s = Math.random().toString(36).slice(2) + Date.now().toString(36); sessionStorage.setItem(k, s); } return s; } catch (e) { return null; } })();
   function track(event, props) { try { saveLead({ event: event, session_id: SESSION_ID, page: "homepage", props: props || null, user_agent: navigator.userAgent }, "analytics_events"); } catch (e) {} }
   function checkServedZip(zip) {
+    // Guard against a request that never settles: abort after 8s so the UI
+    // can never get stuck on "Checking your area...". Returns a status string
+    // so the caller can tell "not served" apart from "check failed".
+    var ctrl = (typeof AbortController !== "undefined") ? new AbortController() : null;
+    var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 8000);
     return fetch(SUPABASE_URL + "/rest/v1/served_zips?select=zip&active=eq.true&zip=eq." + encodeURIComponent(zip), {
-      headers: { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY }
-    }).then(function (r) { return r.json(); }).then(function (rows) { return !!(rows && rows.length); }).catch(function () { return false; });
+      headers: { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY },
+      signal: ctrl ? ctrl.signal : undefined
+    }).then(function (r) {
+      clearTimeout(timer);
+      if (!r.ok) throw new Error("http " + r.status);
+      return r.json();
+    }).then(function (rows) {
+      return (rows && rows.length) ? "served" : "not_served";
+    }).catch(function () {
+      clearTimeout(timer);
+      return "error";
+    });
   }
   function leadFail(msg, form, text) {
     msg.textContent = text; msg.className = "address-form__msg is-error";
@@ -286,10 +301,10 @@
       if (!zip) { leadFail(msg, form, "Enter a 5-digit ZIP."); return; }
       var btn = $("button", form); if (btn) btn.disabled = true;
       msg.textContent = "Checking your area..."; msg.className = "address-form__msg";
-      checkServedZip(zip).then(function (served) {
+      checkServedZip(zip).then(function (status) {
         if (btn) btn.disabled = false;
         var lead = { name: name, email: email, zip: zip, address: address || null, source: "coverage_check" };
-        if (served) {
+        if (status === "served") {
           saveLead(lead, "leads");
           track("coverage_check_served", { zip: zip });
           msg.textContent = "Great news, we serve " + zip + "! Taking you to sign up...";
@@ -297,11 +312,15 @@
           if (typeof fireConfetti === "function") fireConfetti();
           var q = "?zip=" + encodeURIComponent(zip) + "&name=" + encodeURIComponent(name) + "&email=" + encodeURIComponent(email) + (address ? "&address=" + encodeURIComponent(address) : "");
           setTimeout(function () { window.location.href = "join.html" + q; }, 900);
-        } else {
+        } else if (status === "not_served") {
           saveLead(lead, "waitlist");
           track("coverage_check_blocked", { zip: zip });
-          msg.innerHTML = "We are not in " + zip + " yet, but you are on the list. We will reach out the moment we expand to your street. <a href=\"#\" onclick=\"return window.openSupport ? (window.openSupport(), false) : false\" style=\"text-decoration:underline\">Contact us</a> with any questions.";
+          msg.innerHTML = "We do not serve " + zip + " just yet, but we are expanding fast and we will be there soon. You are on the list, and we will email you the moment we reach your street. <a href=\"#\" onclick=\"return window.openSupport ? (window.openSupport(), false) : false\" style=\"text-decoration:underline\">Contact us</a> with any questions.";
           msg.className = "address-form__msg is-success";
+        } else {
+          // Request failed or timed out: never leave the button spinning.
+          track("coverage_check_error", { zip: zip });
+          leadFail(msg, form, "We couldn't check your area just now. Please try again in a moment.");
         }
       });
     });

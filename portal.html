@@ -57,6 +57,22 @@
         <p class="auth__msg" data-auth-msg role="status" aria-live="polite"></p>
       </form>
       <a href="#" data-toggle-mode hidden aria-hidden="true"></a>
+      <a href="#" data-forgot style="display:inline-block;margin-top:16px;color:#0066ff;font-size:14px;text-decoration:underline;cursor:pointer">Forgot your password?</a>
+
+      <div data-reset-request hidden style="margin-top:8px;text-align:left">
+        <p class="auth__sub">Enter your email and we will send you a link to reset your password.</p>
+        <label class="field"><span>Email</span><input type="email" data-reset-email autocomplete="email" placeholder="you@email.com" /></label>
+        <button type="button" class="btn btn--block" data-reset-send>Send reset link</button>
+        <p class="auth__msg" data-reset-msg role="status" aria-live="polite"></p>
+        <a href="#" data-reset-back style="display:inline-block;margin-top:12px;color:#0066ff;font-size:14px;text-decoration:underline;cursor:pointer">Back to sign in</a>
+      </div>
+
+      <div data-reset-new hidden style="margin-top:8px;text-align:left">
+        <p class="auth__sub">Choose a new password for your account.</p>
+        <label class="field"><span>New password</span><input type="password" data-newpass autocomplete="new-password" placeholder="At least 8 characters" /></label>
+        <button type="button" class="btn btn--block" data-newpass-save>Update password</button>
+        <p class="auth__msg" data-newpass-msg role="status" aria-live="polite"></p>
+      </div>
     </div>
 
     <div class="auth__newcard">
@@ -236,7 +252,7 @@
           <label class="addon"><input type="checkbox" data-addon="trash2" /><span class="addon__name">Second trash can</span><strong class="addon__price">+$8/mo</strong></label>
           <label class="addon"><input type="checkbox" data-addon="recycling" /><span class="addon__name">Recycling can</span><strong class="addon__price">+$8/mo</strong></label>
           <label class="addon"><input type="checkbox" data-addon="yard" /><span class="addon__name">Yard-waste can</span><strong class="addon__price">+$8/mo</strong></label>
-          <label class="addon"><input type="checkbox" data-addon="cleaning" /><span class="addon__name">Monthly can cleaning</span><strong class="addon__price">+$25/mo</strong></label>
+          <label class="addon"><input type="checkbox" data-addon="cleaning" /><span class="addon__name">Monthly can cleaning</span><strong class="addon__price">+$45/mo</strong></label>
           <div class="line line--total"><span>New monthly total</span><strong data-addon-total>$35.00</strong></div>
           <div class="actions"><button class="btn" data-action="save-addons" data-addon-save disabled>Save changes</button></div>
         </article>

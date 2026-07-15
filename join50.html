@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Curb Crews | 50% off your first 2 months</title>
+  <meta name="description" content="Never touch your trash cans again. 50% off your first 2 months. Check your street and start in about two minutes." />
+  <meta name="robots" content="noindex" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="curb-crew-favicon.png?v=3" />
+  <style>
+    :root { --ink:#0b0b0f; --blue:#0066ff; --muted:#5a5a66; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; background:#f7f8fa; color:var(--ink);
+      font-family:Inter,system-ui,sans-serif; display:grid; place-items:center; padding:28px 22px; }
+    .card { width:100%; max-width:440px; text-align:center; }
+    .logo { height:32px; margin-bottom:26px; }
+    .offer { display:inline-block; background:rgba(0,102,255,.1); color:var(--blue);
+      font-weight:700; font-size:13px; letter-spacing:.02em; padding:8px 14px; border-radius:999px; margin-bottom:18px; }
+    h1 { font-family:"Space Grotesk",sans-serif; font-size:2.1rem; line-height:1.1; margin:0 0 12px; }
+    h1 .accent { color:var(--blue); }
+    .sub { color:var(--muted); font-size:1.05rem; line-height:1.5; margin:0 0 22px; }
+    .price { margin:0 0 22px; }
+    .price .now { font-family:"Space Grotesk",sans-serif; font-size:2.4rem; font-weight:700; }
+    .price .was { color:var(--muted); text-decoration:line-through; margin-left:8px; font-size:1.1rem; }
+    .price .note { display:block; color:var(--muted); font-size:.9rem; margin-top:4px; }
+    ul { list-style:none; padding:0; margin:0 0 26px; text-align:left; display:inline-block; }
+    li { position:relative; padding-left:26px; margin:9px 0; font-size:1rem; }
+    li::before { content:""; position:absolute; left:0; top:6px; width:14px; height:8px;
+      border-left:2.5px solid var(--blue); border-bottom:2.5px solid var(--blue); transform:rotate(-45deg); }
+    .cta { display:block; background:var(--blue); color:#fff; font-family:"Space Grotesk",sans-serif;
+      font-weight:600; font-size:17px; text-decoration:none; padding:17px 20px; border-radius:999px; }
+    .micro { color:var(--muted); font-size:.85rem; margin-top:12px; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <img class="logo" src="curb-crew-logo.png" alt="Curb Crews" onerror="this.remove()" />
+    <span class="offer">&#127881; 50% OFF your first 2 months</span>
+    <h1>Never touch your <span class="accent">trash cans</span> again.</h1>
+    <p class="sub">We take your cans to the curb the night before and bring them back after pickup. You forget trash day exists.</p>
+    <div class="price">
+      <span class="now">$17.50<span style="font-size:1rem;font-weight:500">/mo</span></span>
+      <span class="was">$35/mo</span>
+      <span class="note">for your first 2 months, then $35. Cancel anytime.</span>
+    </div>
+    <ul>
+      <li>Cans out and back every week, without you</li>
+      <li>Local crew, no contract, cancel anytime</li>
+      <li>Check your street and start in about 2 minutes</li>
+    </ul>
+    <a class="cta" href="join.html?promo=flyer50&src=qr">Check my street &amp; start &rarr;</a>
+    <p class="micro">Your 50% off is applied automatically at checkout.</p>
+  </main>
+  <script>
+    // lightweight landing-view analytics (best effort)
+    (function () {
+      try {
+        var U="https://hezahtnfyhqfucixzqxi.supabase.co/rest/v1/analytics_events";
+        var K="sb_publishable_9l4_Bqgjg7qBapvYlLPJSA_pHOk0nMB";
+        var sid=sessionStorage.getItem("cc_sess")||(Math.random().toString(36).slice(2)+Date.now().toString(36));
+        sessionStorage.setItem("cc_sess",sid);
+        fetch(U,{method:"POST",headers:{apikey:K,Authorization:"Bearer "+K,"Content-Type":"application/json","Prefer":"return=minimal"},body:JSON.stringify({event:"qr_landing_view",session_id:sid,page:"join50",user_agent:navigator.userAgent})}).catch(function(){});
+      } catch (e) {}
+    })();
+  </script>
+</body>
+</html>

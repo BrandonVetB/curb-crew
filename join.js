@@ -9,9 +9,8 @@
   var SUPABASE_KEY = "sb_publishable_9l4_Bqgjg7qBapvYlLPJSA_pHOk0nMB";
   var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  // Soft coverage list (placeholder until a real coverage table exists).
-  // Greater Austin + Georgetown / Williamson County (soft list; never blocks signup)
-  var SERVED_ZIPS = ["78701","78702","78703","78704","78705","78717","78719","78721","78722","78723","78724","78725","78726","78727","78728","78729","78730","78731","78732","78733","78734","78735","78736","78737","78738","78739","78741","78742","78744","78745","78746","78747","78748","78749","78750","78751","78752","78753","78754","78756","78757","78758","78759","78660","78664","78665","78681","78613","78626","78628","78633","78634"];
+  // Coverage is controlled by the served_zips table in Supabase (see checkServed below).
+  // Only ZIPs marked active there can complete signup; everyone else goes to the waitlist.
 
   function $(s, c) { return (c || document).querySelector(s); }
   function $all(s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); }
@@ -30,7 +29,7 @@
   var step = 1;
   var MAX = 4;
   var BASE = 3500;
-  var ADDON = { trash2: 800, recycling: 800, yard: 800, cleaning: 2500 };
+  var ADDON = { trash2: 800, recycling: 800, yard: 800, cleaning: 4500 };
   var PROMO = "";
   var REF = "";
 
@@ -155,7 +154,7 @@
     if (checked("trash2")) addons.push("2nd trash can +$8");
     if (checked("recycling")) addons.push("Recycling +$8");
     if (checked("yard")) addons.push("Yard-waste +$8");
-    if (checked("cleaning")) addons.push("Cleaning +$25");
+    if (checked("cleaning")) addons.push("Cleaning +$45");
     var rows = [
       ["Address", val("address")],
       ["Pickup day", val("pickup_day")],
