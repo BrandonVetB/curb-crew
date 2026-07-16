@@ -252,7 +252,7 @@
           addon_cleaning: checked("cleaning"), addon_second_trash: checked("trash2"), source: "onboarding", user_agent: navigator.userAgent
         };
 
-        Promise.all([
+        var writes = [
           sb.from("profiles").update({ full_name: name, phone: val("phone") }).eq("id", uid),
           sb.from("service_addresses").insert({
             profile_id: uid, line1: val("address"), zip: val("zip"),
@@ -265,7 +265,22 @@
             is_primary: true, is_prospect: false
           }),
           sb.from("leads").insert(leadRow)
-        ]).then(function () {
+        ];
+
+        // Worker referral: REF carries the referring crew member's profile id.
+        // Record it (fire-and-forget so it never blocks signup/checkout) so an
+        // admin can approve the worker's reward later. The client's
+        // 50%-off-first-month is applied by create-checkout-session via `ref`.
+        if (REF && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(REF)) {
+          try {
+            sb.from("worker_referrals").insert({
+              worker_id: REF, client_name: name, client_email: email, client_phone: val("phone"),
+              client_zip: val("zip"), monthly_cents: totalCents(), status: "pending"
+            }).then(function () {}, function () {});
+          } catch (e) {}
+        }
+
+        Promise.all(writes).then(function () {
           setMsg("Account created. Opening secure checkout...", "success");
           sb.functions.invoke("create-checkout-session", {
             body: { addons: { trash2: checked("trash2"), recycling: checked("recycling"), yard: checked("yard"), cleaning: checked("cleaning") }, promo: PROMO, ref: REF }
