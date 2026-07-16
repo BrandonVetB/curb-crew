@@ -200,7 +200,9 @@
       checkServed(val("zip")).then(function (served) {
         nextBtn.disabled = false; setMsg("");
         if (served) { track("signup_zip_served", { zip: val("zip") }); showStep(2); }
-        else { track("signup_zip_blocked", { zip: val("zip") }); recordWaitlist("coverage_block"); showWaitlist(); }
+        // NOTE: the supabase query builder is lazy. Without .then() the insert is
+        // never sent, which silently dropped every blocked-ZIP lead.
+        else { track("signup_zip_blocked", { zip: val("zip") }); recordWaitlist("coverage_block").then(function () {}, function () {}); showWaitlist(); }
       });
       return;
     }
