@@ -37,15 +37,45 @@
   function checked(name) { var el = form.querySelector('[name="' + name + '"]'); return !!(el && el.checked); }
   function money(c) { return "$" + (c / 100).toFixed(0); }
 
-  // Recycling runs every other week. Map the This/Next choice to an absolute
-  // alternating-week letter (A = even week since epoch, B = odd). This anchor
-  // never drifts. The OS scheduler rolls recycling on weeks whose parity matches.
+  // Recycling runs every other week. We ask for the customer's NEXT recycling
+  // date (not "this/next week", which is ambiguous once the week's pickup has
+  // already happened) and derive the alternating-week letter from that date.
+  // A = even week since epoch, B = odd. This anchor never drifts.
+  var DAY_IDX = { Sunday: 0, Monday: 1, Tuesday: 2, Wednesday: 3, Thursday: 4, Friday: 5, Saturday: 6 };
+
+  function letterForDate(d) { return (Math.floor(d.getTime() / (7 * 86400000)) % 2) === 0 ? "A" : "B"; }
+
+  // The next two occurrences of their trash day. If today is their day, the
+  // pickup has already happened, so start from next week.
+  function nextPickupDates() {
+    var day = val("pickup_day");
+    if (!(day in DAY_IDX)) return [];
+    var d = new Date(); d.setHours(12, 0, 0, 0);
+    var delta = (DAY_IDX[day] - d.getDay() + 7) % 7;
+    if (delta === 0) delta = 7;
+    var first = new Date(d.getTime() + delta * 86400000);
+    var second = new Date(first.getTime() + 7 * 86400000);
+    return [first, second];
+  }
+
+  function syncRecycleWeeks() {
+    var wrap = form.querySelector("[data-recycle-week-wrap]");
+    if (!wrap || wrap.hidden) return;
+    var dates = nextPickupDates();
+    if (dates.length !== 2) return;
+    ["a", "b"].forEach(function (k, i) {
+      var input = form.querySelector('[data-rw="' + k + '"]');
+      var label = form.querySelector('[data-rw-label="' + k + '"]');
+      var iso = dates[i].getFullYear() + "-" + String(dates[i].getMonth() + 1).padStart(2, "0") + "-" + String(dates[i].getDate()).padStart(2, "0");
+      if (input) input.value = iso;
+      if (label) label.textContent = dates[i].toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+    });
+  }
+
   function recycleWeekLetter() {
     var sel = form.querySelector('[name="recycle_week"]:checked');
-    if (!sel) return null;
-    var parity = Math.floor(Date.now() / (7 * 86400000)) % 2; // 0 even, 1 odd (this week)
-    var thisLetter = parity === 0 ? "A" : "B";
-    return sel.value === "this" ? thisLetter : (thisLetter === "A" ? "B" : "A");
+    if (!sel || !sel.value) return null;
+    return letterForDate(new Date(sel.value + "T12:00:00"));
   }
 
   function totalCents() {
@@ -110,7 +140,11 @@
       var rf = form.querySelector('[data-canfield="recycling"]'); if (rf) rf.hidden = !checked("recycling");
       var yf = form.querySelector('[data-canfield="yard"]'); if (yf) yf.hidden = !checked("yard");
       var rw = form.querySelector("[data-recycle-week-wrap]"); if (rw) rw.hidden = !checked("recycling");
+      syncRecycleWeeks();
     }
+    // Their trash day drives the recycling dates, so refresh when it changes.
+    var daySel = form.querySelector('[name="pickup_day"]');
+    if (daySel) daySel.addEventListener("change", syncRecycleWeeks);
     if (sp && spf) sp.addEventListener("change", function () { spf.style.display = sp.checked ? "block" : "none"; syncCanFields(); });
     $all("[data-addon]").forEach(function (a) { a.addEventListener("change", syncCanFields); });
     syncCanFields();
@@ -252,7 +286,7 @@
           addon_cleaning: checked("cleaning"), addon_second_trash: checked("trash2"), source: "onboarding", user_agent: navigator.userAgent
         };
 
-        var writes = [
+        Promise.all([
           sb.from("profiles").update({ full_name: name, phone: val("phone") }).eq("id", uid),
           sb.from("service_addresses").insert({
             profile_id: uid, line1: val("address"), zip: val("zip"),
@@ -265,22 +299,7 @@
             is_primary: true, is_prospect: false
           }),
           sb.from("leads").insert(leadRow)
-        ];
-
-        // Worker referral: REF carries the referring crew member's profile id.
-        // Record it (fire-and-forget so it never blocks signup/checkout) so an
-        // admin can approve the worker's reward later. The client's
-        // 50%-off-first-month is applied by create-checkout-session via `ref`.
-        if (REF && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(REF)) {
-          try {
-            sb.from("worker_referrals").insert({
-              worker_id: REF, client_name: name, client_email: email, client_phone: val("phone"),
-              client_zip: val("zip"), monthly_cents: totalCents(), status: "pending"
-            }).then(function () {}, function () {});
-          } catch (e) {}
-        }
-
-        Promise.all(writes).then(function () {
+        ]).then(function () {
           setMsg("Account created. Opening secure checkout...", "success");
           sb.functions.invoke("create-checkout-session", {
             body: { addons: { trash2: checked("trash2"), recycling: checked("recycling"), yard: checked("yard"), cleaning: checked("cleaning") }, promo: PROMO, ref: REF }
