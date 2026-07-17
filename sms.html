@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Text Alerts | Curb Crews</title>
+  <meta name="description" content="Opt in to Curb Crews text alerts: service reminders, confirmations, schedule changes, and account and billing notices. Consent is optional and never required to sign up. Reply STOP to opt out, HELP for help." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="canonical" href="https://curbcrews.com/sms.html" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="legal.css" />
+  <link rel="icon" type="image/png" href="curb-crew-favicon.png?v=3" />
+  <link rel="apple-touch-icon" href="curb-crew-favicon.png?v=3" />
+</head>
+<body class="legal-body">
+
+  <header class="legal-top">
+    <a href="index.html" class="wordmark wordmark--header" aria-label="Curb Crews home">
+      <img class="wordmark__img" src="curb-crew-logo.png" alt="Curb Crews"
+           onload="this.closest('.wordmark').classList.add('has-logo')" onerror="this.remove()" />
+      <span class="wordmark__fallback" aria-hidden="true">
+        <span class="wordmark__text">Curb&nbsp;Crews</span>
+      </span>
+    </a>
+    <a href="index.html" class="legal-top__back">Back to site</a>
+  </header>
+
+  <main class="legal-wrap">
+    <div class="legal-hero">
+      <h1>Curb Crews text alerts</h1>
+      <p class="legal-intro">Get helpful text messages about your Curb Crews service. Opting in is optional and is never required to sign up for or pay for service.</p>
+    </div>
+
+    <article class="legal-card">
+      <h2>Sign up for text alerts</h2>
+      <form id="sms-optin" novalidate style="max-width:520px">
+        <label style="display:block;font-weight:600;margin-bottom:6px">Mobile number</label>
+        <input type="tel" name="phone" autocomplete="tel" placeholder="(555) 123-4567"
+               style="width:100%;padding:12px 14px;border:1px solid #cfd6dd;border-radius:10px;font:inherit;box-sizing:border-box" />
+
+        <label style="display:flex;flex-direction:row;align-items:flex-start;gap:10px;margin-top:16px;cursor:pointer">
+          <input type="checkbox" id="sms-consent" name="sms_consent" style="width:auto;margin-top:4px;flex:none" />
+          <span style="font-weight:500;font-size:.95rem;line-height:1.5">I agree to receive account, service, and billing text messages from Curb Crews at the mobile number provided (such as service reminders, sign-up and service confirmations, schedule changes, and billing notices). Consent is not a condition of purchase. Message frequency varies. Msg &amp; data rates may apply. Reply STOP to opt out, HELP for help. See our <a href="terms.html">Terms of Service</a> and <a href="privacy.html">Privacy Policy</a>.</span>
+        </label>
+
+        <button type="submit"
+                style="margin-top:18px;padding:13px 22px;border:0;border-radius:10px;background:#1f6feb;color:#fff;font:inherit;font-weight:600;cursor:pointer">Sign up for text alerts</button>
+        <p id="sms-msg" style="margin-top:14px;font-weight:600" hidden></p>
+      </form>
+    </article>
+
+    <article class="legal-card">
+      <h2>About the text message program</h2>
+      <p>By opting in you consent to receive SMS text messages from Curb Crews related to your account and service.</p>
+      <p><strong>What you will receive:</strong> service reminders, sign-up and service confirmations, schedule changes, and account and billing notifications.</p>
+      <p><strong>Sample messages:</strong></p>
+      <ul>
+        <li>"Curb Crews: Hi Jane, reminder that your trash pickup is tomorrow 07/18. We'll have your bins at the curb the night before and returned by 6pm. Reply STOP to opt out, HELP for help."</li>
+        <li>"Curb Crews: Thanks for signing up! Your bin valet service starts 07/21 on your Monday collection day. Manage your account at https://curbcrews.com. Reply STOP to unsubscribe, HELP for help."</li>
+      </ul>
+      <p><strong>Message frequency varies.</strong> Message and data rates may apply.</p>
+      <p><strong>To opt out:</strong> reply STOP to any message at any time. <strong>For help:</strong> reply HELP, email <a href="mailto:hello@curbcrews.com">hello@curbcrews.com</a>, or visit <a href="https://curbcrews.com">curbcrews.com</a>.</p>
+      <p>Mobile opt-in information and consent are never shared with third parties or affiliates for marketing or promotional purposes.</p>
+    </article>
+
+    <p class="legal-foot">See our <a href="terms.html">Terms of Service</a> &middot; <a href="privacy.html">Privacy Policy</a> &middot; <a href="index.html">Back to Curb Crews</a></p>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    (function () {
+      var form = document.getElementById("sms-optin");
+      var msg = document.getElementById("sms-msg");
+      var sb = null;
+      try { sb = window.supabase.createClient("https://hezahtnfyhqfucixzqxi.supabase.co", "sb_publishable_9l4_Bqgjg7qBapvYlLPJSA_pHOk0nMB"); } catch (e) {}
+
+      var pe = form.querySelector('[name="phone"]');
+      pe.addEventListener("input", function () {
+        var d = (pe.value || "").replace(/\D/g, "").slice(0, 10);
+        if (d.length < 4) pe.value = d;
+        else if (d.length < 7) pe.value = "(" + d.slice(0, 3) + ") " + d.slice(3);
+        else pe.value = "(" + d.slice(0, 3) + ") " + d.slice(3, 6) + "-" + d.slice(6);
+      });
+
+      function show(t, ok) { msg.hidden = false; msg.textContent = t; msg.style.color = ok ? "#1a7f37" : "#b42318"; }
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var phone = (pe.value || "").trim();
+        var consent = form.querySelector('#sms-consent').checked;
+        if (phone.replace(/\D/g, "").length < 10) { show("Please enter a valid 10-digit mobile number.", false); return; }
+        if (!consent) { show("Please check the box to agree to receive text messages.", false); return; }
+        if (sb) {
+          try {
+            sb.from("analytics_events").insert({
+              event: "sms_optin",
+              page: "sms",
+              props: { phone: phone, consent: true, consent_text: "SMS opt-in via curbcrews.com/sms.html" },
+              user_agent: navigator.userAgent
+            }).then(function () {}, function () {});
+          } catch (e) {}
+        }
+        show("Thanks! You're signed up for Curb Crews text alerts. Reply STOP any time to opt out.", true);
+        pe.value = "";
+        form.querySelector('#sms-consent').checked = false;
+      });
+    })();
+  </script>
+</body>
+</html>
